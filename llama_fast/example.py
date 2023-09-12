@@ -27,7 +27,11 @@ import torch.distributed as dist
 NC = 4
 DATA_LIMIT = 22222
 CTX_GRP_LIMIT = 22222
+#DATA_LIMIT = 1000
+#CTX_GRP_LIMIT = 2
+SCHED_THR = 1024
 DEBUG_SCHEDULE = True
+DEBUG_ANSWER = False
 
 logger = logging.getLogger('llama_fast')
 sh = logging.StreamHandler()
@@ -117,11 +121,12 @@ def grade_output(logprobs, eis, pe):
   completion_len = np.array([float(len(i)) for i in pe["choices"]])
   acc_norm = 1.0 if np.argmax(ss / completion_len) == gold else 0.0
 
-  num_choices = 4
-  for j in range(num_choices):
-    encoded_input = eis[j]
-    print(f'ctx="{encoded_input[0]}" cont="{encoded_input[1]}" ctx_enc={encoded_input[2]} cont_enc={encoded_input[3]} logproblist={logproblist[j]}')
-  print(f'results: {ss}, normed_results: {ss / completion_len}, gold: {gold}')
+  if DEBUG_ANSWER:
+    num_choices = 4
+    for j in range(num_choices):
+      encoded_input = eis[j]
+      print(f'ctx="{encoded_input[0]}" cont="{encoded_input[1]}" ctx_enc={encoded_input[2]} cont_enc={encoded_input[3]} logproblist={logproblist[j]}')
+    print(f'results: {ss}, normed_results: {ss / completion_len}, gold: {gold}')
 
   return acc, acc_norm
 
@@ -145,8 +150,9 @@ def record_logprobs(ctx_logprobs, logprobs, eis, pes, cached_len, cont2ctx, quer
       logproblist[i].append(logprob)
     logprobsum_db[cont2ctx[i]][query_idx[i]] = s
   
-  #for i in range(N):
-  #  print(f'ctx="{pes[i]["query"]}" cont="{pes[i]["choices"][query_idx[i]]}" ctx_enc={eis[i][0]} cont_enc={eis[i][1]} logproblist={logproblist[i]}')
+  if DEBUG_ANSWER:
+    for i in range(N):
+      print(f'ctx="{pes[i]["query"]}" cont="{pes[i]["choices"][query_idx[i]]}" ctx_enc={eis[i][0]} cont_enc={eis[i][1]} logproblist={logproblist[i]}')
 
 def grade_from_db(pes, logprobsum_db):
   acc, acc_norm = 0, 0
@@ -157,8 +163,9 @@ def grade_from_db(pes, logprobsum_db):
     completion_len = np.array([float(len(i)) for i in pe["choices"]])
     acc_norm += 1.0 if np.argmax(ss / completion_len) == gold else 0.0
 
-    #print(f'ctx="{pe["query"]}"')
-    #print(f'results: {ss}, normed_results: {ss / completion_len}, gold: {gold}')
+  if DEBUG_ANSWER:
+    print(f'ctx="{pe["query"]}"')
+    print(f'results: {ss}, normed_results: {ss / completion_len}, gold: {gold}')
 
   return acc, acc_norm
 
@@ -335,9 +342,8 @@ def main(
 
   # schedule context blocks and cont blocks
   NC = 4
-  THR = 1024
   ctx_lengths = [len(whole_ei[i][0]) for i in range(0, len(whole_ei), NC)]
-  ctx_idx, ctx_blocks = schedule_min(ctx_lengths, THR)
+  ctx_idx, ctx_blocks = schedule_min(ctx_lengths, SCHED_THR)
 
   schedule_info = []
   s = 0
@@ -350,7 +356,7 @@ def main(
       cur_ctx_grp.append(ctx_idx[j] * NC)
       cur_grp.extend([ctx_idx[j] * NC + k for k in range(NC)])
     cont_lengths = [len(whole_ei[j][0]) + len(whole_ei[j][1]) - ctx_min_len for j in cur_grp]
-    cont_idx, cont_blocks = schedule_max(cont_lengths, THR)
+    cont_idx, cont_blocks = schedule_max(cont_lengths, SCHED_THR)
     # TODO
     schedule_info.append((cur_ctx_grp, cur_grp, cont_idx, cont_blocks))
 
@@ -389,17 +395,17 @@ def main(
     if local_rank == 0:
       h = pretb.forward(tokens)
       h, cache_k_list, cache_v_list = tb.forward(h, 0, phase = 0)
-      dist.isend(h, local_rank + 1)
+      dist.send(h, local_rank + 1)
     elif local_rank == 1:
       h = torch.empty((B, S, H), dtype=torch.float16, device='cuda')
       dist.recv(h, local_rank - 1)
       h, cache_k_list, cache_v_list = tb.forward(h, 0, phase = 0)
-      dist.isend(h, local_rank + 1)
+      dist.send(h, local_rank + 1)
     elif local_rank == 2:
       h = torch.empty((B, S, H), dtype=torch.float16, device='cuda')
       dist.recv(h, local_rank - 1)
       h, cache_k_list, cache_v_list = tb.forward(h, 0, phase = 0)
-      dist.isend(h, local_rank + 1)
+      dist.send(h, local_rank + 1)
     elif local_rank == 3:
       h = torch.empty((B, S, H), dtype=torch.float16, device='cuda')
       dist.recv(h, local_rank - 1)
@@ -445,6 +451,9 @@ def main(
       S = tokens.size(1)
       H = model_args.dim
 
+      if DEBUG_SCHEDULE:
+        logger.info(f'Rank {local_rank} cont group id={cont_block_idx} size={(B, S, H)} min_len={len(eis[0][0])}')
+
       torch.cuda.nvtx.range_pop()
 
       torch.cuda.nvtx.range_push('cont group forward')
@@ -461,7 +470,7 @@ def main(
         #h = torch.cat((h_new, h_new2), dim = 1)
         #logger.info(h.shape)
 
-        dist.isend(h, local_rank + 1)
+        dist.send(h, local_rank + 1)
       elif local_rank == 1:
         #if nccl_handle is not None:
         #  nccl_handle.wait()
@@ -479,13 +488,13 @@ def main(
         dist.recv(h, local_rank - 1)
         h = tb.forward(h, cached_len, phase = 1, cache_k_list = cache_k_list, cache_v_list = cache_v_list, cont2ctx = cont2ctx_gpu)
         #h, _, _ = tb.forward(h, cached_len, phase = 0)
-        dist.isend(h, local_rank + 1)
+        dist.send(h, local_rank + 1)
       elif local_rank == 2:
         h = torch.empty((B, S, H), dtype=torch.float16, device='cuda')
         dist.recv(h, local_rank - 1)
         h = tb.forward(h, cached_len, phase = 1, cache_k_list = cache_k_list, cache_v_list = cache_v_list, cont2ctx = cont2ctx_gpu)
         #h, _, _ = tb.forward(h, cached_len, phase = 0)
-        dist.isend(h, local_rank + 1)
+        dist.send(h, local_rank + 1)
       elif local_rank == 3:
         h = torch.empty((B, S, H), dtype=torch.float16, device='cuda')
         dist.recv(h, local_rank - 1)
@@ -502,13 +511,13 @@ def main(
 
         # process previous cpu job if exists MODIFY ALL COPIES
         if prev_ctx_args is not None:
-          pes, logprobsum_db = prev_ctx_args
-          acc, acc_norm = grade_from_db(*prev_ctx_args)
+          pes_tmp, logprobsum_db_tmp = prev_ctx_args
+          acc, acc_norm = grade_from_db(pes_tmp, logprobsum_db_tmp)
           prev_ctx_args = None
 
           sum_acc += acc
           sum_acc_norm += acc_norm
-          count += len(pes)
+          count += len(pes_tmp)
           print(f'acc: {acc}, acc_norm: {acc_norm}, avg_acc: {sum_acc / count}, avg_acc_norm: {sum_acc_norm / count}, count: {count}')
 
           elapsed = time.time() - start_time
@@ -541,28 +550,25 @@ def main(
   # process previous cpu job if exists MODIFY ALL COPIES
   if prev_cont_args is not None:
     d2h_stream.synchronize() # logits are ready
-    logprobs = torch.log_softmax(logits, dim=-1)
-    ctx_logprobs = torch.log_softmax(ctx_logits, dim=-1)
-    record_logprobs(ctx_logprobs, logprobs, *prev_cont_args)
+    record_logprobs(ctx_logprobs_cpu, logprobs_cpu, *prev_cont_args)
     prev_cont_args = None
 
   # process previous cpu job if exists MODIFY ALL COPIES
   if prev_ctx_args is not None:
-    pes, logprobsum_db = prev_ctx_args
-    acc, acc_norm = grade_from_db(*prev_ctx_args)
+    pes_tmp, logprobsum_db_tmp = prev_ctx_args
+    acc, acc_norm = grade_from_db(pes_tmp, logprobsum_db_tmp)
     prev_ctx_args = None
 
     sum_acc += acc
     sum_acc_norm += acc_norm
-    count += len(pes)
+    count += len(pes_tmp)
     print(f'acc: {acc}, acc_norm: {acc_norm}, avg_acc: {sum_acc / count}, avg_acc_norm: {sum_acc_norm / count}, count: {count}')
 
     elapsed = time.time() - start_time
     print(f'elapsed={elapsed}, throughput(example/s)={count / elapsed}')
 
-
 if __name__ == "__main__":
-  if False:
+  if True:
     from torch.profiler import profile, record_function, ProfilerActivity
     #with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA], record_shapes=True, profile_memory=True, with_flops=True) as prof:
     with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA]) as prof:

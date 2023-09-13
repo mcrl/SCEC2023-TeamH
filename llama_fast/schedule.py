@@ -1,0 +1,209 @@
+# Scheduling related functions for hellaswag
+
+import re
+from dataclasses import dataclass
+
+@dataclass
+class Batch:
+  data_idx: tuple[int] # [0, num_data * NUM_CHOICES)
+  phase: int # 0: ctx, 1: cont
+  cache_mapping: tuple[int]
+  cache_len: int
+  cache_dep: int
+
+  def __init__(self, data_idx, phase, cache_mapping = None, cache_len = 0, cache_dep = None):
+    self.data_idx = data_idx
+    self.phase = phase
+    self.cache_mapping = cache_mapping
+    self.cache_len = cache_len
+    self.cache_dep = cache_dep
+
+# Taken from lm-evaluation-harness
+def process_example(example):
+  def preprocess(text):
+    text = text.strip()
+    # NOTE: Brackets are artifacts of the WikiHow dataset portion of HellaSwag.
+    text = text.replace(" [title]", ". ")
+    text = re.sub("\\[.*?\\]", "", text)
+    text = text.replace("  ", " ")
+    return text
+  ctx = example['ctx_a'] + " " + example['ctx_b'].capitalize()
+  out_example = {
+    "query": preprocess(example["activity_label"] + ": " + ctx),
+    "choices": [preprocess(ending) for ending in example["endings"]],
+    "gold": int(example["label"]),
+  }
+  return out_example
+
+def encode_input(tokenizer, example):
+  def encode_pair(context, continuation):
+    n_spaces = len(context) - len(context.rstrip())
+    if n_spaces > 0:
+        continuation = context[-n_spaces:] + continuation
+        context = context[:-n_spaces]
+    bos = False
+    whole_enc = tokenizer.encode(context + continuation, bos=bos, eos=False)
+    context_enc = tokenizer.encode(context, bos=bos, eos=False)
+    context_enc_len = len(context_enc)
+    continuation_enc = whole_enc[context_enc_len:]
+    return context_enc, continuation_enc
+  reqs = [(example['query'], ' {}'.format(choice)) for choice in example['choices']]
+  new_reqs = []
+  for ctx, cont in reqs:
+    ctx_enc, cont_enc = encode_pair(ctx, cont)
+    new_reqs.append({
+      "ctx": ctx_enc,
+      "cont": cont_enc
+    })
+  return new_reqs
+
+# length is minimum of each block
+def schedule_min(lengths, thr):
+  N = len(lengths)
+  idx = [i for i in range(N)]
+  idx.sort(key=lambda x: lengths[x])
+  # init
+  D = []
+  E = []
+  total_area = 0
+  for i in range(N):
+    total_area += lengths[idx[i]]
+    rect_area = lengths[idx[0]] * (i + 1)
+    penalty = total_area - rect_area
+    if rect_area >= thr:
+      D.append(penalty)
+      E.append(-1)
+    else:
+      D.append(2 ** 30)
+      E.append(-1)
+  # DP
+  for i in range(N):
+    total_area = 0
+    for j in range(i - 1, -1, -1):
+      total_area += lengths[idx[j + 1]]
+      rect_area = lengths[idx[j + 1]] * (i - j)
+      penalty = total_area - rect_area
+      if rect_area >= thr and D[i] > D[j] + penalty:
+        D[i] = D[j] + penalty
+        E[i] = j
+  blocks = []
+  i = N - 1
+  while i >= 0:
+    blocks.append(i - E[i])
+    i = E[i]
+  blocks.reverse()
+
+  #logging
+  #print(f'total penalty: {D[N - 1]}')
+  #s = 0
+  #for i, block in enumerate(blocks):
+  #  s += block
+  #  cur_s = lengths[idx[s - block]]
+  #  print(f'block {i}: {block} x {cur_s} = {block * cur_s}')
+  #print(blocks)
+  #print(sum(blocks))
+
+  return idx, blocks
+
+# length is maximum of each block
+def schedule_max(lengths, thr):
+  N = len(lengths)
+  idx = [i for i in range(N)]
+  idx.sort(key=lambda x: lengths[x])
+  # init
+  D = []
+  E = []
+  total_area = 0
+  for i in range(N):
+    total_area += lengths[idx[i]]
+    rect_area = lengths[idx[i]] * (i + 1)
+    penalty = rect_area - total_area
+    if rect_area >= thr:
+      D.append(penalty)
+      E.append(-1)
+    else:
+      D.append(2 ** 30)
+      E.append(-1)
+  # DP
+  for i in range(N):
+    total_area = 0
+    for j in range(i - 1, -1, -1):
+      total_area += lengths[idx[j + 1]]
+      rect_area = lengths[idx[i]] * (i - j)
+      penalty = rect_area - total_area
+      if rect_area >= thr and D[i] > D[j] + penalty:
+        D[i] = D[j] + penalty
+        E[i] = j
+  blocks = []
+  i = N - 1
+  while i >= 0:
+    blocks.append(i - E[i])
+    i = E[i]
+  blocks.reverse()
+
+  #logging
+  #print(f'total penalty: {D[N - 1]}')
+  #s = 0
+  #for i, block in enumerate(blocks):
+  #  s += block
+  #  cur_s = lengths[idx[s - 1]]
+  #  print(f'block {i}: {block} x {cur_s} = {block * cur_s}')
+  #print(blocks)
+  #print(sum(blocks))
+
+  return idx, blocks
+
+def preprocess_and_schedule_dataset(dataset, tokenizer, num_data = None, min_bs_per_batch = 1024):
+  NUM_CHOICES = 4
+  # encode the whole dataset
+  whole_pe = []
+  whole_ei = []
+  for i, data in enumerate(dataset):
+    if i == num_data:
+      break
+    if i % 1000 == 0:
+      print(f'Processing {i}...')
+    pe = process_example(data)
+    whole_pe.append(pe)
+    whole_ei.extend(encode_input(tokenizer, pe))
+
+  # whole_pe is list of {'query': str, 'choices': [str], 'gold': int} with length num_data
+  # whole_ei is list of {'ctx': [int], 'cont': [int]} with length num_data * NUM_CHOICES
+
+  ctx_lengths = [len(whole_ei[i]['ctx']) for i in range(0, len(whole_ei), NUM_CHOICES)]
+  ctx_idx, ctx_blocks = schedule_min(ctx_lengths, min_bs_per_batch)
+
+  # ctx_idx points to whole_pe [0, num_data)
+
+  batches = []
+  schedule_info = []
+  s = 0
+  for i, ctx_block_size in enumerate(ctx_blocks):
+    s += ctx_block_size
+    ctx_block_start, ctx_block_end = s - ctx_block_size, s
+    ctx_min_len = len(whole_ei[ctx_idx[ctx_block_start] * NUM_CHOICES]['ctx'])
+
+    data_idx = tuple(ctx_idx[j] * NUM_CHOICES for j in range(ctx_block_start, ctx_block_end))
+    batches.append(Batch(data_idx, phase = 0))
+    cache_dep = len(batches) - 1
+
+    cur_ctx_grp = []
+    cur_grp = []
+    for j in range(ctx_block_start, ctx_block_end):
+      cur_ctx_grp.append(ctx_idx[j] * NUM_CHOICES)
+      cur_grp.extend([ctx_idx[j] * NUM_CHOICES + k for k in range(NUM_CHOICES)])
+    cont_lengths = tuple(len(whole_ei[j]['ctx']) + len(whole_ei[j]['cont']) - ctx_min_len - 1 for j in cur_grp)
+    cont_idx, cont_blocks = schedule_max(cont_lengths, min_bs_per_batch)
+
+    # cont_idx points to cur_grp; length is number of conts in current ctx group
+    # cur_grp points to whole_ei; length is num_data * NUM_CHOICES
+
+    cont_block_end = 0
+    for cont_block_size in cont_blocks:
+      cont_block_end += cont_block_size
+      cont_block_start = cont_block_end - cont_block_size
+      data_idx = tuple(cur_grp[cont_idx[j]] for j in range(cont_block_start, cont_block_end))
+      cache_mapping = tuple(cont_idx[j] // NUM_CHOICES for j in range(cont_block_start, cont_block_end))
+      batches.append(Batch(data_idx, phase = 1, cache_mapping=cache_mapping, cache_len=ctx_min_len, cache_dep=cache_dep))
+  
+  return whole_pe, whole_ei, batches

@@ -239,7 +239,7 @@ class TransformerBlocks(nn.Module):
     if phase == 1:
       for i, layer in enumerate(self.layers):
         h = layer(h, start_pos, freqs_cis, mask, phase, cache_k_list[i], cache_v_list[i], cont2ctx)
-      return h
+      return h, None, None
   
   def custom_load(self, full_dict):
     local_dict = {}

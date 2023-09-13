@@ -315,16 +315,28 @@ def main(
 
   B = 2
   S = 2
-  H = model_args.dim
-  h_input = torch.randn((B, S, H)).cuda().half()
+  #H = model_args.dim
+  H = 2
 
-  h_ref, _, _ = tb.forward(h_input, 0, phase=0)
+  if local_rank == 0:
+    h_input = torch.randn((B, S, H)).cuda().half()
+    print(f'local_rank={local_rank}, h_input={h_input}')
+    dist.isend(h_input, 1)
+    A = torch.randn((B, S, H)).cuda().half()
+    B = torch.randn((B, S, H)).cuda().half()
+    C = A * B
+  if local_rank == 1:
+    h_input = torch.empty((B, S, H)).cuda().half()
+    dist.recv(h_input, 0)
+    print(f'local_rank={local_rank}, h_input={h_input}')
 
-  cut = 1
-  h_part1, cache_k_list, cache_v_list = tb.forward(h_input[:, 0:cut, :], 0, phase = 0)
-  tmp = torch.Tensor([i for i in range(B)]).cuda().long()
-  h_part2 = tb.forward(h_input[:, cut:, :], cut, phase = 1, cache_k_list = cache_k_list, cache_v_list = cache_v_list, cont2ctx = tmp)
-  h_merged = torch.cat((h_part1, h_part2), dim = 1)
+  #h_ref, _, _ = tb.forward(h_input, 0, phase=0)
+
+  #cut = 1
+  #h_part1, cache_k_list, cache_v_list = tb.forward(h_input[:, 0:cut, :], 0, phase = 0)
+  #tmp = torch.Tensor([i for i in range(B)]).cuda().long()
+  #h_part2 = tb.forward(h_input[:, cut:, :], cut, phase = 1, cache_k_list = cache_k_list, cache_v_list = cache_v_list, cont2ctx = tmp)
+  #h_merged = torch.cat((h_part1, h_part2), dim = 1)
 
   print(h_ref)
   print(h_merged)

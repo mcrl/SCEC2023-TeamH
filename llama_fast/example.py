@@ -58,62 +58,13 @@ def make_input_cpu_tensor_from_docs(docs, phase, cached_len):
       tokens[i, :len(encs[i]) - cached_len] = torch.tensor(encs[i][cached_len:]).long()
   return tokens
 
-def encoded_input_to_tensor(eis):
-  full_encs = [ei[2] + ei[3] for ei in eis]
-  bsz = len(full_encs)
-  max_len = max([len(enc) for enc in full_encs])
-  tokens = torch.full((bsz, max_len), 0).cuda().long() # pad with 0, as it does not matter
-  for i in range(bsz):
-    tokens[i, :len(full_encs[i])] = torch.tensor(full_encs[i]).long()
-  return tokens
-
-def encoded_ctx_to_tensor(eis):
-  ctxs = [ei[0] for ei in eis]
-  bsz = len(ctxs)
-  min_len = min([len(ctx) for ctx in ctxs])
-  tokens = torch.full((bsz, min_len), 0).long() # pad with 0, as it does not matter
-  for i in range(bsz):
-    tokens[i, :min_len] = torch.tensor(ctxs[i][:min_len]).long()
-  return tokens
-
-def encoded_ctx_cont_to_tensor(eis, cached_len):
-  full_encs = [ei[0] + ei[1][:-1] for ei in eis] # do not use last token
-  bsz = len(full_encs)
-  max_len = max([len(enc) for enc in full_encs])
-  tokens = torch.full((bsz, max_len - cached_len), 0).long() # pad with 0, as it does not matter
-  for i in range(bsz):
-    tokens[i, :len(full_encs[i]) - cached_len] = torch.tensor(full_encs[i][cached_len:]).long()
-  return tokens
-
-def grade_output(logprobs, eis, pe):
-  bsz = len(eis)
-  ss = []
-  logproblist = [[] for _ in range(bsz)]
-  for i in range(bsz):
-    ctx = eis[i][2]
-    cont = eis[i][3]
-    s = 0
-    for j in range(len(cont)):
-      logprob = logprobs[i, len(ctx) + j - 1, cont[j]].item()
-      s += logprob
-      logproblist[i].append(logprob)
-    ss.append(s)
-
-  gold = pe["gold"]
-  acc = 1.0 if np.argmax(ss) == gold else 0.0
-  completion_len = np.array([float(len(i)) for i in pe["choices"]])
-  acc_norm = 1.0 if np.argmax(ss / completion_len) == gold else 0.0
-
-  if DEBUG_ANSWER:
-    num_choices = 4
-    for j in range(num_choices):
-      encoded_input = eis[j]
-      print(f'ctx="{encoded_input[0]}" cont="{encoded_input[1]}" ctx_enc={encoded_input[2]} cont_enc={encoded_input[3]} logproblist={logproblist[j]}')
-    print(f'results: {ss}, normed_results: {ss / completion_len}, gold: {gold}')
-
-  return acc, acc_norm
-
-def record_logprobs(ctx_logprobs, logprobs, eis, pes, cached_len, cont2ctx, query_idx, logprobsum_db):
+def record_logprobs(ctx_logprobs, logprobs, batch, docs, tokenized_docs, logprobsum_db):
+  pes = [docs[i // NUM_CHOICES] for i in batch.data_idx]
+  eis = [tokenized_docs[i] for i in batch.data_idx]
+  query_idx = [i % NUM_CHOICES for i in batch.data_idx]
+  cached_len = batch.cache_len
+  cont2ctx = batch.cache_mapping
+        
   N = len(eis)
 
   logproblist = [[] for _ in range(N)]
@@ -137,7 +88,9 @@ def record_logprobs(ctx_logprobs, logprobs, eis, pes, cached_len, cont2ctx, quer
     for i in range(N):
       print(f'ctx="{pes[i]["query"]}" cont="{pes[i]["choices"][query_idx[i]]}" ctx_enc={eis[i]["ctx"]} cont_enc={eis[i]["cont"]} logproblist={logproblist[i]}')
 
-def grade_from_db(pes, logprobsum_db):
+def grade_from_db(batch, docs, logprobsum_db):
+  pes = [docs[i // NUM_CHOICES] for i in batch.data_idx]
+
   acc, acc_norm = 0, 0
   for i, pe in enumerate(pes):
     ss = logprobsum_db[i]
@@ -151,6 +104,23 @@ def grade_from_db(pes, logprobsum_db):
     print(f'results: {ss}, normed_results: {ss / completion_len}, gold: {gold}')
 
   return acc, acc_norm
+
+def run_grade(grade_queue, grade_state, d2h_stream):
+  if len(grade_queue) > 0:
+    d2h_stream.synchronize()
+  while len(grade_queue) > 0:
+    ctx_logprobs_cpu, logprobs_cpu, batch, ctx_batch, logprobsum_db, docs, tokenized_docs = grade_queue.pop(0)
+    record_logprobs(ctx_logprobs_cpu, logprobs_cpu, batch, docs, tokenized_docs, logprobsum_db)
+
+    if ctx_batch is not None:
+      acc, acc_norm = grade_from_db(ctx_batch, docs, logprobsum_db)
+      grade_state["sum_acc"] += acc
+      grade_state["sum_acc_norm"] += acc_norm
+      grade_state["count"] += len(ctx_batch.data_idx)
+      print(f'acc: {acc}, acc_norm: {acc_norm}, avg_acc: {grade_state["sum_acc"] / grade_state["count"]}, avg_acc_norm: {grade_state["sum_acc_norm"] / grade_state["count"]}, count: {grade_state["count"]}')
+
+      elapsed = time.time() - grade_state["start_time"]
+      print(f'elapsed={elapsed}, throughput(example/s)={grade_state["count"] / elapsed}')
 
 def setup_model_parallel() -> Tuple[int, int]:
   global local_rank, world_size
@@ -219,17 +189,27 @@ def main(
   prev_cont_args = None
   prev_ctx_args = None
   nccl_handle = None
+  send_queue = []
 
-  sum_acc = 0
-  sum_acc_norm = 0
-  count = 0
-  start_time = time.time()
+  grade_state = {
+    "sum_acc": 0,
+    "sum_acc_norm": 0,
+    "count": 0,
+    "start_time": time.time(),
+  }
 
   kv_cache = {}
   output_cache = {}
   logprobsumdb_cache = {}
+  grade_queue = []
+  ctx_grp_count = 0
 
   for batch_idx, batch in enumerate(batches):
+    if batch.phase == 0:
+      ctx_grp_count += 1
+      if ctx_grp_count > CTX_GRP_LIMIT:
+        break
+
     docs_in_batch = (tokenized_docs[i] for i in batch.data_idx)
     tokens = make_input_cpu_tensor_from_docs(docs_in_batch, batch.phase, batch.cache_len).pin_memory().cuda(non_blocking=True)
     cont2ctx_gpu = None
@@ -254,16 +234,21 @@ def main(
       h = pretb.forward(tokens)
     else:
       h = torch.empty((B, S, H), dtype=torch.float16, device='cuda')
-      dist.recv(h, local_rank - 1)
+      handle = dist.irecv(h, local_rank - 1, tag = batch_idx)
+      handle.wait()
+      #print(f'Rank {local_rank} received from {local_rank - 1} h[0]={h[0, 0, 0]}')
 
     # run transformer
     h, new_cache_k_list, new_cache_v_list = tb.forward(
       h, batch.cache_len, phase = batch.phase,
       cache_k_list = cache_k_list, cache_v_list = cache_v_list, cont2ctx = cont2ctx_gpu)
 
+    run_grade(grade_queue, grade_state, d2h_stream)
+
     # run epilog
     if local_rank < world_size - 1:
-      dist.send(h, local_rank + 1)
+      #print(f'Rank {local_rank} sending to {local_rank + 1} h[0]={h[0, 0, 0]}')
+      dist.isend(h, local_rank + 1, tag = batch_idx)
     else:
       if batch.phase == 0:
         ctx_h = h[:, -1, :] # [B, V]
@@ -272,24 +257,18 @@ def main(
       if batch.phase == 1:
         logits = posttb.forward(h)
         logprobs = torch.log_softmax(logits, dim=-1)
-        pes = [docs[i // NUM_CHOICES] for i in batch.data_idx]
-        eis = [tokenized_docs[i] for i in batch.data_idx]
-        query_idx = [i % NUM_CHOICES for i in batch.data_idx]
-        record_logprobs(ctx_logprobs.cpu(), logprobs.cpu(), eis, pes, batch.cache_len, batch.cache_mapping, query_idx, logprobsum_db)
-        if batch_idx + 1 == len(batches) or batches[batch_idx + 1].phase == 0:
-          pes = [docs[i // NUM_CHOICES] for i in batches[batch.cache_dep].data_idx]
-          acc, acc_norm = grade_from_db(pes, logprobsum_db)
-          sum_acc += acc
-          sum_acc_norm += acc_norm
-          count += len(pes)
-          print(f'acc: {acc}, acc_norm: {acc_norm}, avg_acc: {sum_acc / count}, avg_acc_norm: {sum_acc_norm / count}, count: {count}')
 
-          elapsed = time.time() - start_time
-          print(f'elapsed={elapsed}, throughput(example/s)={count / elapsed}')
+        with torch.cuda.stream(d2h_stream):
+          torch.cuda.current_stream().wait_stream(torch.cuda.default_stream())
+          logprobs_cpu = torch.empty_like(logprobs, device='cpu', pin_memory=True).copy_(logprobs, non_blocking=True)
+          ctx_logprobs_cpu = torch.empty_like(ctx_logprobs, device='cpu', pin_memory=True).copy_(ctx_logprobs, non_blocking=True)
 
-          # TODO
-          if count == 133:
-            break
+          # check if last cont in ctx
+          ctx_batch = None
+          if batch_idx + 1 == len(batches) or batches[batch_idx + 1].phase == 0:
+            ctx_batch = batches[batch.cache_dep]
+
+          grade_queue.append((ctx_logprobs_cpu, logprobs_cpu, batch, ctx_batch, logprobsum_db, docs, tokenized_docs))
 
     # update cache
     if batch.phase == 0:
@@ -302,8 +281,11 @@ def main(
         output_cache[batch_idx] = ctx_logprobs
         logprobsumdb_cache[batch_idx] = [[0 for _ in range(NUM_CHOICES)] for _ in range(len(batch.data_idx))]
 
+  # empty remaining grade queue
+  run_grade(grade_queue, grade_state, d2h_stream)
+
 if __name__ == "__main__":
-  if True:
+  if False:
     from torch.profiler import profile, record_function, ProfilerActivity
     #with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA], record_shapes=True, profile_memory=True, with_flops=True) as prof:
     with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA]) as prof:
@@ -311,3 +293,5 @@ if __name__ == "__main__":
     prof.export_chrome_trace(f'trace_{local_rank}.json')
   else:
     fire.Fire(main)
+
+  dist.barrier() # this prevent isend result in wrong result

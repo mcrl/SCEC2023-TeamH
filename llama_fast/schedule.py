@@ -103,7 +103,7 @@ def schedule_min(lengths, thr):
   #print(blocks)
   #print(sum(blocks))
 
-  return idx, blocks
+  return idx, blocks, D[N - 1]
 
 # length is maximum of each block
 def schedule_max(lengths, thr):
@@ -151,7 +151,7 @@ def schedule_max(lengths, thr):
   #print(blocks)
   #print(sum(blocks))
 
-  return idx, blocks
+  return idx, blocks, D[N - 1]
 
 def preprocess_and_schedule_dataset(dataset, tokenizer, num_data = None, min_bs_per_batch = 1024):
   NUM_CHOICES = 4
@@ -171,13 +171,15 @@ def preprocess_and_schedule_dataset(dataset, tokenizer, num_data = None, min_bs_
   # whole_ei is list of {'ctx': [int], 'cont': [int]} with length num_data * NUM_CHOICES
 
   ctx_lengths = [len(whole_ei[i]['ctx']) for i in range(0, len(whole_ei), NUM_CHOICES)]
-  ctx_idx, ctx_blocks = schedule_min(ctx_lengths, min_bs_per_batch)
+  ctx_idx, ctx_blocks, total_ctx_wasted = schedule_min(ctx_lengths, min_bs_per_batch)
 
   # ctx_idx points to whole_pe [0, num_data)
 
   batches = []
   schedule_info = []
   s = 0
+  sum_ctx_block_wasted = 0
+  sum_ctx_block_effective = 0
   for i, ctx_block_size in enumerate(ctx_blocks):
     s += ctx_block_size
     ctx_block_start, ctx_block_end = s - ctx_block_size, s
@@ -187,17 +189,28 @@ def preprocess_and_schedule_dataset(dataset, tokenizer, num_data = None, min_bs_
     batches.append(Batch(data_idx, phase = 0))
     cache_dep = len(batches) - 1
 
+    # ctx schedule validation
+    lengths = tuple(len(whole_ei[data_idx[j]]['ctx']) for j in range(ctx_block_size))
+    min_S = min(lengths)
+    ctx_block_wasted = sum(lengths[j] - min_S for j in range(ctx_block_size))
+    ctx_block_effective = sum(lengths[j] for j in range(ctx_block_size))
+    sum_ctx_block_wasted += ctx_block_wasted
+    sum_ctx_block_effective += ctx_block_effective
+    #print(f'ctx_block_wasted: {ctx_block_wasted}, ctx_block_effective: {ctx_block_effective}')
+
     cur_ctx_grp = []
     cur_grp = []
     for j in range(ctx_block_start, ctx_block_end):
       cur_ctx_grp.append(ctx_idx[j] * NUM_CHOICES)
       cur_grp.extend([ctx_idx[j] * NUM_CHOICES + k for k in range(NUM_CHOICES)])
     cont_lengths = tuple(len(whole_ei[j]['ctx']) + len(whole_ei[j]['cont']) - ctx_min_len - 1 for j in cur_grp)
-    cont_idx, cont_blocks = schedule_max(cont_lengths, min_bs_per_batch)
+    cont_idx, cont_blocks, total_cont_wasted = schedule_max(cont_lengths, min_bs_per_batch)
 
     # cont_idx points to cur_grp; length is number of conts in current ctx group
     # cur_grp points to whole_ei; length is num_data * NUM_CHOICES
 
+    sum_cont_block_wasted = 0
+    sum_cont_block_effective = 0
     cont_block_end = 0
     for cont_block_size in cont_blocks:
       cont_block_end += cont_block_size
@@ -205,5 +218,20 @@ def preprocess_and_schedule_dataset(dataset, tokenizer, num_data = None, min_bs_
       data_idx = tuple(cur_grp[cont_idx[j]] for j in range(cont_block_start, cont_block_end))
       cache_mapping = tuple(cont_idx[j] // NUM_CHOICES for j in range(cont_block_start, cont_block_end))
       batches.append(Batch(data_idx, phase = 1, cache_mapping=cache_mapping, cache_len=ctx_min_len, cache_dep=cache_dep))
+      # cont schedule validation
+      lengths = tuple(len(whole_ei[data_idx[j]]['ctx']) + len(whole_ei[data_idx[j]]['cont']) for j in range(cont_block_size))
+      max_S = max(lengths)
+      cont_block_wasted = sum(max_S - lengths[j] for j in range(cont_block_size))
+      cont_block_effective = sum(lengths[j] for j in range(cont_block_size))
+      sum_cont_block_wasted += cont_block_wasted
+      sum_cont_block_effective += cont_block_effective
+      #print(f'cont_block_wasted: {cont_block_wasted}, cont_block_effective: {cont_block_effective}')
+    assert sum_cont_block_wasted == total_cont_wasted
+    #print(f'total_cont_wasted: {sum_cont_block_wasted}, total_cont_effective: {sum_cont_block_effective}')
+    #print(f'total_cont_efficiency: {sum_cont_block_effective / (sum_cont_block_effective + sum_cont_block_wasted)}')
+  assert sum_ctx_block_wasted == total_ctx_wasted
+  #print(f'total_ctx_wasted: {sum_ctx_block_wasted}, total_ctx_effective: {sum_ctx_block_effective}')
+  #print(f'total_ctx_efficiency: {sum_ctx_block_effective / (sum_ctx_block_effective + sum_ctx_block_wasted)}')
+
   
   return whole_pe, whole_ei, batches

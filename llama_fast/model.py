@@ -29,21 +29,18 @@ def precompute_freqs_cis(dim: int, end: int, theta: float = 10000.0):
     freqs_cis = torch.polar(torch.ones_like(freqs), freqs)  # complex64
     return freqs_cis
 
-def reshape_for_broadcast(freqs_cis: torch.Tensor, x: torch.Tensor):
-    ndim = x.ndim
-    assert 0 <= 1 < ndim
-    assert freqs_cis.shape == (x.shape[1], x.shape[-1])
-    shape = [d if i == 1 or i == ndim - 1 else 1 for i, d in enumerate(x.shape)]
-    return freqs_cis.view(*shape)
-
 def apply_rotary_emb(
     xq: torch.Tensor,
     xk: torch.Tensor,
     freqs_cis: torch.Tensor,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
+    # xq = bsz seqlen n_heads(52) head_dim(128)
     xq_ = torch.view_as_complex(xq.float().reshape(*xq.shape[:-1], -1, 2))
+    # xq = bsz seqlen n_heads, head_dim//2 (64)
     xk_ = torch.view_as_complex(xk.float().reshape(*xk.shape[:-1], -1, 2))
-    freqs_cis = reshape_for_broadcast(freqs_cis, xq_)
+    # freq_cis = seqlen, head_dim//2
+    #freqs_cis = reshape_for_broadcast(freqs_cis, xq_)
+    freqs_cis = freqs_cis.view(1, xq_.shape[1], 1, xq_.shape[3])
     xq_out = torch.view_as_real(xq_ * freqs_cis).flatten(3)
     xk_out = torch.view_as_real(xk_ * freqs_cis).flatten(3)
     return xq_out.type_as(xq), xk_out.type_as(xk)
@@ -99,8 +96,10 @@ class Attention(nn.Module):
     keys = keys.transpose(1, 2)
     values = values.transpose(1, 2)
 
-    attn_mask = torch.ones(xq.shape[2], keys.shape[2], dtype=torch.bool, device=x.device).tril(diagonal=start_pos)
-    output = F.scaled_dot_product_attention(xq, keys, values, attn_mask = attn_mask) # (bsz, n_heads, seqlen, head_dim)
+    if phase == 0:
+      output = F.scaled_dot_product_attention(xq, keys, values, is_causal=True) # (bsz, n_heads, seqlen, head_dim)
+    if phase == 1:
+      output = F.scaled_dot_product_attention(xq, keys, values, attn_mask = mask) # (bsz, n_heads, seqlen, head_dim)
 
     output = output.transpose(
         1, 2
@@ -197,9 +196,8 @@ class TransformerBlocks(nn.Module):
     freqs_cis = self.freqs_cis[start_pos : start_pos + seqlen]
 
     mask = None
-    if seqlen > 1:
-        mask = torch.full((1, 1, seqlen, seqlen), float("-inf"), device=h.device)
-        mask = torch.triu(mask, diagonal=start_pos + 1).type_as(h)
+    if phase == 1:
+      mask = torch.ones(seqlen, start_pos + seqlen, dtype=torch.bool, device=h.device).tril(diagonal=start_pos)
 
     if phase == 0:
       cache_k_list = []

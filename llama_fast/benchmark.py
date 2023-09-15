@@ -163,23 +163,34 @@ def main(
   # max S = 170
   B = 1
   S = 170
+  target_b = 32
+  target_s = 32
   H = model_args.dim
-  num_iter = 5
-  for B in [1, 2, 4, 8, 16, 32, 64, 128]:
-    for S in [170]:
-    #for S in [1, 2, 4, 8, 16, 32, 64, 128, 170]:
+  num_iter = 3
+  #for B in [1, 2, 4, 8, 16, 32, 64, 128]:
+  #  for S in [170]:
+  #for S in [1, 2, 4, 8, 16, 32, 64, 128, 170]:
+
+  # warm up
+  for _ in range(10):
+    h = torch.empty((10, 10, H)).cuda().half()
+    h, _, _ = tb.forward(h, 0, phase=0)
+
+
+  for B in range(33, 129):
+    for S in range(1, 171):
       avg = 0
       for iter in range(num_iter):
         h = torch.empty((B, S, H)).cuda().half()
         torch.cuda.synchronize()
         st = time.time()
-        h = tb(h, 0)
+        h, _, _ = tb.forward(h, 0, phase=0)
         torch.cuda.synchronize()
         et = time.time()
         elapsed = et - st
         avg += elapsed
       avg /= num_iter
-      print(f'B={B} S={S} avg={avg}')
+      print(f'B={B} S={S} BS_thr={B*S/avg} avg={avg}')
 
 
   #for param in tb.parameters():

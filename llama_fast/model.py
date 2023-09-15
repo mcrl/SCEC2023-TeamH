@@ -76,13 +76,6 @@ class Attention(nn.Module):
         bias=False,
     )
 
-    #self.cache_k = torch.zeros(
-    #    (args.max_batch_size, args.max_seq_len, self.n_heads, self.head_dim)
-    #)
-    #self.cache_v = torch.zeros(
-    #    (args.max_batch_size, args.max_seq_len, self.n_heads, self.head_dim)
-    #)
-
   def forward(self, x: torch.Tensor, start_pos: int, freqs_cis: torch.Tensor, mask: Optional[torch.Tensor], phase: int, cache_k = None, cache_v = None, cont2ctx = None):
     bsz, seqlen, _ = x.shape
     xq, xk, xv = self.wq(x), self.wk(x), self.wv(x)
@@ -95,38 +88,18 @@ class Attention(nn.Module):
 
     if phase == 0:
       cache_k = xk # (bsz, seqlen, n_heads, head_dim)
-      #if seqlen > 0:
-      #  print(f'cache_k[seq=0]={cache_k[0, 0, :, 0]}')
-      #if seqlen > 1:
-      #  print(f'cache_k[seq=1]={cache_k[0, 1, :, 0]}')
       cache_v = xv
       keys = xk
       values = xv
     elif phase == 1:
       keys = torch.cat((cache_k[cont2ctx], xk), dim=1) # (bsz, start_pos + seqlen, n_heads, head_dim)
-      #print(f'keys[seq=0]={keys[0, 0, :, 0]}')
-      #print(f'keys[seq=1]={keys[0, 1, :, 0]}')
       values = torch.cat((cache_v[cont2ctx], xv), dim=1)
-
-    #self.cache_k = self.cache_k.to(xq)
-    #self.cache_v = self.cache_v.to(xq)
-
-    #self.cache_k[:bsz, start_pos : start_pos + seqlen] = xk
-    #self.cache_v[:bsz, start_pos : start_pos + seqlen] = xv
-
-    #keys = self.cache_k[:bsz, : start_pos + seqlen]
-    #values = self.cache_v[:bsz, : start_pos + seqlen]
 
     xq = xq.transpose(1, 2)
     keys = keys.transpose(1, 2)
     values = values.transpose(1, 2)
 
-
-
-    #output = F.scaled_dot_product_attention(xq, keys, values, is_causal=True) # (bsz, n_heads, seqlen, head_dim)
-
     attn_mask = torch.ones(xq.shape[2], keys.shape[2], dtype=torch.bool, device=x.device).tril(diagonal=start_pos)
-    #print(f'xq={xq.shape} keys={keys.shape} values={values.shape} mask={attn_mask.shape}')
     output = F.scaled_dot_product_attention(xq, keys, values, attn_mask = attn_mask) # (bsz, n_heads, seqlen, head_dim)
 
     output = output.transpose(

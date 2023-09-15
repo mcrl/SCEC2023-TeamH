@@ -27,13 +27,16 @@ import torch.distributed as dist
 import schedule
 
 NUM_CHOICES = 4
-#DATA_LIMIT = 22222
-#CTX_GRP_LIMIT = 22222
+DATA_LIMIT = 22222
+CTX_GRP_LIMIT = 22222
 DATA_LIMIT = 1000
 CTX_GRP_LIMIT = 2
-SCHED_THR = 1024
-DEBUG_SCHEDULE = True
+CTX_THR = 10000
+CONT_THR = 512
+DEBUG_SCHEDULE = False
 DEBUG_ANSWER = False
+DEBUG_PERFORMANCE = False
+DEBUG_PROFILE = False
 
 logger = logging.getLogger('llama_fast')
 sh = logging.StreamHandler()
@@ -183,7 +186,7 @@ def main(
   #for param in tb.parameters():
   #  logger.info(f'Rank {local_rank} {type(param)} {param.size()} {param.device} {param.dtype}')
 
-  docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset(dataset, tokenizer, DATA_LIMIT, SCHED_THR)
+  docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset(dataset, tokenizer, DATA_LIMIT, CTX_THR, CONT_THR)
 
   d2h_stream = torch.cuda.Stream()
   prev_cont_args = None
@@ -191,11 +194,16 @@ def main(
   nccl_handle = None
   send_queue = []
 
+  print(f'Rank {local_rank} waiting for other ranks...')
+  dist.barrier()
+  start_time = time.time()
+  print(f'Rank {local_rank} computation starting...')
+
   grade_state = {
     "sum_acc": 0,
     "sum_acc_norm": 0,
     "count": 0,
-    "start_time": time.time(),
+    "start_time": start_time,
   }
 
   kv_cache = {}
@@ -223,6 +231,13 @@ def main(
 
     # load cache
     cache_k_list, cache_v_list = None, None
+    if batch.phase == 0:
+      # TODO currently only keep one element in cache
+      kv_cache.clear()
+      if local_rank == world_size - 1:
+        output_cache.clear()
+        logprobsumdb_cache.clear()
+
     if batch.phase == 1:
       cache_k_list, cache_v_list = kv_cache[batch.cache_dep]
       if local_rank == world_size - 1:
@@ -239,9 +254,20 @@ def main(
       #print(f'Rank {local_rank} received from {local_rank - 1} h[0]={h[0, 0, 0]}')
 
     # run transformer
+    if DEBUG_PERFORMANCE:
+      torch.cuda.synchronize()
+      perf_start = time.time()
+
     h, new_cache_k_list, new_cache_v_list = tb.forward(
       h, batch.cache_len, phase = batch.phase,
       cache_k_list = cache_k_list, cache_v_list = cache_v_list, cont2ctx = cont2ctx_gpu)
+
+    if DEBUG_PERFORMANCE:
+      torch.cuda.synchronize()
+      elapsed = time.time() - perf_start
+      FLOPs = 15 * (8 * B * S * H ** 2 + 4 * B * H * S ** 2 + 6 * B * S * H * 17920)
+      TFLOPS = FLOPs / elapsed / 1e12
+      print(f'Rank {local_rank} batch_idx={batch_idx} elapsed={elapsed} TFLOPS={TFLOPS}')
 
     run_grade(grade_queue, grade_state, d2h_stream)
 
@@ -272,12 +298,8 @@ def main(
 
     # update cache
     if batch.phase == 0:
-      # TODO currently only keep one element in cache
-      kv_cache.clear()
       kv_cache[batch_idx] = (new_cache_k_list, new_cache_v_list)
       if local_rank == world_size - 1:
-        output_cache.clear()
-        logprobsumdb_cache.clear()
         output_cache[batch_idx] = ctx_logprobs
         logprobsumdb_cache[batch_idx] = [[0 for _ in range(NUM_CHOICES)] for _ in range(len(batch.data_idx))]
 
@@ -285,7 +307,7 @@ def main(
   run_grade(grade_queue, grade_state, d2h_stream)
 
 if __name__ == "__main__":
-  if False:
+  if DEBUG_PROFILE:
     from torch.profiler import profile, record_function, ProfilerActivity
     #with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA], record_shapes=True, profile_memory=True, with_flops=True) as prof:
     with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA]) as prof:

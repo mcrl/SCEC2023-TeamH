@@ -24,7 +24,18 @@ import math
 import logging
 import torch.distributed as dist
 
-NC = 4
+import schedule
+
+NUM_CHOICES = 4
+DATA_LIMIT = 22222
+CTX_GRP_LIMIT = 22222
+#DATA_LIMIT = 1000
+#CTX_GRP_LIMIT = 2
+SCHED_THR = 512
+DEBUG_SCHEDULE = False
+DEBUG_ANSWER = False
+DEBUG_PERFORMANCE = False
+DEBUG_PROFILE = False
 
 logger = logging.getLogger('llama_fast')
 sh = logging.StreamHandler()
@@ -33,104 +44,37 @@ sh.setFormatter(formatter)
 logger.addHandler(sh)
 logger.setLevel(logging.INFO)
 
-def process_example(example):
-  def preprocess(text):
-    text = text.strip()
-    # NOTE: Brackets are artifacts of the WikiHow dataset portion of HellaSwag.
-    text = text.replace(" [title]", ". ")
-    text = re.sub("\\[.*?\\]", "", text)
-    text = text.replace("  ", " ")
-    return text
-  ctx = example['ctx_a'] + " " + example['ctx_b'].capitalize()
-  out_example = {
-    "query": preprocess(example["activity_label"] + ": " + ctx),
-    "choices": [preprocess(ending) for ending in example["endings"]],
-    "gold": int(example["label"]),
-  }
-  return out_example
-
-def encode_input(tokenizer, example):
-  def encode_pair(context, continuation):
-    n_spaces = len(context) - len(context.rstrip())
-    if n_spaces > 0:
-        continuation = context[-n_spaces:] + continuation
-        context = context[:-n_spaces]
-    bos = False
-    whole_enc = tokenizer.encode(context + continuation, bos=bos, eos=False)
-    context_enc = tokenizer.encode(context, bos=bos, eos=False)
-    context_enc_len = len(context_enc)
-    continuation_enc = whole_enc[context_enc_len:]
-    return context_enc, continuation_enc
-  reqs = [(example['query'], ' {}'.format(choice)) for choice in example['choices']]
-  new_reqs = []
-  for ctx, cont in reqs:
-    ctx_enc, cont_enc = encode_pair(ctx, cont)
-    new_reqs.append((ctx_enc, cont_enc))
-  return new_reqs
-
-def encoded_input_to_tensor(eis):
-  full_encs = [ei[2] + ei[3] for ei in eis]
-  bsz = len(full_encs)
-  max_len = max([len(enc) for enc in full_encs])
-  tokens = torch.full((bsz, max_len), 0).cuda().long() # pad with 0, as it does not matter
+def make_input_cpu_tensor_from_docs(docs, phase, cached_len):
+  if phase == 0:
+    encs = [doc['ctx'] for doc in docs]
+    S = min([len(enc) for enc in encs])
+  if phase == 1:
+    encs = [doc['ctx'] + doc['cont'][:-1] for doc in docs]
+    S = max([len(enc) for enc in encs]) - cached_len
+  bsz = len(encs)
+  tokens = torch.full((bsz, S), 0).long() # pad with 0, as it does not matter
   for i in range(bsz):
-    tokens[i, :len(full_encs[i])] = torch.tensor(full_encs[i]).long()
+    if phase == 0:
+      tokens[i, :] = torch.tensor(encs[i][: S]).long()
+    if phase == 1:
+      tokens[i, :len(encs[i]) - cached_len] = torch.tensor(encs[i][cached_len:]).long()
   return tokens
 
-def encoded_ctx_to_tensor(eis):
-  ctxs = [ei[0] for ei in eis]
-  bsz = len(ctxs)
-  min_len = min([len(ctx) for ctx in ctxs])
-  tokens = torch.full((bsz, min_len), 0).cuda().long() # pad with 0, as it does not matter
-  for i in range(bsz):
-    tokens[i, :min_len] = torch.tensor(ctxs[i][:min_len]).long()
-  return tokens
-
-def encoded_ctx_cont_to_tensor(eis, cached_len):
-  full_encs = [ei[0] + ei[1][:-1] for ei in eis] # do not use last token
-  bsz = len(full_encs)
-  max_len = max([len(enc) for enc in full_encs])
-  tokens = torch.full((bsz, max_len - cached_len), 0).cuda().long() # pad with 0, as it does not matter
-  for i in range(bsz):
-    tokens[i, :len(full_encs[i]) - cached_len] = torch.tensor(full_encs[i][cached_len:]).long()
-  return tokens
-
-def grade_output(logprobs, eis, pe):
-  bsz = len(eis)
-  ss = []
-  logproblist = [[] for _ in range(bsz)]
-  for i in range(bsz):
-    ctx = eis[i][2]
-    cont = eis[i][3]
-    s = 0
-    for j in range(len(cont)):
-      logprob = logprobs[i, len(ctx) + j - 1, cont[j]].item()
-      s += logprob
-      logproblist[i].append(logprob)
-    ss.append(s)
-
-  gold = pe["gold"]
-  acc = 1.0 if np.argmax(ss) == gold else 0.0
-  completion_len = np.array([float(len(i)) for i in pe["choices"]])
-  acc_norm = 1.0 if np.argmax(ss / completion_len) == gold else 0.0
-
-  num_choices = 4
-  for j in range(num_choices):
-    encoded_input = eis[j]
-    print(f'ctx="{encoded_input[0]}" cont="{encoded_input[1]}" ctx_enc={encoded_input[2]} cont_enc={encoded_input[3]} logproblist={logproblist[j]}')
-  print(f'results: {ss}, normed_results: {ss / completion_len}, gold: {gold}')
-
-  return acc, acc_norm
-
-def record_logprobs(ctx_logprobs, logprobs, eis, pes, cached_len, cont2ctx, query_idx, logprobsum_db):
+def record_logprobs(ctx_logprobs, logprobs, batch, docs, tokenized_docs, logprobsum_db):
+  pes = [docs[i // NUM_CHOICES] for i in batch.data_idx]
+  eis = [tokenized_docs[i] for i in batch.data_idx]
+  query_idx = [i % NUM_CHOICES for i in batch.data_idx]
+  cached_len = batch.cache_len
+  cont2ctx = batch.cache_mapping
+        
   N = len(eis)
 
   logproblist = [[] for _ in range(N)]
   for i in range(N):
     pe = pes[i]
     ei = eis[i]
-    ctx = ei[0]
-    cont = ei[1]
+    ctx = ei['ctx']
+    cont = ei['cont']
     s = 0
     for j in range(len(cont)):
       k = len(ctx) + j - cached_len - 1
@@ -142,10 +86,13 @@ def record_logprobs(ctx_logprobs, logprobs, eis, pes, cached_len, cont2ctx, quer
       logproblist[i].append(logprob)
     logprobsum_db[cont2ctx[i]][query_idx[i]] = s
   
-  for i in range(N):
-    print(f'ctx="{pes[i]["query"]}" cont="{pes[i]["choices"][query_idx[i]]}" ctx_enc={eis[i][0]} cont_enc={eis[i][1]} logproblist={logproblist[i]}')
+  if DEBUG_ANSWER:
+    for i in range(N):
+      print(f'ctx="{pes[i]["query"]}" cont="{pes[i]["choices"][query_idx[i]]}" ctx_enc={eis[i]["ctx"]} cont_enc={eis[i]["cont"]} logproblist={logproblist[i]}')
 
-def grade_from_db(pes, logprobsum_db):
+def grade_from_db(batch, docs, logprobsum_db):
+  pes = [docs[i // NUM_CHOICES] for i in batch.data_idx]
+
   acc, acc_norm = 0, 0
   for i, pe in enumerate(pes):
     ss = logprobsum_db[i]
@@ -154,119 +101,41 @@ def grade_from_db(pes, logprobsum_db):
     completion_len = np.array([float(len(i)) for i in pe["choices"]])
     acc_norm += 1.0 if np.argmax(ss / completion_len) == gold else 0.0
 
+  if DEBUG_ANSWER:
     print(f'ctx="{pe["query"]}"')
     print(f'results: {ss}, normed_results: {ss / completion_len}, gold: {gold}')
 
   return acc, acc_norm
 
+def run_grade(grade_queue, grade_state, d2h_stream):
+  if len(grade_queue) > 0:
+    d2h_stream.synchronize()
+  while len(grade_queue) > 0:
+    ctx_logprobs_cpu, logprobs_cpu, batch, ctx_batch, logprobsum_db, docs, tokenized_docs = grade_queue.pop(0)
+    record_logprobs(ctx_logprobs_cpu, logprobs_cpu, batch, docs, tokenized_docs, logprobsum_db)
+
+    if ctx_batch is not None:
+      acc, acc_norm = grade_from_db(ctx_batch, docs, logprobsum_db)
+      grade_state["sum_acc"] += acc
+      grade_state["sum_acc_norm"] += acc_norm
+      grade_state["count"] += len(ctx_batch.data_idx)
+      print(f'acc: {acc}, acc_norm: {acc_norm}, avg_acc: {grade_state["sum_acc"] / grade_state["count"]}, avg_acc_norm: {grade_state["sum_acc_norm"] / grade_state["count"]}, count: {grade_state["count"]}')
+
+      elapsed = time.time() - grade_state["start_time"]
+      print(f'elapsed={elapsed}, throughput(example/s)={grade_state["count"] / elapsed}')
+
 def setup_model_parallel() -> Tuple[int, int]:
-    local_rank = int(os.environ.get("LOCAL_RANK", -1))
-    world_size = int(os.environ.get("WORLD_SIZE", -1))
+  global local_rank, world_size
+  local_rank = int(os.environ.get("LOCAL_RANK", -1))
+  world_size = int(os.environ.get("WORLD_SIZE", -1))
 
-    torch.distributed.init_process_group("nccl")
-    initialize_model_parallel(world_size)
-    torch.cuda.set_device(local_rank)
+  torch.distributed.init_process_group("nccl")
+  initialize_model_parallel(world_size)
+  torch.cuda.set_device(local_rank)
 
-    # seed must be the same in all processes
-    torch.manual_seed(1)
-    return local_rank, world_size
-
-# length is minimum of each block
-def schedule_min(lengths, thr):
-  N = len(lengths)
-  idx = [i for i in range(N)]
-  idx.sort(key=lambda x: lengths[x])
-  # init
-  D = []
-  E = []
-  total_area = 0
-  for i in range(N):
-    total_area += lengths[idx[i]]
-    rect_area = lengths[idx[0]] * (i + 1)
-    penalty = total_area - rect_area
-    if rect_area >= thr:
-      D.append(penalty)
-      E.append(-1)
-    else:
-      D.append(2 ** 30)
-      E.append(-1)
-  # DP
-  for i in range(N):
-    total_area = 0
-    for j in range(i - 1, -1, -1):
-      total_area += lengths[idx[j + 1]]
-      rect_area = lengths[idx[j + 1]] * (i - j)
-      penalty = total_area - rect_area
-      if rect_area >= thr and D[i] > D[j] + penalty:
-        D[i] = D[j] + penalty
-        E[i] = j
-  blocks = []
-  i = N - 1
-  while i >= 0:
-    blocks.append(i - E[i])
-    i = E[i]
-  blocks.reverse()
-
-  #logging
-  print(f'total penalty: {D[N - 1]}')
-  s = 0
-  for i, block in enumerate(blocks):
-    s += block
-    cur_s = lengths[idx[s - block]]
-    print(f'block {i}: {block} x {cur_s} = {block * cur_s}')
-  print(blocks)
-  print(sum(blocks))
-
-  return idx, blocks
-
-# length is maximum of each block
-def schedule_max(lengths, thr):
-  N = len(lengths)
-  idx = [i for i in range(N)]
-  idx.sort(key=lambda x: lengths[x])
-  # init
-  D = []
-  E = []
-  total_area = 0
-  for i in range(N):
-    total_area += lengths[idx[i]]
-    rect_area = lengths[idx[i]] * (i + 1)
-    penalty = rect_area - total_area
-    if rect_area >= thr:
-      D.append(penalty)
-      E.append(-1)
-    else:
-      D.append(2 ** 30)
-      E.append(-1)
-  # DP
-  for i in range(N):
-    total_area = 0
-    for j in range(i - 1, -1, -1):
-      total_area += lengths[idx[j + 1]]
-      rect_area = lengths[idx[i]] * (i - j)
-      penalty = rect_area - total_area
-      if rect_area >= thr and D[i] > D[j] + penalty:
-        D[i] = D[j] + penalty
-        E[i] = j
-  blocks = []
-  i = N - 1
-  while i >= 0:
-    blocks.append(i - E[i])
-    i = E[i]
-  blocks.reverse()
-
-  #logging
-  print(f'total penalty: {D[N - 1]}')
-  s = 0
-  for i, block in enumerate(blocks):
-    s += block
-    cur_s = lengths[idx[s - 1]]
-    print(f'block {i}: {block} x {cur_s} = {block * cur_s}')
-  print(blocks)
-  print(sum(blocks))
-
-  return idx, blocks
-
+  # seed must be the same in all processes
+  torch.manual_seed(1)
+  return local_rank, world_size
 
 def main(
   tokenizer_path: str,
@@ -296,7 +165,7 @@ def main(
   torch.set_default_tensor_type(torch.cuda.HalfTensor)
   if local_rank == 0:
     pretb = PreTransformer(model_args)
-    tb = TransformerBlocks(model_args, 0, 2)
+    tb = TransformerBlocks(model_args, 0, 15)
     pretb.custom_load(checkpoint)
     tb.custom_load(checkpoint)
   elif local_rank == 1:
@@ -313,34 +182,21 @@ def main(
   torch.set_default_tensor_type(torch.FloatTensor)
   print(f"Loaded model in gpu in {time.time() - start_time:.2f} seconds")
 
-  B = 2
-  S = 2
-  #H = model_args.dim
-  H = 2
+  #for param in tb.parameters():
+  #  logger.info(f'Rank {local_rank} {type(param)} {param.size()} {param.device} {param.dtype}')
 
-  if local_rank == 0:
-    h_input = torch.randn((B, S, H)).cuda().half()
-    print(f'local_rank={local_rank}, h_input={h_input}')
-    dist.isend(h_input, 1)
-    A = torch.randn((B, S, H)).cuda().half()
-    B = torch.randn((B, S, H)).cuda().half()
-    C = A * B
-  if local_rank == 1:
-    h_input = torch.empty((B, S, H)).cuda().half()
-    dist.recv(h_input, 0)
-    print(f'local_rank={local_rank}, h_input={h_input}')
-
-  #h_ref, _, _ = tb.forward(h_input, 0, phase=0)
-
-  #cut = 1
-  #h_part1, cache_k_list, cache_v_list = tb.forward(h_input[:, 0:cut, :], 0, phase = 0)
-  #tmp = torch.Tensor([i for i in range(B)]).cuda().long()
-  #h_part2 = tb.forward(h_input[:, cut:, :], cut, phase = 1, cache_k_list = cache_k_list, cache_v_list = cache_v_list, cont2ctx = tmp)
-  #h_merged = torch.cat((h_part1, h_part2), dim = 1)
-
-  print(h_ref)
-  print(h_merged)
+  docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset(dataset, tokenizer, DATA_LIMIT, SCHED_THR)
+  schedule.evaluate_schedule(docs, tokenized_docs, batches)
 
 
 if __name__ == "__main__":
+  if DEBUG_PROFILE:
+    from torch.profiler import profile, record_function, ProfilerActivity
+    #with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA], record_shapes=True, profile_memory=True, with_flops=True) as prof:
+    with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA]) as prof:
+      fire.Fire(main)
+    prof.export_chrome_trace(f'trace_{local_rank}.json')
+  else:
     fire.Fire(main)
+
+  dist.barrier() # this prevent isend result in wrong result

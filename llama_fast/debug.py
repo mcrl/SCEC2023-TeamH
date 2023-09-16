@@ -185,7 +185,7 @@ def main(
   #for param in tb.parameters():
   #  logger.info(f'Rank {local_rank} {type(param)} {param.size()} {param.device} {param.dtype}')
 
-  docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset(dataset, tokenizer, DATA_LIMIT, SCHED_THR)
+  docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset_typeG(dataset, tokenizer, 10042, 1024, 1024)
   schedule.evaluate_schedule(docs, tokenized_docs, batches)
 
 

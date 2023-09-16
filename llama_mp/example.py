@@ -21,6 +21,7 @@ from generation import LLaMA
 from datasets import load_dataset
 import re
 import math
+import torch.distributed as dist
 
 def setup_model_parallel() -> Tuple[int, int]:
     local_rank = int(os.environ.get("LOCAL_RANK", -1))
@@ -116,6 +117,11 @@ def load(
     #  print(f'prob={prob[0, len(ctx_enc) - 1, cont_enc[0]]}')
     #return
 
+    print(f'Rank {local_rank} waiting for other ranks...')
+    dist.barrier()
+    start_time = time.time()
+    print(f'Rank {local_rank} computation starting...')
+
     print(f'pad_id={tokenizer.pad_id}')
 
     num_choices = 4
@@ -123,7 +129,7 @@ def load(
     sum_acc_norm = 0
     count = 0
     bsz = max_batch_size
-    assert bsz == 4 # single batch process
+    #assert bsz == 4 # single batch process
     for ex_idx in range(0, len(dataset), bsz // num_choices):
       # last batch
       if ex_idx + bsz // num_choices > len(dataset):
@@ -156,19 +162,18 @@ def load(
       logproblist = [[] for _ in range(bsz)]
       cur_pos = total_len
       #assert bsz == 4 # single batch process
+      logits = model.forward(tokens, 0)
+      logprobs = torch.log_softmax(logits, dim=-1) # [1, S, V]
       for i in range(bsz):
         ctx = encoded_inputs[i][2]
         cont = encoded_inputs[i][3]
-        logits = model.forward(tokens[i:i+1, 0:len(ctx)+len(cont)], 0)
-        logprobs = torch.log_softmax(logits, dim=-1) # [1, S, V]
-        for cur_pos in range(start_pos, total_len):
-          if cur_pos >= len(ctx) and cur_pos < len(ctx) + len(cont):
-            #p = probs[i, cont[cur_pos - len(ctx)]].item()
-            #logprob = math.log(p)
-            logprob = logprobs[0, cur_pos - 1, cont[cur_pos - len(ctx)]].item()
-            sumlogprobs[i] += logprob
-            #plist[i].append(p)
-            logproblist[i].append(logprob)
+        for cur_pos in range(len(ctx), len(ctx) + len(cont)):
+          #p = probs[i, cont[cur_pos - len(ctx)]].item()
+          #logprob = math.log(p)
+          logprob = logprobs[i, cur_pos - 1, cont[cur_pos - len(ctx)]].item()
+          sumlogprobs[i] += logprob
+          #plist[i].append(p)
+          logproblist[i].append(logprob)
       #probs = torch.softmax(logits, dim=-1)
 
       # eval
@@ -185,9 +190,11 @@ def load(
         count += 1
         for j in range(num_choices):
           encoded_input = encoded_inputs[i * num_choices + j]
-          print(f'ctx="{encoded_input[0]}" cont="{encoded_input[1]}" ctx_enc={encoded_input[2]} cont_enc={encoded_input[3]} plist={plist[i * num_choices + j]} logproblist={logproblist[i * num_choices + j]}')
+          #print(f'ctx="{encoded_input[0]}" cont="{encoded_input[1]}" ctx_enc={encoded_input[2]} cont_enc={encoded_input[3]} plist={plist[i * num_choices + j]} logproblist={logproblist[i * num_choices + j]}')
         print(f'results: {results}, normed_results: {results / completion_len}, gold: {gold}')
         print(f'acc: {acc}, acc_norm: {acc_norm}, avg_acc: {sum_acc / count}, avg_acc_norm: {sum_acc_norm / count}, count: {count}')
+        elapsed = time.time() - start_time
+        print(f'elapsed={elapsed}, throughput(example/s)={count / elapsed}')
          
 
       #results = []

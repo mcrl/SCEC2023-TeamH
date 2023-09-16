@@ -1,0 +1,2191 @@
+WARNING:torch.distributed.run:
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+> initializing model parallel with size 4
+> initializing ddp with size 1
+> initializing pipeline with size 1
+Loaded dataset, ckpt, tokenizer in 6.93 seconds
+Loaded dataset, ckpt, tokenizer in 7.01 seconds
+Loaded dataset, ckpt, tokenizer in 7.09 seconds
+Loaded dataset, ckpt, tokenizer in 7.71 seconds
+Loaded model in gpu in 2.47 seconds
+Processing 0...
+Processing 1000...
+Processing 2000...
+Loaded model in gpu in 4.18 seconds
+Processing 0...
+Processing 3000...
+Loaded model in gpu in 4.04 seconds
+Processing 0...
+Processing 1000...
+Processing 1000...
+Processing 2000...
+Loaded model in gpu in 5.39 seconds
+Processing 0...
+Processing 4000...
+Processing 2000...
+Processing 3000...
+Processing 1000...
+Processing 3000...
+Processing 2000...
+Processing 5000...
+Processing 3000...
+Processing 4000...
+Processing 4000...
+Processing 6000...
+Processing 4000...
+Processing 5000...
+Processing 5000...
+Processing 7000...
+Processing 5000...
+Processing 6000...
+Processing 6000...
+Processing 8000...
+Processing 6000...
+Processing 7000...
+Processing 7000...
+Processing 9000...
+Processing 7000...
+Processing 8000...
+Processing 8000...
+Processing 10000...
+Processing 8000...
+Processing 9000...
+Processing 9000...
+Processing 9000...
+Processing 10000...
+Processing 10000...
+Processing 10000...
+Rank 2 waiting for other ranks...
+Rank 0 waiting for other ranks...
+Rank 1 waiting for other ranks...
+Rank 3 waiting for other ranks...
+Rank 1 computation starting...
+Rank 3 computation starting...
+Rank 0 computation starting...
+Rank 2 computation starting...
+acc: 1.0, acc_norm: 1.0, avg_acc: 1.0, avg_acc_norm: 1.0, count: 1
+elapsed=11.109522104263306, throughput(example/s)=0.09001287279641378
+acc: 4.0, acc_norm: 6.0, avg_acc: 0.7142857142857143, avg_acc_norm: 1.0, count: 7
+elapsed=11.308207750320435, throughput(example/s)=0.6190194020623334
+acc: 2.0, acc_norm: 1.0, avg_acc: 0.7777777777777778, avg_acc_norm: 0.8888888888888888, count: 9
+elapsed=11.409040212631226, throughput(example/s)=0.7888481267719507
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.7, avg_acc_norm: 0.8, count: 10
+elapsed=11.509944677352905, throughput(example/s)=0.8688139066103515
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.625, avg_acc_norm: 0.75, count: 16
+elapsed=11.610871076583862, throughput(example/s)=1.3780189181729767
+acc: 2.0, acc_norm: 1.0, avg_acc: 0.6666666666666666, avg_acc_norm: 0.7222222222222222, count: 18
+elapsed=11.71099042892456, throughput(example/s)=1.5370177363942197
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6842105263157895, avg_acc_norm: 0.7368421052631579, count: 19
+elapsed=11.81131386756897, throughput(example/s)=1.6086271360690394
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6363636363636364, avg_acc_norm: 0.7272727272727273, count: 22
+elapsed=12.041825771331787, throughput(example/s)=1.826965479966986
+acc: 1.0, acc_norm: 0.0, avg_acc: 0.6521739130434783, avg_acc_norm: 0.6956521739130435, count: 23
+elapsed=12.16982913017273, throughput(example/s)=1.8899197148936104
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.6428571428571429, avg_acc_norm: 0.7142857142857143, count: 28
+elapsed=12.553363561630249, throughput(example/s)=2.2304779004077346
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.6111111111111112, avg_acc_norm: 0.6944444444444444, count: 36
+elapsed=12.681849718093872, throughput(example/s)=2.838702618328372
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.6341463414634146, avg_acc_norm: 0.7073170731707317, count: 41
+elapsed=12.80938720703125, throughput(example/s)=3.2007776279488636
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.627906976744186, avg_acc_norm: 0.6976744186046512, count: 43
+elapsed=12.936805248260498, throughput(example/s)=3.323849990381655
+acc: 5.0, acc_norm: 6.0, avg_acc: 0.6274509803921569, avg_acc_norm: 0.7058823529411765, count: 51
+elapsed=13.3258056640625, throughput(example/s)=3.8271607200109927
+acc: 3.0, acc_norm: 5.0, avg_acc: 0.6140350877192983, avg_acc_norm: 0.7192982456140351, count: 57
+elapsed=13.457816123962402, throughput(example/s)=4.235456888024222
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6206896551724138, avg_acc_norm: 0.7241379310344828, count: 58
+elapsed=13.58970046043396, throughput(example/s)=4.267938073312609
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6229508196721312, avg_acc_norm: 0.7213114754098361, count: 61
+elapsed=13.721435070037842, throughput(example/s)=4.445599143867958
+acc: 7.0, acc_norm: 9.0, avg_acc: 0.6164383561643836, avg_acc_norm: 0.726027397260274, count: 73
+elapsed=13.986595869064331, throughput(example/s)=5.219282853625735
+acc: 9.0, acc_norm: 9.0, avg_acc: 0.6506024096385542, avg_acc_norm: 0.7469879518072289, count: 83
+elapsed=14.118518114089966, throughput(example/s)=5.87880394594443
+acc: 1.0, acc_norm: 3.0, avg_acc: 0.6395348837209303, avg_acc_norm: 0.7558139534883721, count: 86
+elapsed=14.25005292892456, throughput(example/s)=6.035065303191849
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6436781609195402, avg_acc_norm: 0.7586206896551724, count: 87
+elapsed=14.382019519805908, throughput(example/s)=6.049219991684041
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.6521739130434783, avg_acc_norm: 0.7608695652173914, count: 92
+elapsed=14.672522783279419, throughput(example/s)=6.270223693558806
+acc: 9.0, acc_norm: 10.0, avg_acc: 0.6571428571428571, avg_acc_norm: 0.7619047619047619, count: 105
+elapsed=14.82972264289856, throughput(example/s)=7.0803751714318715
+acc: 5.0, acc_norm: 6.0, avg_acc: 0.6607142857142857, avg_acc_norm: 0.7678571428571429, count: 112
+elapsed=14.985025644302368, throughput(example/s)=7.47412801676351
+acc: 3.0, acc_norm: 2.0, avg_acc: 0.6637931034482759, avg_acc_norm: 0.7586206896551724, count: 116
+elapsed=15.141934871673584, throughput(example/s)=7.6608439398986095
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6666666666666666, avg_acc_norm: 0.7606837606837606, count: 117
+elapsed=15.298633337020874, throughput(example/s)=7.64774195332036
+acc: 2.0, acc_norm: 1.0, avg_acc: 0.6722689075630253, avg_acc_norm: 0.7563025210084033, count: 119
+elapsed=15.455203771591187, throughput(example/s)=7.699672017184176
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.6666666666666666, avg_acc_norm: 0.7583333333333333, count: 120
+elapsed=15.612174272537231, throughput(example/s)=7.686309280513691
+acc: 8.0, acc_norm: 9.0, avg_acc: 0.6518518518518519, avg_acc_norm: 0.7407407407407407, count: 135
+elapsed=15.770859241485596, throughput(example/s)=8.56009161789229
+acc: 9.0, acc_norm: 13.0, avg_acc: 0.6510067114093959, avg_acc_norm: 0.7583892617449665, count: 149
+elapsed=15.926551103591919, throughput(example/s)=9.355446702230214
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.6535947712418301, avg_acc_norm: 0.7647058823529411, count: 153
+elapsed=16.082780599594116, throughput(example/s)=9.513280309492083
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6496815286624203, avg_acc_norm: 0.7579617834394905, count: 157
+elapsed=16.238245248794556, throughput(example/s)=9.668532381086859
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.6415094339622641, avg_acc_norm: 0.7547169811320755, count: 159
+elapsed=16.395396947860718, throughput(example/s)=9.697843882989757
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.639751552795031, avg_acc_norm: 0.7577639751552795, count: 161
+elapsed=16.712758779525757, throughput(example/s)=9.633358688646648
+acc: 10.0, acc_norm: 13.0, avg_acc: 0.6348314606741573, avg_acc_norm: 0.7584269662921348, count: 178
+elapsed=16.876348972320557, throughput(example/s)=10.547305006073502
+acc: 6.0, acc_norm: 9.0, avg_acc: 0.6197916666666666, avg_acc_norm: 0.75, count: 192
+elapsed=17.036128997802734, throughput(example/s)=11.270165894186617
+acc: 1.0, acc_norm: 3.0, avg_acc: 0.6122448979591837, avg_acc_norm: 0.75, count: 196
+elapsed=17.196197509765625, throughput(example/s)=11.39786862117004
+acc: 1.0, acc_norm: 3.0, avg_acc: 0.6080402010050251, avg_acc_norm: 0.7537688442211056, count: 199
+elapsed=17.35677146911621, throughput(example/s)=11.465265896603574
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6119402985074627, avg_acc_norm: 0.7562189054726368, count: 201
+elapsed=17.517902374267578, throughput(example/s)=11.473976490202
+acc: 12.0, acc_norm: 12.0, avg_acc: 0.625, avg_acc_norm: 0.7592592592592593, count: 216
+elapsed=17.841822862625122, throughput(example/s)=12.10638630722395
+acc: 8.0, acc_norm: 7.0, avg_acc: 0.6299559471365639, avg_acc_norm: 0.7533039647577092, count: 227
+elapsed=18.002776861190796, throughput(example/s)=12.60916589425444
+acc: 1.0, acc_norm: 3.0, avg_acc: 0.6233766233766234, avg_acc_norm: 0.7532467532467533, count: 231
+elapsed=18.163294792175293, throughput(example/s)=12.717956881893162
+acc: 3.0, acc_norm: 2.0, avg_acc: 0.6282051282051282, avg_acc_norm: 0.7521367521367521, count: 234
+elapsed=18.324448823928833, throughput(example/s)=12.769824743346877
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6271186440677966, avg_acc_norm: 0.75, count: 236
+elapsed=18.484454870224, throughput(example/s)=12.767484984378125
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6234309623430963, avg_acc_norm: 0.7489539748953975, count: 239
+elapsed=18.644797325134277, throughput(example/s)=12.818589327212155
+acc: 5.0, acc_norm: 4.0, avg_acc: 0.6260162601626016, avg_acc_norm: 0.7439024390243902, count: 246
+elapsed=18.82844614982605, throughput(example/s)=13.06533731155891
+acc: 14.0, acc_norm: 16.0, avg_acc: 0.6292134831460674, avg_acc_norm: 0.7453183520599251, count: 267
+elapsed=19.0130558013916, throughput(example/s)=14.04298197980662
+acc: 9.0, acc_norm: 7.0, avg_acc: 0.6389891696750902, avg_acc_norm: 0.7436823104693141, count: 277
+elapsed=19.19555354118347, throughput(example/s)=14.430425223513613
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6334519572953736, avg_acc_norm: 0.7402135231316725, count: 281
+elapsed=19.378929376602173, throughput(example/s)=14.500285053893387
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.6341463414634146, avg_acc_norm: 0.7421602787456446, count: 287
+elapsed=19.561797618865967, throughput(example/s)=14.671453288281075
+acc: 1.0, acc_norm: 3.0, avg_acc: 0.6288659793814433, avg_acc_norm: 0.7422680412371134, count: 291
+elapsed=19.74419116973877, throughput(example/s)=14.738512076706668
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6313993174061433, avg_acc_norm: 0.7440273037542662, count: 293
+elapsed=19.92752718925476, throughput(example/s)=14.703279399261854
+acc: 8.0, acc_norm: 8.0, avg_acc: 0.6327868852459017, avg_acc_norm: 0.740983606557377, count: 305
+elapsed=20.11209511756897, throughput(example/s)=15.165003855494225
+acc: 11.0, acc_norm: 12.0, avg_acc: 0.6394984326018809, avg_acc_norm: 0.7460815047021944, count: 319
+elapsed=20.294856786727905, throughput(example/s)=15.718268098773397
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.6380368098159509, avg_acc_norm: 0.745398773006135, count: 326
+elapsed=20.478291988372803, throughput(example/s)=15.91929640348408
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6374622356495468, avg_acc_norm: 0.743202416918429, count: 331
+elapsed=20.66080117225647, throughput(example/s)=16.020675928311537
+acc: 5.0, acc_norm: 6.0, avg_acc: 0.6371681415929203, avg_acc_norm: 0.7433628318584071, count: 339
+elapsed=20.844045639038086, throughput(example/s)=16.263637389331883
+acc: 2.0, acc_norm: 1.0, avg_acc: 0.6374269005847953, avg_acc_norm: 0.7397660818713451, count: 342
+elapsed=21.02715253829956, throughput(example/s)=16.2646844063679
+acc: 12.0, acc_norm: 12.0, avg_acc: 0.6406685236768802, avg_acc_norm: 0.7381615598885793, count: 359
+elapsed=21.215293884277344, throughput(example/s)=16.92175474722294
+acc: 8.0, acc_norm: 10.0, avg_acc: 0.6380697050938338, avg_acc_norm: 0.7372654155495979, count: 373
+elapsed=21.402282238006592, throughput(example/s)=17.42804789937866
+acc: 5.0, acc_norm: 5.0, avg_acc: 0.6344647519582245, avg_acc_norm: 0.7310704960835509, count: 383
+elapsed=21.58984351158142, throughput(example/s)=17.739822884521956
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6356589147286822, avg_acc_norm: 0.7312661498708011, count: 387
+elapsed=21.77711319923401, throughput(example/s)=17.770950468017606
+acc: 5.0, acc_norm: 7.0, avg_acc: 0.6370558375634517, avg_acc_norm: 0.7360406091370558, count: 394
+elapsed=21.964178562164307, throughput(example/s)=17.938298893577016
+acc: 4.0, acc_norm: 9.0, avg_acc: 0.6327543424317618, avg_acc_norm: 0.7419354838709677, count: 403
+elapsed=22.15274167060852, throughput(example/s)=18.19187918101741
+acc: 12.0, acc_norm: 14.0, avg_acc: 0.6372315035799523, avg_acc_norm: 0.747016706443914, count: 419
+elapsed=22.340951919555664, throughput(example/s)=18.754796192602587
+acc: 7.0, acc_norm: 8.0, avg_acc: 0.6386946386946387, avg_acc_norm: 0.7482517482517482, count: 429
+elapsed=22.527273178100586, throughput(example/s)=19.043583153998565
+acc: 6.0, acc_norm: 8.0, avg_acc: 0.6407322654462243, avg_acc_norm: 0.7528604118993135, count: 437
+elapsed=22.714977025985718, throughput(example/s)=19.238408187693793
+acc: 6.0, acc_norm: 6.0, avg_acc: 0.6455981941309256, avg_acc_norm: 0.7562076749435666, count: 443
+elapsed=22.90243148803711, throughput(example/s)=19.34292436291742
+acc: 9.0, acc_norm: 12.0, avg_acc: 0.6455142231947484, avg_acc_norm: 0.7592997811816192, count: 457
+elapsed=23.123976945877075, throughput(example/s)=19.76303648241967
+acc: 7.0, acc_norm: 10.0, avg_acc: 0.6398305084745762, avg_acc_norm: 0.7563559322033898, count: 472
+elapsed=23.342951774597168, throughput(example/s)=20.220236264791982
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.6401673640167364, avg_acc_norm: 0.7573221757322176, count: 478
+elapsed=23.562731981277466, throughput(example/s)=20.28627242290115
+acc: 5.0, acc_norm: 6.0, avg_acc: 0.6372950819672131, avg_acc_norm: 0.7540983606557377, count: 488
+elapsed=23.782849550247192, throughput(example/s)=20.51898780963898
+acc: 11.0, acc_norm: 11.0, avg_acc: 0.6388888888888888, avg_acc_norm: 0.751984126984127, count: 504
+elapsed=24.003510236740112, throughput(example/s)=20.99692899201761
+acc: 9.0, acc_norm: 9.0, avg_acc: 0.6439688715953308, avg_acc_norm: 0.754863813229572, count: 514
+elapsed=24.223076581954956, throughput(example/s)=21.219435040010797
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.6429942418426103, avg_acc_norm: 0.7543186180422264, count: 521
+elapsed=24.442663431167603, throughput(example/s)=21.31518938053439
+acc: 9.0, acc_norm: 15.0, avg_acc: 0.6382189239332097, avg_acc_norm: 0.7569573283858998, count: 539
+elapsed=24.66766881942749, throughput(example/s)=21.850463614766074
+acc: 8.0, acc_norm: 8.0, avg_acc: 0.64, avg_acc_norm: 0.7563636363636363, count: 550
+elapsed=24.891369342803955, throughput(example/s)=22.096012172950378
+acc: 5.0, acc_norm: 6.0, avg_acc: 0.6397849462365591, avg_acc_norm: 0.7562724014336918, count: 558
+elapsed=25.11509132385254, throughput(example/s)=22.217717339934616
+acc: 9.0, acc_norm: 9.0, avg_acc: 0.6421052631578947, avg_acc_norm: 0.756140350877193, count: 570
+elapsed=25.339613676071167, throughput(example/s)=22.49442344648945
+acc: 9.0, acc_norm: 10.0, avg_acc: 0.6432246998284734, avg_acc_norm: 0.7564322469982847, count: 583
+elapsed=25.56234097480774, throughput(example/s)=22.806987848826505
+acc: 7.0, acc_norm: 9.0, avg_acc: 0.6377295492487479, avg_acc_norm: 0.7512520868113522, count: 599
+elapsed=25.80609703063965, throughput(example/s)=23.211568928412756
+acc: 5.0, acc_norm: 9.0, avg_acc: 0.6323529411764706, avg_acc_norm: 0.75, count: 612
+elapsed=26.049088716506958, throughput(example/s)=23.49410402261726
+acc: 11.0, acc_norm: 12.0, avg_acc: 0.6347687400318979, avg_acc_norm: 0.7511961722488039, count: 627
+elapsed=26.292479515075684, throughput(example/s)=23.847123267339175
+acc: 7.0, acc_norm: 6.0, avg_acc: 0.6318252730109204, avg_acc_norm: 0.7441497659906396, count: 641
+elapsed=26.535467624664307, throughput(example/s)=24.156348366146766
+acc: 6.0, acc_norm: 12.0, avg_acc: 0.6217851739788199, avg_acc_norm: 0.7397881996974282, count: 661
+elapsed=26.78368377685547, throughput(example/s)=24.679204156792974
+acc: 9.0, acc_norm: 10.0, avg_acc: 0.6222222222222222, avg_acc_norm: 0.7392592592592593, count: 675
+elapsed=27.031984329223633, throughput(example/s)=24.970419921051583
+acc: 13.0, acc_norm: 15.0, avg_acc: 0.6221264367816092, avg_acc_norm: 0.7385057471264368, count: 696
+elapsed=27.279990673065186, throughput(example/s)=25.513205203812383
+acc: 15.0, acc_norm: 20.0, avg_acc: 0.6213592233009708, avg_acc_norm: 0.7406380027739251, count: 721
+elapsed=27.547887802124023, throughput(example/s)=26.17260550714196
+acc: 16.0, acc_norm: 19.0, avg_acc: 0.6203208556149733, avg_acc_norm: 0.7393048128342246, count: 748
+elapsed=27.81960964202881, throughput(example/s)=26.887508833695136
+acc: 14.0, acc_norm: 18.0, avg_acc: 0.6199740596627756, avg_acc_norm: 0.7405966277561609, count: 771
+elapsed=28.090413808822632, throughput(example/s)=27.447085872328604
+acc: 14.0, acc_norm: 23.0, avg_acc: 0.615, avg_acc_norm: 0.7425, count: 800
+elapsed=28.4018132686615, throughput(example/s)=28.167215678539733
+acc: 11.0, acc_norm: 24.0, avg_acc: 0.6031175059952039, avg_acc_norm: 0.7410071942446043, count: 834
+elapsed=29.329004049301147, throughput(example/s)=28.436015031334573
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6035928143712574, avg_acc_norm: 0.7413173652694611, count: 835
+elapsed=31.875900983810425, throughput(example/s)=26.1953379897902
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.6028708133971292, avg_acc_norm: 0.7404306220095693, count: 836
+elapsed=31.961918592453003, throughput(example/s)=26.156126941559766
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6026252983293556, avg_acc_norm: 0.7410501193317423, count: 838
+elapsed=32.04772424697876, throughput(example/s)=26.14850257515558
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.601907032181168, avg_acc_norm: 0.7413587604290822, count: 839
+elapsed=32.24678063392639, throughput(example/s)=26.0181011408407
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6028537455410226, avg_acc_norm: 0.7419738406658739, count: 841
+elapsed=32.345845460891724, throughput(example/s)=26.00024788397709
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6033254156769596, avg_acc_norm: 0.7422802850356295, count: 842
+elapsed=32.44691872596741, throughput(example/s)=25.95007578720083
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.6026097271648873, avg_acc_norm: 0.741399762752076, count: 843
+elapsed=32.54782056808472, throughput(example/s)=25.90035170670128
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6033057851239669, avg_acc_norm: 0.7414403778040142, count: 847
+elapsed=32.64845275878906, throughput(example/s)=25.943036451305797
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6030624263839811, avg_acc_norm: 0.7420494699646644, count: 849
+elapsed=32.7488431930542, throughput(example/s)=25.92457983920687
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6032863849765259, avg_acc_norm: 0.7417840375586855, count: 852
+elapsed=32.85438632965088, throughput(example/s)=25.932610381192095
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.602803738317757, avg_acc_norm: 0.741822429906542, count: 856
+elapsed=32.958792209625244, throughput(example/s)=25.97182550123954
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6030267753201397, avg_acc_norm: 0.7415599534342259, count: 859
+elapsed=33.06315898895264, throughput(example/s)=25.980578573481647
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6020881670533643, avg_acc_norm: 0.740139211136891, count: 862
+elapsed=33.167444944381714, throughput(example/s)=25.989339891736687
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6020761245674741, avg_acc_norm: 0.7393310265282583, count: 867
+elapsed=33.27170395851135, throughput(example/s)=26.05817847745696
+acc: 2.0, acc_norm: 1.0, avg_acc: 0.6022988505747127, avg_acc_norm: 0.7379310344827587, count: 870
+elapsed=33.375582218170166, throughput(example/s)=26.06696099900121
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.5995423340961098, avg_acc_norm: 0.7356979405034325, count: 874
+elapsed=33.50764060020447, throughput(example/s)=26.083603152728895
+acc: 5.0, acc_norm: 5.0, avg_acc: 0.5997732426303855, avg_acc_norm: 0.7346938775510204, count: 882
+elapsed=33.63936686515808, throughput(example/s)=26.2192806284214
+acc: 2.0, acc_norm: 1.0, avg_acc: 0.5993227990970654, avg_acc_norm: 0.7325056433408578, count: 886
+elapsed=33.77079463005066, throughput(example/s)=26.235687069430114
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.5997757847533632, avg_acc_norm: 0.7331838565022422, count: 892
+elapsed=33.902185678482056, throughput(example/s)=26.310987983472653
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.6015625, avg_acc_norm: 0.734375, count: 896
+elapsed=34.03304624557495, throughput(example/s)=26.327352348498625
+acc: 6.0, acc_norm: 5.0, avg_acc: 0.6028761061946902, avg_acc_norm: 0.7334070796460177, count: 904
+elapsed=34.16403651237488, throughput(example/s)=26.460573523639503
+acc: 3.0, acc_norm: 5.0, avg_acc: 0.6021978021978022, avg_acc_norm: 0.734065934065934, count: 910
+elapsed=34.294678926467896, throughput(example/s)=26.534728665958777
+acc: 5.0, acc_norm: 9.0, avg_acc: 0.6017410228509249, avg_acc_norm: 0.7366702937976061, count: 919
+elapsed=34.43051886558533, throughput(example/s)=26.691436268727774
+acc: 8.0, acc_norm: 6.0, avg_acc: 0.6045258620689655, avg_acc_norm: 0.7359913793103449, count: 928
+elapsed=34.56590819358826, throughput(example/s)=26.847262186854323
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.6038543897216274, avg_acc_norm: 0.7355460385438972, count: 934
+elapsed=34.70115661621094, throughput(example/s)=26.915529367792715
+acc: 3.0, acc_norm: 5.0, avg_acc: 0.6031914893617021, avg_acc_norm: 0.7361702127659574, count: 940
+elapsed=34.83680701255798, throughput(example/s)=26.98295511586778
+acc: 6.0, acc_norm: 4.0, avg_acc: 0.6057082452431289, avg_acc_norm: 0.7357293868921776, count: 946
+elapsed=34.97224974632263, throughput(example/s)=27.05001842495057
+acc: 2.0, acc_norm: 6.0, avg_acc: 0.6039915966386554, avg_acc_norm: 0.7373949579831933, count: 952
+elapsed=35.10725975036621, throughput(example/s)=27.11689852096957
+acc: 7.0, acc_norm: 5.0, avg_acc: 0.60625, avg_acc_norm: 0.7364583333333333, count: 960
+elapsed=35.268086433410645, throughput(example/s)=27.22007619587094
+acc: 6.0, acc_norm: 5.0, avg_acc: 0.6055612770339855, avg_acc_norm: 0.733264675592173, count: 971
+elapsed=35.427921772003174, throughput(example/s)=27.407760642830883
+acc: 3.0, acc_norm: 5.0, avg_acc: 0.6036772216547498, avg_acc_norm: 0.7323799795709908, count: 979
+elapsed=35.587488651275635, throughput(example/s)=27.509668063214338
+acc: 7.0, acc_norm: 9.0, avg_acc: 0.6046511627906976, avg_acc_norm: 0.7340748230535895, count: 989
+elapsed=35.74796414375305, throughput(example/s)=27.66591115574976
+acc: 4.0, acc_norm: 3.0, avg_acc: 0.6044176706827309, avg_acc_norm: 0.7319277108433735, count: 996
+elapsed=35.9076874256134, throughput(example/s)=27.73779297436851
+acc: 5.0, acc_norm: 7.0, avg_acc: 0.6015857284440039, avg_acc_norm: 0.7294350842418236, count: 1009
+elapsed=36.07229447364807, throughput(example/s)=27.97160576345111
+acc: 7.0, acc_norm: 5.0, avg_acc: 0.6031434184675835, avg_acc_norm: 0.7278978388998035, count: 1018
+elapsed=36.23711657524109, throughput(example/s)=28.092742916955643
+acc: 9.0, acc_norm: 10.0, avg_acc: 0.6048543689320388, avg_acc_norm: 0.7291262135922331, count: 1030
+elapsed=36.401691913604736, throughput(example/s)=28.295388094723386
+acc: 9.0, acc_norm: 14.0, avg_acc: 0.6042065009560229, avg_acc_norm: 0.731357552581262, count: 1046
+elapsed=36.58900213241577, throughput(example/s)=28.587825276418336
+acc: 11.0, acc_norm: 13.0, avg_acc: 0.6043233082706767, avg_acc_norm: 0.731203007518797, count: 1064
+elapsed=36.774354696273804, throughput(example/s)=28.933206545370346
+acc: 15.0, acc_norm: 16.0, avg_acc: 0.6064516129032258, avg_acc_norm: 0.7317972350230415, count: 1085
+elapsed=36.95995855331421, throughput(example/s)=29.3560935257788
+acc: 7.0, acc_norm: 10.0, avg_acc: 0.6029011786038078, avg_acc_norm: 0.728921124206709, count: 1103
+elapsed=37.15009379386902, throughput(example/s)=29.690369185071376
+acc: 9.0, acc_norm: 11.0, avg_acc: 0.6012488849241748, avg_acc_norm: 0.7270294380017841, count: 1121
+elapsed=37.34022831916809, throughput(example/s)=30.021241177696552
+acc: 13.0, acc_norm: 16.0, avg_acc: 0.6015761821366025, avg_acc_norm: 0.7276707530647986, count: 1142
+elapsed=37.56363010406494, throughput(example/s)=30.401747563700418
+acc: 14.0, acc_norm: 18.0, avg_acc: 0.6027515047291487, avg_acc_norm: 0.7300085984522786, count: 1163
+elapsed=37.79068112373352, throughput(example/s)=30.77478270878812
+acc: 7.0, acc_norm: 21.0, avg_acc: 0.5964616680707666, avg_acc_norm: 0.7329401853411963, count: 1187
+elapsed=38.04330325126648, throughput(example/s)=31.201286390936207
+acc: 17.0, acc_norm: 30.0, avg_acc: 0.5947497949138638, avg_acc_norm: 0.7383100902379, count: 1219
+elapsed=38.787312030792236, throughput(example/s)=31.42780296382146
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5950819672131148, avg_acc_norm: 0.7385245901639345, count: 1220
+elapsed=41.26523542404175, throughput(example/s)=29.564837991672032
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.5945945945945946, avg_acc_norm: 0.737919737919738, count: 1221
+elapsed=41.436965465545654, throughput(example/s)=29.466443458926715
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.5951020408163266, avg_acc_norm: 0.7379591836734694, count: 1225
+elapsed=41.62404441833496, throughput(example/s)=29.430105053904857
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.5946166394779772, avg_acc_norm: 0.7373572593800979, count: 1226
+elapsed=41.72372508049011, throughput(example/s)=29.38376181980151
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5952768729641694, avg_acc_norm: 0.737785016286645, count: 1228
+elapsed=41.92746090888977, throughput(example/s)=29.288680339324586
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5951219512195122, avg_acc_norm: 0.7373983739837399, count: 1230
+elapsed=42.02895164489746, throughput(example/s)=29.265540820343745
+acc: 4.0, acc_norm: 3.0, avg_acc: 0.5964343598055105, avg_acc_norm: 0.7374392220421394, count: 1234
+elapsed=42.23323845863342, throughput(example/s)=29.21869231526437
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5967611336032389, avg_acc_norm: 0.7376518218623481, count: 1235
+elapsed=42.33548641204834, throughput(example/s)=29.171744667814398
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5970873786407767, avg_acc_norm: 0.7378640776699029, count: 1236
+elapsed=42.437723875045776, throughput(example/s)=29.12503044789338
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5972558514931396, avg_acc_norm: 0.7376916868442293, count: 1239
+elapsed=42.54496216773987, throughput(example/s)=29.122131901658708
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.5982286634460547, avg_acc_norm: 0.7383252818035426, count: 1242
+elapsed=42.65169882774353, throughput(example/s)=29.119590406376023
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.5987158908507223, avg_acc_norm: 0.7383627608346709, count: 1246
+elapsed=42.75810503959656, throughput(example/s)=29.1406740042883
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.5995203836930456, avg_acc_norm: 0.7386091127098321, count: 1251
+elapsed=42.88894987106323, throughput(example/s)=29.168352308948414
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.599203187250996, avg_acc_norm: 0.7378486055776893, count: 1255
+elapsed=43.01923871040344, throughput(example/s)=29.17299416775826
+acc: 5.0, acc_norm: 6.0, avg_acc: 0.5988924050632911, avg_acc_norm: 0.7373417721518988, count: 1264
+elapsed=43.149001121520996, throughput(example/s)=29.29384150609149
+acc: 7.0, acc_norm: 7.0, avg_acc: 0.6011014948859166, avg_acc_norm: 0.7387883556254917, count: 1271
+elapsed=43.283408641815186, throughput(example/s)=29.36460042964624
+acc: 6.0, acc_norm: 6.0, avg_acc: 0.6025039123630673, avg_acc_norm: 0.7394366197183099, count: 1278
+elapsed=43.417471170425415, throughput(example/s)=29.43515514718721
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.6018662519440124, avg_acc_norm: 0.7387247278382582, count: 1286
+elapsed=43.55161452293396, throughput(example/s)=29.528181999379193
+acc: 6.0, acc_norm: 8.0, avg_acc: 0.6018518518518519, avg_acc_norm: 0.7391975308641975, count: 1296
+elapsed=43.68569803237915, throughput(example/s)=29.666459696704976
+acc: 7.0, acc_norm: 5.0, avg_acc: 0.6030651340996168, avg_acc_norm: 0.7379310344827587, count: 1305
+elapsed=43.819825172424316, throughput(example/s)=29.78104077013143
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6025934401220442, avg_acc_norm: 0.7368421052631579, count: 1311
+elapsed=43.95847225189209, throughput(example/s)=29.82360243294331
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.6010598031794095, avg_acc_norm: 0.7342922028766087, count: 1321
+elapsed=44.09593319892883, throughput(example/s)=29.957411129969902
+acc: 8.0, acc_norm: 9.0, avg_acc: 0.600749063670412, avg_acc_norm: 0.7333333333333333, count: 1335
+elapsed=44.2337064743042, throughput(example/s)=30.180604484851724
+acc: 5.0, acc_norm: 4.0, avg_acc: 0.6008935219657483, avg_acc_norm: 0.7319434102755026, count: 1343
+elapsed=44.39336705207825, throughput(example/s)=30.25226715568826
+acc: 6.0, acc_norm: 6.0, avg_acc: 0.6017764618800888, avg_acc_norm: 0.7320503330866025, count: 1351
+elapsed=44.55174684524536, throughput(example/s)=30.32428794975928
+acc: 5.0, acc_norm: 7.0, avg_acc: 0.6014705882352941, avg_acc_norm: 0.7323529411764705, count: 1360
+elapsed=44.71583008766174, throughput(example/s)=30.414284993341973
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.6005852231163131, avg_acc_norm: 0.731528895391368, count: 1367
+elapsed=44.892783880233765, throughput(example/s)=30.450328133958482
+acc: 10.0, acc_norm: 12.0, avg_acc: 0.6013024602026049, avg_acc_norm: 0.7322720694645442, count: 1382
+elapsed=45.04049062728882, throughput(example/s)=30.68350234983194
+acc: 10.0, acc_norm: 11.0, avg_acc: 0.6015736766809728, avg_acc_norm: 0.7317596566523605, count: 1398
+elapsed=45.2081823348999, throughput(example/s)=30.92360559076867
+acc: 4.0, acc_norm: 6.0, avg_acc: 0.5984419263456091, avg_acc_norm: 0.7287535410764873, count: 1412
+elapsed=45.37601017951965, throughput(example/s)=31.117764528299197
+acc: 7.0, acc_norm: 7.0, avg_acc: 0.5978947368421053, avg_acc_norm: 0.7270175438596491, count: 1425
+elapsed=45.560832500457764, throughput(example/s)=31.27686483748256
+acc: 6.0, acc_norm: 10.0, avg_acc: 0.5962473940236275, avg_acc_norm: 0.7268936761640028, count: 1439
+elapsed=45.74897885322571, throughput(example/s)=31.45425397617455
+acc: 7.0, acc_norm: 12.0, avg_acc: 0.5940934065934066, avg_acc_norm: 0.7266483516483516, count: 1456
+elapsed=45.937666177749634, throughput(example/s)=31.695123438927077
+acc: 5.0, acc_norm: 8.0, avg_acc: 0.5918367346938775, avg_acc_norm: 0.7251700680272108, count: 1470
+elapsed=46.13176345825195, throughput(example/s)=31.8652461948547
+acc: 11.0, acc_norm: 16.0, avg_acc: 0.5916722632639355, avg_acc_norm: 0.7266621893888516, count: 1489
+elapsed=46.35397458076477, throughput(example/s)=32.12238030216035
+acc: 10.0, acc_norm: 12.0, avg_acc: 0.5904572564612326, avg_acc_norm: 0.7249834327369119, count: 1509
+elapsed=46.57921290397644, throughput(example/s)=32.3964254851369
+acc: 9.0, acc_norm: 22.0, avg_acc: 0.5867014341590613, avg_acc_norm: 0.727509778357236, count: 1534
+elapsed=46.83073544502258, throughput(example/s)=32.756265418911795
+acc: 18.0, acc_norm: 23.0, avg_acc: 0.5869565217391305, avg_acc_norm: 0.7282608695652174, count: 1564
+elapsed=47.38842725753784, throughput(example/s)=33.00383850049006
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.5865814696485623, avg_acc_norm: 0.7277955271565495, count: 1565
+elapsed=49.952900886535645, throughput(example/s)=31.32951184466309
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.5862068965517241, avg_acc_norm: 0.7273307790549169, count: 1566
+elapsed=50.03825068473816, throughput(example/s)=31.296058086971364
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.5854591836734694, avg_acc_norm: 0.7270408163265306, count: 1568
+elapsed=50.1255669593811, throughput(example/s)=31.281441689639493
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.5850860420650096, avg_acc_norm: 0.7265774378585086, count: 1569
+elapsed=50.21265172958374, throughput(example/s)=31.247104981623462
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5853503184713376, avg_acc_norm: 0.7267515923566878, count: 1570
+elapsed=50.31355023384094, throughput(example/s)=31.20431757852811
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5856142584341184, avg_acc_norm: 0.7269255251432208, count: 1571
+elapsed=50.51471424102783, throughput(example/s)=31.099849293496362
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5855054036872218, avg_acc_norm: 0.7266369993642721, count: 1573
+elapsed=50.61743116378784, throughput(example/s)=31.076251082558652
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.5851334180432021, avg_acc_norm: 0.7261753494282084, count: 1574
+elapsed=50.71954345703125, throughput(example/s)=31.033402367540365
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.5843908629441624, avg_acc_norm: 0.725253807106599, count: 1576
+elapsed=50.82583045959473, throughput(example/s)=31.00785537095908
+acc: 3.0, acc_norm: 5.0, avg_acc: 0.5829652996845426, avg_acc_norm: 0.7242902208201892, count: 1585
+elapsed=50.932188510894775, throughput(example/s)=31.119809423876546
+acc: 5.0, acc_norm: 5.0, avg_acc: 0.5839094908862351, avg_acc_norm: 0.7247014456316782, count: 1591
+elapsed=51.03821587562561, throughput(example/s)=31.172719749395004
+acc: 1.0, acc_norm: 3.0, avg_acc: 0.5823418910457107, avg_acc_norm: 0.7238572323105823, count: 1597
+elapsed=51.143232345581055, throughput(example/s)=31.226027897667404
+acc: 4.0, acc_norm: 6.0, avg_acc: 0.5815691158156912, avg_acc_norm: 0.7235367372353674, count: 1606
+elapsed=51.249154567718506, throughput(example/s)=31.337102310202958
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.581727781230578, avg_acc_norm: 0.723430702299565, count: 1609
+elapsed=51.3547306060791, throughput(example/s)=31.331096103725546
+acc: 6.0, acc_norm: 5.0, avg_acc: 0.5825602968460112, avg_acc_norm: 0.7229437229437229, count: 1617
+elapsed=51.48857760429382, throughput(example/s)=31.405023701123806
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.581739666872301, avg_acc_norm: 0.7223935842072795, count: 1621
+elapsed=51.621341943740845, throughput(example/s)=31.401740810353893
+acc: 5.0, acc_norm: 7.0, avg_acc: 0.5815950920245399, avg_acc_norm: 0.7226993865030675, count: 1630
+elapsed=51.75429320335388, throughput(example/s)=31.494971703997102
+acc: 5.0, acc_norm: 4.0, avg_acc: 0.5807434491163924, avg_acc_norm: 0.720292504570384, count: 1641
+elapsed=51.88709259033203, throughput(example/s)=31.62636251285667
+acc: 3.0, acc_norm: 7.0, avg_acc: 0.5797453001819285, avg_acc_norm: 0.7210430563978169, count: 1649
+elapsed=52.01942706108093, throughput(example/s)=31.699695539971117
+acc: 6.0, acc_norm: 9.0, avg_acc: 0.5795180722891566, avg_acc_norm: 0.7216867469879518, count: 1660
+elapsed=52.157002687454224, throughput(example/s)=31.826982274027305
+acc: 5.0, acc_norm: 6.0, avg_acc: 0.579388855602157, avg_acc_norm: 0.7213900539245057, count: 1669
+elapsed=52.29303503036499, throughput(example/s)=31.91629629129122
+acc: 5.0, acc_norm: 8.0, avg_acc: 0.5796064400715564, avg_acc_norm: 0.7227191413237924, count: 1677
+elapsed=52.42962861061096, throughput(example/s)=31.98573105399798
+acc: 2.0, acc_norm: 6.0, avg_acc: 0.5770142180094787, avg_acc_norm: 0.7215639810426541, count: 1688
+elapsed=52.59163546562195, throughput(example/s)=32.09635876608953
+acc: 5.0, acc_norm: 5.0, avg_acc: 0.5772405660377359, avg_acc_norm: 0.7211084905660378, count: 1696
+elapsed=52.75349020957947, throughput(example/s)=32.14953159046195
+acc: 4.0, acc_norm: 7.0, avg_acc: 0.5758640890451083, avg_acc_norm: 0.7205623901581723, count: 1707
+elapsed=52.91531443595886, throughput(example/s)=32.25909206428148
+acc: 7.0, acc_norm: 8.0, avg_acc: 0.5769230769230769, avg_acc_norm: 0.7214452214452215, count: 1716
+elapsed=53.08177089691162, throughput(example/s)=32.32748212814127
+acc: 7.0, acc_norm: 11.0, avg_acc: 0.5769675925925926, avg_acc_norm: 0.7228009259259259, count: 1728
+elapsed=53.24712777137756, throughput(example/s)=32.45245466420948
+acc: 9.0, acc_norm: 10.0, avg_acc: 0.5778288340034463, avg_acc_norm: 0.723147616312464, count: 1741
+elapsed=53.435521364212036, throughput(example/s)=32.58132335106249
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.5771428571428572, avg_acc_norm: 0.7222857142857143, count: 1750
+elapsed=53.62282395362854, throughput(example/s)=32.6353569426584
+acc: 8.0, acc_norm: 11.0, avg_acc: 0.5777525539160046, avg_acc_norm: 0.7236095346197503, count: 1762
+elapsed=53.81474804878235, throughput(example/s)=32.741953904583376
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.5761851015801355, avg_acc_norm: 0.7217832957110609, count: 1772
+elapsed=54.00689625740051, throughput(example/s)=32.81062462013237
+acc: 8.0, acc_norm: 15.0, avg_acc: 0.5751816657350475, avg_acc_norm: 0.723309111235327, count: 1789
+elapsed=54.232686281204224, throughput(example/s)=32.98748637904048
+acc: 8.0, acc_norm: 12.0, avg_acc: 0.57387935805202, avg_acc_norm: 0.7227448810182623, count: 1807
+elapsed=54.46064019203186, throughput(example/s)=33.17992578912766
+acc: 11.0, acc_norm: 12.0, avg_acc: 0.5739320920043811, avg_acc_norm: 0.7217962760131434, count: 1826
+elapsed=54.714526653289795, throughput(example/s)=33.373221184400194
+acc: 12.0, acc_norm: 18.0, avg_acc: 0.5732828555976204, avg_acc_norm: 0.7225527312060573, count: 1849
+elapsed=54.992719650268555, throughput(example/s)=33.62263244587451
+acc: 14.0, acc_norm: 22.0, avg_acc: 0.5721896643580181, avg_acc_norm: 0.7234949387320192, count: 1877
+elapsed=55.61554932594299, throughput(example/s)=33.74955426583255
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5724174653887114, avg_acc_norm: 0.7236421725239617, count: 1878
+elapsed=58.21769046783447, throughput(example/s)=32.25823602599974
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.5721128259712613, avg_acc_norm: 0.7237892496008516, count: 1879
+elapsed=58.39300322532654, throughput(example/s)=32.17851277060245
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5720361509835195, avg_acc_norm: 0.723551302498671, count: 1881
+elapsed=58.49479961395264, throughput(example/s)=32.15670473980612
+acc: 1.0, acc_norm: 0.0, avg_acc: 0.5722635494155154, avg_acc_norm: 0.7231668437832094, count: 1882
+elapsed=58.59586548805237, throughput(example/s)=32.11830705672805
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.5721102863202545, avg_acc_norm: 0.7232237539766702, count: 1886
+elapsed=58.69904661178589, throughput(example/s)=32.12999373692246
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5720338983050848, avg_acc_norm: 0.7229872881355932, count: 1888
+elapsed=58.80170440673828, throughput(example/s)=32.10791284110547
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.5715795034337031, avg_acc_norm: 0.722662440570523, count: 1893
+elapsed=58.90852928161621, throughput(example/s)=32.13456562377216
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.5712777191129884, avg_acc_norm: 0.7222808870116156, count: 1894
+elapsed=59.01491975784302, throughput(example/s)=32.093579179158155
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5717299578059072, avg_acc_norm: 0.7225738396624473, count: 1896
+elapsed=59.12058758735657, throughput(example/s)=32.07004661782955
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5718799368088467, avg_acc_norm: 0.7224855186940495, count: 1899
+elapsed=59.22637057304382, throughput(example/s)=32.06342008848854
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.571953781512605, avg_acc_norm: 0.7226890756302521, count: 1904
+elapsed=59.360676765441895, throughput(example/s)=32.07510600870465
+acc: 3.0, acc_norm: 5.0, avg_acc: 0.5717277486910994, avg_acc_norm: 0.7230366492146597, count: 1910
+elapsed=59.49384379386902, throughput(example/s)=32.1041620141012
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5715778474399164, avg_acc_norm: 0.7225705329153606, count: 1914
+elapsed=59.627028942108154, throughput(example/s)=32.09953663561372
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.5722483046426708, avg_acc_norm: 0.7230046948356808, count: 1917
+elapsed=59.760154724121094, throughput(example/s)=32.078230199531895
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.572840790842872, avg_acc_norm: 0.7232049947970863, count: 1922
+elapsed=59.892245292663574, throughput(example/s)=32.09096587727081
+acc: 4.0, acc_norm: 8.0, avg_acc: 0.5722423614707406, avg_acc_norm: 0.7239772138788193, count: 1931
+elapsed=60.03010272979736, throughput(example/s)=32.16719466051325
+acc: 3.0, acc_norm: 2.0, avg_acc: 0.5720185854414043, avg_acc_norm: 0.7227671657201858, count: 1937
+elapsed=60.167202949523926, throughput(example/s)=32.19361886616214
+acc: 5.0, acc_norm: 6.0, avg_acc: 0.5713552361396304, avg_acc_norm: 0.7217659137577002, count: 1948
+elapsed=60.30452919006348, throughput(example/s)=32.30271467438928
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.5710633946830266, avg_acc_norm: 0.7213701431492843, count: 1956
+elapsed=60.44206476211548, throughput(example/s)=32.36156818431528
+acc: 7.0, acc_norm: 9.0, avg_acc: 0.5711382113821138, avg_acc_norm: 0.7215447154471545, count: 1968
+elapsed=60.605860233306885, throughput(example/s)=32.47210735767191
+acc: 7.0, acc_norm: 8.0, avg_acc: 0.5720789074355084, avg_acc_norm: 0.7223065250379362, count: 1977
+elapsed=60.767796754837036, throughput(example/s)=32.53367911257427
+acc: 3.0, acc_norm: 8.0, avg_acc: 0.5704225352112676, avg_acc_norm: 0.7223340040241448, count: 1988
+elapsed=60.930439710617065, throughput(example/s)=32.62736998849515
+acc: 5.0, acc_norm: 11.0, avg_acc: 0.5689310689310689, avg_acc_norm: 0.7227772227772228, count: 2002
+elapsed=61.09748721122742, throughput(example/s)=32.76730502972482
+acc: 7.0, acc_norm: 7.0, avg_acc: 0.5684523809523809, avg_acc_norm: 0.7212301587301587, count: 2016
+elapsed=61.26419544219971, throughput(example/s)=32.90665919055469
+acc: 11.0, acc_norm: 15.0, avg_acc: 0.5688298918387414, avg_acc_norm: 0.7222222222222222, count: 2034
+elapsed=61.45317506790161, throughput(example/s)=33.098371202994265
+acc: 4.0, acc_norm: 7.0, avg_acc: 0.5674486803519062, avg_acc_norm: 0.7214076246334311, count: 2046
+elapsed=61.640727281570435, throughput(example/s)=33.192340360522
+acc: 8.0, acc_norm: 9.0, avg_acc: 0.5677513355998057, avg_acc_norm: 0.7212238950947062, count: 2059
+elapsed=61.833033084869385, throughput(example/s)=33.29935306867293
+acc: 6.0, acc_norm: 10.0, avg_acc: 0.5662650602409639, avg_acc_norm: 0.7204819277108434, count: 2075
+elapsed=62.02591896057129, throughput(example/s)=33.45375666774141
+acc: 3.0, acc_norm: 10.0, avg_acc: 0.5644465740297077, avg_acc_norm: 0.7211308097747964, count: 2087
+elapsed=62.251540422439575, throughput(example/s)=33.52527480986972
+acc: 8.0, acc_norm: 13.0, avg_acc: 0.5636882129277566, avg_acc_norm: 0.7214828897338403, count: 2104
+elapsed=62.48072838783264, throughput(example/s)=33.674383354495724
+acc: 11.0, acc_norm: 13.0, avg_acc: 0.5635593220338984, avg_acc_norm: 0.7208097928436912, count: 2124
+elapsed=62.72933340072632, throughput(example/s)=33.8597572276355
+acc: 9.0, acc_norm: 9.0, avg_acc: 0.5640785781103835, avg_acc_norm: 0.7202993451824135, count: 2138
+elapsed=63.004189252853394, throughput(example/s)=33.93425144190983
+acc: 16.0, acc_norm: 27.0, avg_acc: 0.5626151012891344, avg_acc_norm: 0.7214548802946593, count: 2172
+elapsed=64.08952212333679, throughput(example/s)=33.890095105095405
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5627586206896552, avg_acc_norm: 0.7213793103448276, count: 2175
+elapsed=67.41943311691284, throughput(example/s)=32.260728093460926
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5629595588235294, avg_acc_norm: 0.7215073529411765, count: 2176
+elapsed=67.50741815567017, throughput(example/s)=32.233494621023816
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5631023405231758, avg_acc_norm: 0.7214318494722349, count: 2179
+elapsed=67.81582975387573, throughput(example/s)=32.131141179106024
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.563302752293578, avg_acc_norm: 0.7215596330275229, count: 2180
+elapsed=67.91916871070862, throughput(example/s)=32.09697705938332
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5635029802842733, avg_acc_norm: 0.7216872994039432, count: 2181
+elapsed=68.02325987815857, throughput(example/s)=32.062562186912956
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.5638443935926774, avg_acc_norm: 0.7221967963386727, count: 2185
+elapsed=68.12753367424011, throughput(example/s)=32.07220168056922
+acc: 3.0, acc_norm: 2.0, avg_acc: 0.5641845591594336, avg_acc_norm: 0.7217907720420284, count: 2189
+elapsed=68.2366955280304, throughput(example/s)=32.079513567605254
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.5639269406392694, avg_acc_norm: 0.7219178082191781, count: 2190
+elapsed=68.34546566009521, throughput(example/s)=32.04309135724673
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.563669557279781, avg_acc_norm: 0.7215883158375171, count: 2191
+elapsed=68.45378541946411, throughput(example/s)=32.00699547255443
+acc: 6.0, acc_norm: 2.0, avg_acc: 0.564604185623294, avg_acc_norm: 0.7202001819836215, count: 2198
+elapsed=68.58619499206543, throughput(example/s)=32.047265492046634
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.5648820326678766, avg_acc_norm: 0.72005444646098, count: 2204
+elapsed=68.71732544898987, throughput(example/s)=32.07342523300139
+acc: 4.0, acc_norm: 7.0, avg_acc: 0.5649027589326097, avg_acc_norm: 0.7209407507914971, count: 2211
+elapsed=68.85385084152222, throughput(example/s)=32.11149373604329
+acc: 3.0, acc_norm: 2.0, avg_acc: 0.5649819494584838, avg_acc_norm: 0.720216606498195, count: 2216
+elapsed=68.98951506614685, throughput(example/s)=32.1208229667263
+acc: 8.0, acc_norm: 11.0, avg_acc: 0.5652759084791387, avg_acc_norm: 0.7209510991475998, count: 2229
+elapsed=69.12602138519287, throughput(example/s)=32.245454827774346
+acc: 3.0, acc_norm: 5.0, avg_acc: 0.564343163538874, avg_acc_norm: 0.7202859696157283, count: 2238
+elapsed=69.2613434791565, throughput(example/s)=32.3123966065357
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.5641711229946524, avg_acc_norm: 0.7201426024955436, count: 2244
+elapsed=69.40217089653015, throughput(example/s)=32.33328253298474
+acc: 5.0, acc_norm: 6.0, avg_acc: 0.5638864241348713, avg_acc_norm: 0.7196095829636202, count: 2254
+elapsed=69.56300282478333, throughput(example/s)=32.402281506987556
+acc: 8.0, acc_norm: 11.0, avg_acc: 0.5641817379797088, avg_acc_norm: 0.7203352448169387, count: 2267
+elapsed=69.7240982055664, throughput(example/s)=32.513866200409524
+acc: 5.0, acc_norm: 10.0, avg_acc: 0.5631578947368421, avg_acc_norm: 0.7206140350877193, count: 2280
+elapsed=69.8892970085144, throughput(example/s)=32.623020942995524
+acc: 7.0, acc_norm: 7.0, avg_acc: 0.5637554585152839, avg_acc_norm: 0.7205240174672489, count: 2290
+elapsed=70.05404543876648, throughput(example/s)=32.68904722999424
+acc: 6.0, acc_norm: 6.0, avg_acc: 0.5634231103388357, avg_acc_norm: 0.7193744569939183, count: 2302
+elapsed=70.22342705726624, throughput(example/s)=32.78108312946264
+acc: 9.0, acc_norm: 10.0, avg_acc: 0.5639032815198618, avg_acc_norm: 0.7193436960276338, count: 2316
+elapsed=70.41054344177246, throughput(example/s)=32.89280108901967
+acc: 8.0, acc_norm: 12.0, avg_acc: 0.5637065637065637, avg_acc_norm: 0.7198627198627199, count: 2331
+elapsed=70.60123825073242, throughput(example/s)=33.01641809342937
+acc: 7.0, acc_norm: 11.0, avg_acc: 0.5628461866212185, avg_acc_norm: 0.7196420962931401, count: 2347
+elapsed=70.79180264472961, throughput(example/s)=33.15355609431895
+acc: 4.0, acc_norm: 10.0, avg_acc: 0.5612028801355358, avg_acc_norm: 0.7196103346039814, count: 2361
+elapsed=71.01664996147156, throughput(example/s)=33.245724788213835
+acc: 8.0, acc_norm: 11.0, avg_acc: 0.5614995787700084, avg_acc_norm: 0.7203032855939343, count: 2374
+elapsed=71.2445936203003, throughput(example/s)=33.321826672944304
+acc: 8.0, acc_norm: 14.0, avg_acc: 0.560853199498118, avg_acc_norm: 0.7210372229192806, count: 2391
+elapsed=71.47897529602051, throughput(example/s)=33.45039558972407
+acc: 6.0, acc_norm: 7.0, avg_acc: 0.5607826810990841, avg_acc_norm: 0.7206494587843464, count: 2402
+elapsed=71.73080015182495, throughput(example/s)=33.48631264276911
+acc: 7.0, acc_norm: 10.0, avg_acc: 0.5608947804473903, avg_acc_norm: 0.7212096106048053, count: 2414
+elapsed=72.01000666618347, throughput(example/s)=33.52311868530399
+acc: 4.0, acc_norm: 6.0, avg_acc: 0.5606936416184971, avg_acc_norm: 0.7213047068538398, count: 2422
+elapsed=72.31995606422424, throughput(example/s)=33.49006459363894
+acc: 11.0, acc_norm: 12.0, avg_acc: 0.5619868637110016, avg_acc_norm: 0.7220853858784894, count: 2436
+elapsed=72.63659858703613, throughput(example/s)=33.53681267276145
+acc: 4.0, acc_norm: 7.0, avg_acc: 0.5620139173147769, avg_acc_norm: 0.7228817028243962, count: 2443
+elapsed=72.98811674118042, throughput(example/s)=33.471202013103074
+acc: 24.0, acc_norm: 34.0, avg_acc: 0.5628525382755842, avg_acc_norm: 0.7252215954875101, count: 2482
+elapsed=74.23661208152771, throughput(example/s)=33.43363780225089
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.563028594442207, avg_acc_norm: 0.725332259363673, count: 2483
+elapsed=76.89591836929321, throughput(example/s)=32.29040048751839
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.5629778672032193, avg_acc_norm: 0.7255533199195171, count: 2485
+elapsed=76.99989771842957, throughput(example/s)=32.272770141683274
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5629272215520708, avg_acc_norm: 0.7253719340570969, count: 2487
+elapsed=77.10403394699097, throughput(example/s)=32.25512171918025
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5630522088353414, avg_acc_norm: 0.7253012048192771, count: 2490
+elapsed=77.21196103096008, throughput(example/s)=32.24888950821456
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.5630016051364366, avg_acc_norm: 0.7255216693418941, count: 2492
+elapsed=77.31949877738953, throughput(example/s)=32.229903703523924
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.563301282051282, avg_acc_norm: 0.7255608974358975, count: 2496
+elapsed=77.42659950256348, throughput(example/s)=32.23698336277007
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5632, avg_acc_norm: 0.7252, count: 2500
+elapsed=77.53359508514404, throughput(example/s)=32.24408718897412
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.5636726546906188, avg_acc_norm: 0.7253493013972055, count: 2505
+elapsed=77.66980338096619, throughput(example/s)=32.25191632986517
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.5641434262948207, avg_acc_norm: 0.7258964143426295, count: 2510
+elapsed=77.80422639846802, throughput(example/s)=32.260458283400176
+acc: 6.0, acc_norm: 6.0, avg_acc: 0.5651828298887123, avg_acc_norm: 0.7265500794912559, count: 2516
+elapsed=77.9385929107666, throughput(example/s)=32.28182478070418
+acc: 6.0, acc_norm: 6.0, avg_acc: 0.5653206650831354, avg_acc_norm: 0.7260490894695171, count: 2526
+elapsed=78.07744860649109, throughput(example/s)=32.35249159755455
+acc: 5.0, acc_norm: 4.0, avg_acc: 0.5657323332017371, avg_acc_norm: 0.7256217923410975, count: 2533
+elapsed=78.21509099006653, throughput(example/s)=32.385054698992754
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.5653543307086614, avg_acc_norm: 0.7248031496062992, count: 2540
+elapsed=78.35350275039673, throughput(example/s)=32.41718507584065
+acc: 8.0, acc_norm: 9.0, avg_acc: 0.5664966653589643, avg_acc_norm: 0.7257748136524127, count: 2549
+elapsed=78.51769518852234, throughput(example/s)=32.46401965671314
+acc: 7.0, acc_norm: 8.0, avg_acc: 0.566796875, avg_acc_norm: 0.72578125, count: 2560
+elapsed=78.68126082420349, throughput(example/s)=32.536336774264136
+acc: 4.0, acc_norm: 7.0, avg_acc: 0.5665887850467289, avg_acc_norm: 0.7262461059190031, count: 2568
+elapsed=78.84852576255798, throughput(example/s)=32.56877633620184
+acc: 7.0, acc_norm: 10.0, avg_acc: 0.5664471135218907, avg_acc_norm: 0.7264626113909337, count: 2581
+elapsed=79.01657223701477, throughput(example/s)=32.664033973254895
+acc: 11.0, acc_norm: 11.0, avg_acc: 0.5669745958429562, avg_acc_norm: 0.7259430331023865, count: 2598
+elapsed=79.20598816871643, throughput(example/s)=32.800550312761814
+acc: 6.0, acc_norm: 8.0, avg_acc: 0.567101226993865, avg_acc_norm: 0.7262269938650306, count: 2608
+elapsed=79.40016174316406, throughput(example/s)=32.84628069696011
+acc: 6.0, acc_norm: 7.0, avg_acc: 0.566793893129771, avg_acc_norm: 0.7255725190839695, count: 2620
+elapsed=79.59354424476624, throughput(example/s)=32.91724253342671
+acc: 9.0, acc_norm: 9.0, avg_acc: 0.5669829222011386, avg_acc_norm: 0.7248576850094877, count: 2635
+elapsed=79.82131695747375, throughput(example/s)=33.011231841787875
+acc: 7.0, acc_norm: 7.0, avg_acc: 0.5674858223062382, avg_acc_norm: 0.7247637051039697, count: 2645
+elapsed=80.0738787651062, throughput(example/s)=33.03199546207835
+acc: 7.0, acc_norm: 8.0, avg_acc: 0.5681989449886963, avg_acc_norm: 0.725320271288621, count: 2654
+elapsed=80.33066916465759, throughput(example/s)=33.03844008270328
+acc: 5.0, acc_norm: 10.0, avg_acc: 0.5677298311444653, avg_acc_norm: 0.726078799249531, count: 2665
+elapsed=80.61269450187683, throughput(example/s)=33.059309287049736
+acc: 3.0, acc_norm: 7.0, avg_acc: 0.5669409124906507, avg_acc_norm: 0.7262528047868362, count: 2674
+elapsed=80.92786979675293, throughput(example/s)=33.041769253480204
+acc: 7.0, acc_norm: 13.0, avg_acc: 0.5665922619047619, avg_acc_norm: 0.7273065476190477, count: 2688
+elapsed=81.27302384376526, throughput(example/s)=33.07370481461674
+acc: 8.0, acc_norm: 12.0, avg_acc: 0.5666173205033309, avg_acc_norm: 0.727979274611399, count: 2702
+elapsed=81.64556121826172, throughput(example/s)=33.09426697156002
+acc: 11.0, acc_norm: 25.0, avg_acc: 0.5644216691068814, avg_acc_norm: 0.7291361639824304, count: 2732
+elapsed=82.43868899345398, throughput(example/s)=33.139779797043275
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5647403072421361, avg_acc_norm: 0.7293343087051939, count: 2734
+elapsed=85.9363625049591, throughput(example/s)=31.8142392848223
+acc: 1.0, acc_norm: 0.0, avg_acc: 0.5648994515539305, avg_acc_norm: 0.7290676416819013, count: 2735
+elapsed=86.14551973342896, throughput(example/s)=31.74860408832936
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5648520277676288, avg_acc_norm: 0.7289002557544757, count: 2737
+elapsed=86.25391483306885, throughput(example/s)=31.73189304273367
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.5651222181685516, avg_acc_norm: 0.7292958774170011, count: 2741
+elapsed=86.36172986030579, throughput(example/s)=31.738595375911277
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5646630236794171, avg_acc_norm: 0.7285974499089253, count: 2745
+elapsed=86.46972036361694, throughput(example/s)=31.74521657358092
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.5644104803493449, avg_acc_norm: 0.7285298398835517, count: 2748
+elapsed=86.60575580596924, throughput(example/s)=31.72999270575728
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.564, avg_acc_norm: 0.7283636363636363, count: 2750
+elapsed=86.74111270904541, throughput(example/s)=31.703536121611553
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.5642701525054467, avg_acc_norm: 0.7287581699346405, count: 2754
+elapsed=86.87538504600525, throughput(example/s)=31.700578921654355
+acc: 6.0, acc_norm: 6.0, avg_acc: 0.5648081100651702, avg_acc_norm: 0.7288196958725561, count: 2762
+elapsed=87.01445865631104, throughput(example/s)=31.741851212444175
+acc: 5.0, acc_norm: 5.0, avg_acc: 0.565185987721199, avg_acc_norm: 0.7287829541350668, count: 2769
+elapsed=87.15330338478088, throughput(example/s)=31.771601218314068
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.5645915797049298, avg_acc_norm: 0.7279596977329975, count: 2779
+elapsed=87.29261589050293, throughput(example/s)=31.835453338755354
+acc: 7.0, acc_norm: 7.0, avg_acc: 0.5652797704447633, avg_acc_norm: 0.7281205164992827, count: 2788
+elapsed=87.45675086975098, throughput(example/s)=31.878613969459696
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.5655444126074498, avg_acc_norm: 0.7285100286532952, count: 2792
+elapsed=87.62018060684204, throughput(example/s)=31.8648053526379
+acc: 5.0, acc_norm: 7.0, avg_acc: 0.5653104925053534, avg_acc_norm: 0.7284082798001428, count: 2802
+elapsed=87.78875827789307, throughput(example/s)=31.917526286570094
+acc: 7.0, acc_norm: 6.0, avg_acc: 0.5653873489694385, avg_acc_norm: 0.7274342572850035, count: 2814
+elapsed=87.95652079582214, throughput(example/s)=31.99307992789163
+acc: 10.0, acc_norm: 10.0, avg_acc: 0.5663247258577998, avg_acc_norm: 0.7276264591439688, count: 2827
+elapsed=88.14611721038818, throughput(example/s)=32.0717473380306
+acc: 10.0, acc_norm: 11.0, avg_acc: 0.5672535211267605, avg_acc_norm: 0.7281690140845071, count: 2840
+elapsed=88.33517909049988, throughput(example/s)=32.15027160459373
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.5668655668655669, avg_acc_norm: 0.7276237276237276, count: 2849
+elapsed=88.53084921836853, throughput(example/s)=32.180872827422114
+acc: 7.0, acc_norm: 11.0, avg_acc: 0.5657481688175794, avg_acc_norm: 0.7268922218346704, count: 2867
+elapsed=88.7608711719513, throughput(example/s)=32.300268825053855
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.5657620041753654, avg_acc_norm: 0.7268615170494085, count: 2874
+elapsed=88.98762035369873, throughput(example/s)=32.296627200241154
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.5660180681028492, avg_acc_norm: 0.7268936761640028, count: 2878
+elapsed=89.21824383735657, throughput(example/s)=32.25797635343
+acc: 5.0, acc_norm: 8.0, avg_acc: 0.5659854520263249, avg_acc_norm: 0.7273986837547627, count: 2887
+elapsed=89.46901750564575, throughput(example/s)=32.268153607675664
+acc: 3.0, acc_norm: 5.0, avg_acc: 0.5654576856649396, avg_acc_norm: 0.7271157167530224, count: 2895
+elapsed=89.72497320175171, throughput(example/s)=32.26526458236357
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5652173913043478, avg_acc_norm: 0.7267080745341615, count: 2898
+elapsed=90.0018572807312, throughput(example/s)=32.199335519939794
+acc: 2.0, acc_norm: 5.0, avg_acc: 0.5645438898450946, avg_acc_norm: 0.7266781411359725, count: 2905
+elapsed=90.28245401382446, throughput(example/s)=32.17679483496509
+acc: 0.0, acc_norm: 3.0, avg_acc: 0.5637676177380543, avg_acc_norm: 0.726710209694053, count: 2909
+elapsed=90.56125020980835, throughput(example/s)=32.121906370114765
+acc: 5.0, acc_norm: 4.0, avg_acc: 0.5641289437585734, avg_acc_norm: 0.7263374485596708, count: 2916
+elapsed=90.87349128723145, throughput(example/s)=32.0885657488734
+acc: 3.0, acc_norm: 6.0, avg_acc: 0.5634188034188035, avg_acc_norm: 0.7261538461538461, count: 2925
+elapsed=91.1849365234375, throughput(example/s)=32.077666679607546
+acc: 7.0, acc_norm: 9.0, avg_acc: 0.5640763462849352, avg_acc_norm: 0.7269938650306749, count: 2934
+elapsed=91.52939009666443, throughput(example/s)=32.055277511424414
+acc: 10.0, acc_norm: 11.0, avg_acc: 0.5649813369528334, avg_acc_norm: 0.7275195113674924, count: 2947
+elapsed=91.8779399394989, throughput(example/s)=32.07516409206152
+acc: 8.0, acc_norm: 11.0, avg_acc: 0.5650118203309693, avg_acc_norm: 0.7277946639648767, count: 2961
+elapsed=92.2501015663147, throughput(example/s)=32.09752563655946
+acc: 11.0, acc_norm: 12.0, avg_acc: 0.5658602150537635, avg_acc_norm: 0.7281586021505376, count: 2976
+elapsed=92.66269731521606, throughput(example/s)=32.11648361450529
+acc: 15.0, acc_norm: 20.0, avg_acc: 0.5661446184605131, avg_acc_norm: 0.728757080973009, count: 3001
+elapsed=93.10879349708557, throughput(example/s)=32.231112522083485
+acc: 7.0, acc_norm: 24.0, avg_acc: 0.5634081902245707, avg_acc_norm: 0.7301849405548216, count: 3028
+elapsed=93.72497606277466, throughput(example/s)=32.30729019308494
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5635523275008254, avg_acc_norm: 0.7302740178276659, count: 3029
+elapsed=96.32247734069824, throughput(example/s)=31.446450336677383
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.5629947229551451, avg_acc_norm: 0.7298812664907651, count: 3032
+elapsed=96.42868304252625, throughput(example/s)=31.442926568465634
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.563570487483531, avg_acc_norm: 0.7302371541501976, count: 3036
+elapsed=96.6781005859375, throughput(example/s)=31.403182122938887
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5633432050016453, avg_acc_norm: 0.7298453438631128, count: 3039
+elapsed=96.81618332862854, throughput(example/s)=31.389380323788988
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.5632599408478475, avg_acc_norm: 0.7298718370029577, count: 3043
+elapsed=96.95820426940918, throughput(example/s)=31.38465716160218
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.5629508196721311, avg_acc_norm: 0.7291803278688525, count: 3050
+elapsed=97.12122011184692, throughput(example/s)=31.40405357848216
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.56282722513089, avg_acc_norm: 0.7290575916230366, count: 3056
+elapsed=97.28800773620605, throughput(example/s)=31.41188797170424
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.5625204048318642, avg_acc_norm: 0.7286973555337904, count: 3063
+elapsed=97.46138906478882, throughput(example/s)=31.42783033765123
+acc: 0.0, acc_norm: 3.0, avg_acc: 0.5617867623084447, avg_acc_norm: 0.7287251385718944, count: 3067
+elapsed=97.6561439037323, throughput(example/s)=31.40611412041207
+acc: 7.0, acc_norm: 6.0, avg_acc: 0.562053281351527, avg_acc_norm: 0.7280701754385965, count: 3078
+elapsed=97.84870409965515, throughput(example/s)=31.4567272844531
+acc: 5.0, acc_norm: 9.0, avg_acc: 0.5613070203817535, avg_acc_norm: 0.7279197670656745, count: 3091
+elapsed=98.07596707344055, throughput(example/s)=31.51638563691571
+acc: 3.0, acc_norm: 7.0, avg_acc: 0.5610071013557134, avg_acc_norm: 0.7285345384118787, count: 3098
+elapsed=98.30587530136108, throughput(example/s)=31.513884500829086
+acc: 1.0, acc_norm: 4.0, avg_acc: 0.5604253947792459, avg_acc_norm: 0.7286496938446665, count: 3103
+elapsed=98.55499911308289, throughput(example/s)=31.48495792120692
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.5604501607717042, avg_acc_norm: 0.7286173633440515, count: 3110
+elapsed=98.81053900718689, throughput(example/s)=31.474375418332624
+acc: 2.0, acc_norm: 4.0, avg_acc: 0.5601926163723917, avg_acc_norm: 0.7287319422150883, count: 3115
+elapsed=99.06890416145325, throughput(example/s)=31.442762250841735
+acc: 3.0, acc_norm: 6.0, avg_acc: 0.5597182196605828, avg_acc_norm: 0.728786423310919, count: 3123
+elapsed=99.34071707725525, throughput(example/s)=31.437260489787956
+acc: 1.0, acc_norm: 4.0, avg_acc: 0.559322033898305, avg_acc_norm: 0.7291333546530221, count: 3127
+elapsed=99.61891555786133, throughput(example/s)=31.389620961932224
+acc: 4.0, acc_norm: 6.0, avg_acc: 0.5595276093201405, avg_acc_norm: 0.7296520906479412, count: 3133
+elapsed=99.93004941940308, throughput(example/s)=31.35193085766328
+acc: 2.0, acc_norm: 4.0, avg_acc: 0.5592734225621415, avg_acc_norm: 0.7297641810070108, count: 3138
+elapsed=100.23834156990051, throughput(example/s)=31.305386250946075
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.5590576249602037, avg_acc_norm: 0.7297039159503342, count: 3141
+elapsed=100.55814623832703, throughput(example/s)=31.235659342363952
+acc: 9.0, acc_norm: 9.0, avg_acc: 0.5597843323818585, avg_acc_norm: 0.7297811607992388, count: 3153
+elapsed=100.90647554397583, throughput(example/s)=31.246755800383674
+acc: 13.0, acc_norm: 15.0, avg_acc: 0.5608832807570978, avg_acc_norm: 0.7305993690851735, count: 3170
+elapsed=101.25860381126404, throughput(example/s)=31.30598172090704
+acc: 10.0, acc_norm: 11.0, avg_acc: 0.5615577889447236, avg_acc_norm: 0.7308417085427136, count: 3184
+elapsed=101.63237476348877, throughput(example/s)=31.328599842417987
+acc: 10.0, acc_norm: 13.0, avg_acc: 0.561875, avg_acc_norm: 0.73125, count: 3200
+elapsed=102.04225158691406, throughput(example/s)=31.359558910501043
+acc: 14.0, acc_norm: 14.0, avg_acc: 0.5630826600372902, avg_acc_norm: 0.7315102548166563, count: 3218
+elapsed=102.50116491317749, throughput(example/s)=31.394765149506078
+acc: 19.0, acc_norm: 38.0, avg_acc: 0.562001227747084, avg_acc_norm: 0.7341927562922038, count: 3258
+elapsed=103.8604154586792, throughput(example/s)=31.369025298153108
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5619251992642551, avg_acc_norm: 0.7339055793991416, count: 3262
+elapsed=106.76682591438293, throughput(example/s)=30.552561360359448
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5621936274509803, avg_acc_norm: 0.7340686274509803, count: 3264
+elapsed=106.9054925441742, throughput(example/s)=30.531639884183587
+acc: 5.0, acc_norm: 5.0, avg_acc: 0.5626911314984709, avg_acc_norm: 0.7342507645259939, count: 3270
+elapsed=107.04838609695435, throughput(example/s)=30.54693414096259
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.5627097955447056, avg_acc_norm: 0.7339029600244126, count: 3277
+elapsed=107.21839714050293, throughput(example/s)=30.56378464328
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.5621193666260658, avg_acc_norm: 0.7332521315468941, count: 3284
+elapsed=107.39195919036865, throughput(example/s)=30.579570619236105
+acc: 2.0, acc_norm: 6.0, avg_acc: 0.5615314494074749, avg_acc_norm: 0.7335156487389851, count: 3291
+elapsed=107.58665370941162, throughput(example/s)=30.589296037488943
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.5618932038834952, avg_acc_norm: 0.7336165048543689, count: 3296
+elapsed=107.77991318702698, throughput(example/s)=30.580837398528598
+acc: 7.0, acc_norm: 7.0, avg_acc: 0.562481089258699, avg_acc_norm: 0.7337367624810892, count: 3305
+elapsed=108.00753235816956, throughput(example/s)=30.599717703392322
+acc: 0.0, acc_norm: 2.0, avg_acc: 0.5621409132143937, avg_acc_norm: 0.7338977925612338, count: 3307
+elapsed=108.23896908760071, throughput(example/s)=30.552766973635492
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.5621980676328503, avg_acc_norm: 0.7339975845410628, count: 3312
+elapsed=108.4739077091217, throughput(example/s)=30.532688182316583
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.5624246079613993, avg_acc_norm: 0.7343184559710495, count: 3316
+elapsed=108.72979021072388, throughput(example/s)=30.497621613850473
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.5620855937311634, avg_acc_norm: 0.7338758288125377, count: 3318
+elapsed=108.98310685157776, throughput(example/s)=30.445085443551612
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5623493975903614, avg_acc_norm: 0.7340361445783132, count: 3320
+elapsed=109.24243807792664, throughput(example/s)=30.39111959064592
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.562575210589651, avg_acc_norm: 0.7340553549939831, count: 3324
+elapsed=109.52259492874146, throughput(example/s)=30.349901791157247
+acc: 5.0, acc_norm: 4.0, avg_acc: 0.5632322018624212, avg_acc_norm: 0.7341544007209372, count: 3329
+elapsed=109.80105662345886, throughput(example/s)=30.318469624715462
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.5632494004796164, avg_acc_norm: 0.7338129496402878, count: 3336
+elapsed=110.0852358341217, throughput(example/s)=30.303791191643004
+acc: 7.0, acc_norm: 5.0, avg_acc: 0.5638266068759342, avg_acc_norm: 0.7333333333333333, count: 3345
+elapsed=110.39798617362976, throughput(example/s)=30.299465741513718
+acc: 5.0, acc_norm: 7.0, avg_acc: 0.5641408114558473, avg_acc_norm: 0.733890214797136, count: 3352
+elapsed=110.71799111366272, throughput(example/s)=30.275115780947
+acc: 7.0, acc_norm: 9.0, avg_acc: 0.5647128830705147, avg_acc_norm: 0.7346027967866706, count: 3361
+elapsed=111.02922558784485, throughput(example/s)=30.271309037824654
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5648038049940547, avg_acc_norm: 0.7345422116527943, count: 3364
+elapsed=111.3789210319519, throughput(example/s)=30.20320154686137
+acc: 8.0, acc_norm: 7.0, avg_acc: 0.5656685443225615, avg_acc_norm: 0.7346575748591758, count: 3373
+elapsed=111.7276337146759, throughput(example/s)=30.189487487167124
+acc: 8.0, acc_norm: 12.0, avg_acc: 0.5658594211458948, avg_acc_norm: 0.735380980507974, count: 3386
+elapsed=112.09304022789001, throughput(example/s)=30.207049368240124
+acc: 9.0, acc_norm: 9.0, avg_acc: 0.5668433451118964, avg_acc_norm: 0.7358657243816255, count: 3396
+elapsed=112.46375012397766, throughput(example/s)=30.19639658339973
+acc: 6.0, acc_norm: 10.0, avg_acc: 0.5669406928948914, avg_acc_norm: 0.7366412213740458, count: 3406
+elapsed=112.868967294693, throughput(example/s)=30.176585129083104
+acc: 11.0, acc_norm: 15.0, avg_acc: 0.5673385918784691, avg_acc_norm: 0.7373648846041484, count: 3423
+elapsed=113.27839756011963, throughput(example/s)=30.21758846988747
+acc: 12.0, acc_norm: 14.0, avg_acc: 0.5678581807614066, avg_acc_norm: 0.7375762859633828, count: 3441
+elapsed=113.72397804260254, throughput(example/s)=30.257471284648123
+acc: 11.0, acc_norm: 17.0, avg_acc: 0.5680832610581092, avg_acc_norm: 0.7386527898236485, count: 3459
+elapsed=114.18929266929626, throughput(example/s)=30.29180686859681
+acc: 20.0, acc_norm: 38.0, avg_acc: 0.5668189605939463, avg_acc_norm: 0.740434037692747, count: 3502
+elapsed=115.35939598083496, throughput(example/s)=30.357301806450156
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.567313177410154, avg_acc_norm: 0.7407301768397033, count: 3506
+elapsed=118.52152991294861, throughput(example/s)=29.58112338387024
+acc: 6.0, acc_norm: 8.0, avg_acc: 0.5675675675675675, avg_acc_norm: 0.7411095305832148, count: 3515
+elapsed=118.69028759002686, throughput(example/s)=29.614891591983586
+acc: 4.0, acc_norm: 3.0, avg_acc: 0.5678977272727272, avg_acc_norm: 0.740909090909091, count: 3520
+elapsed=118.879967212677, throughput(example/s)=29.60969861055478
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.5677821894498015, avg_acc_norm: 0.7404991491775383, count: 3526
+elapsed=119.07371830940247, throughput(example/s)=29.611908068898988
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.568271954674221, avg_acc_norm: 0.7407932011331445, count: 3530
+elapsed=119.30110168457031, throughput(example/s)=29.58899750425816
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.568233295583239, avg_acc_norm: 0.7409399773499433, count: 3532
+elapsed=119.5336046218872, throughput(example/s)=29.54817610639739
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5678733031674208, avg_acc_norm: 0.7403846153846154, count: 3536
+elapsed=119.76389813423157, throughput(example/s)=29.524757085284964
+acc: 0.0, acc_norm: 2.0, avg_acc: 0.5673919186210794, avg_acc_norm: 0.7403221248940378, count: 3539
+elapsed=120.01410388946533, throughput(example/s)=29.48820084728932
+acc: 0.0, acc_norm: 2.0, avg_acc: 0.5670714487432928, avg_acc_norm: 0.7404687941259531, count: 3541
+elapsed=120.26983761787415, throughput(example/s)=29.442128385095177
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.56731583403895, avg_acc_norm: 0.7406152977702511, count: 3543
+elapsed=120.52437400817871, throughput(example/s)=29.396543472273702
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5675599435825106, avg_acc_norm: 0.7407616361071933, count: 3545
+elapsed=120.79806351661682, throughput(example/s)=29.34649692883822
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.5677655677655677, avg_acc_norm: 0.7407720484643562, count: 3549
+elapsed=121.07175350189209, throughput(example/s)=29.313195665779606
+acc: 4.0, acc_norm: 6.0, avg_acc: 0.5679324894514768, avg_acc_norm: 0.7412095639943741, count: 3555
+elapsed=121.35132455825806, throughput(example/s)=29.295106690766477
+acc: 3.0, acc_norm: 5.0, avg_acc: 0.5679775280898877, avg_acc_norm: 0.7415730337078652, count: 3560
+elapsed=121.62876582145691, throughput(example/s)=29.26939179195362
+acc: 0.0, acc_norm: 2.0, avg_acc: 0.5674992983440921, avg_acc_norm: 0.7415099635138928, count: 3563
+elapsed=121.91173911094666, throughput(example/s)=29.226061624446732
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.567703952901598, avg_acc_norm: 0.7417998317914214, count: 3567
+elapsed=122.2298150062561, throughput(example/s)=29.182732542116913
+acc: 3.0, acc_norm: 5.0, avg_acc: 0.5677491601343785, avg_acc_norm: 0.7421612541993281, count: 3572
+elapsed=122.54562282562256, throughput(example/s)=29.148327925859995
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.5680738048644115, avg_acc_norm: 0.7425216662007269, count: 3577
+elapsed=122.88895750045776, throughput(example/s)=29.107578685307633
+acc: 7.0, acc_norm: 9.0, avg_acc: 0.5681248258567846, avg_acc_norm: 0.742546670381722, count: 3589
+elapsed=123.23942565917969, throughput(example/s)=29.12217401860853
+acc: 5.0, acc_norm: 6.0, avg_acc: 0.5682513205448986, avg_acc_norm: 0.7425632471504031, count: 3597
+elapsed=123.59205293655396, throughput(example/s)=29.103813024665282
+acc: 7.0, acc_norm: 8.0, avg_acc: 0.5689320388349515, avg_acc_norm: 0.743134535367545, count: 3605
+elapsed=123.96359610557556, throughput(example/s)=29.081118273866018
+acc: 11.0, acc_norm: 15.0, avg_acc: 0.5689845474613686, avg_acc_norm: 0.7433774834437086, count: 3624
+elapsed=124.33831906318665, throughput(example/s)=29.146284325738264
+acc: 10.0, acc_norm: 13.0, avg_acc: 0.5692307692307692, avg_acc_norm: 0.7436813186813187, count: 3640
+elapsed=124.74453258514404, throughput(example/s)=29.179635568521032
+acc: 12.0, acc_norm: 13.0, avg_acc: 0.5697102241662111, avg_acc_norm: 0.7435757244395844, count: 3658
+elapsed=125.16090297698975, throughput(example/s)=29.22637910875816
+acc: 10.0, acc_norm: 17.0, avg_acc: 0.5696409140369967, avg_acc_norm: 0.7445593035908596, count: 3676
+elapsed=125.61162853240967, throughput(example/s)=29.264806474915954
+acc: 12.0, acc_norm: 19.0, avg_acc: 0.5696510684338653, avg_acc_norm: 0.7454692994319718, count: 3697
+elapsed=126.08067321777344, throughput(example/s)=29.322495713632012
+acc: 24.0, acc_norm: 42.0, avg_acc: 0.5693664795509222, avg_acc_norm: 0.747928361400695, count: 3741
+elapsed=131.45737838745117, throughput(example/s)=28.45789293754175
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5694815606627472, avg_acc_norm: 0.7479957242116515, count: 3742
+elapsed=131.60260915756226, throughput(example/s)=28.434086709632492
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5694073678590497, avg_acc_norm: 0.7477309129738388, count: 3746
+elapsed=131.9086856842041, throughput(example/s)=28.398433208318888
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.5697147427352706, avg_acc_norm: 0.7480671820847774, count: 3751
+elapsed=132.08376359939575, throughput(example/s)=28.39864566076886
+acc: 2.0, acc_norm: 4.0, avg_acc: 0.5696404793608522, avg_acc_norm: 0.748335552596538, count: 3755
+elapsed=132.28066086769104, throughput(example/s)=28.386613548565524
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.5695663740356478, avg_acc_norm: 0.7483373237563181, count: 3759
+elapsed=132.48197555541992, throughput(example/s)=28.37367109178964
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.569377990430622, avg_acc_norm: 0.748006379585327, count: 3762
+elapsed=132.71550011634827, throughput(example/s)=28.34634987399325
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.5694186355189806, avg_acc_norm: 0.7480753915582692, count: 3767
+elapsed=132.94622135162354, throughput(example/s)=28.334765454046487
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5694960212201592, avg_acc_norm: 0.7480106100795756, count: 3770
+elapsed=133.1824722290039, throughput(example/s)=28.307028221533386
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.5694223635400106, avg_acc_norm: 0.7480127186009539, count: 3774
+elapsed=133.4335834980011, throughput(example/s)=28.283734132468506
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.5692715231788079, avg_acc_norm: 0.7480794701986755, count: 3775
+elapsed=133.94483399391174, throughput(example/s)=28.183244455486705
+acc: 4.0, acc_norm: 2.0, avg_acc: 0.5697274411219899, avg_acc_norm: 0.7478168827732204, count: 3779
+elapsed=134.2061049938202, throughput(example/s)=28.15818252212902
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.5700687466948704, avg_acc_norm: 0.7480169222633527, count: 3782
+elapsed=134.4797818660736, throughput(example/s)=28.12318660485661
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5701453104359313, avg_acc_norm: 0.7479524438573316, count: 3785
+elapsed=134.76032137870789, throughput(example/s)=28.086902444847016
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.5698442038552944, avg_acc_norm: 0.7478214945867441, count: 3787
+elapsed=135.03943705558777, throughput(example/s)=28.043659560289157
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5699577613516368, avg_acc_norm: 0.7478880675818373, count: 3788
+elapsed=135.32467484474182, throughput(example/s)=27.99193867892886
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.5699973635644608, avg_acc_norm: 0.7479567624571579, count: 3793
+elapsed=135.63713002204895, throughput(example/s)=27.96431920509831
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.5699604743083004, avg_acc_norm: 0.7480895915678525, count: 3795
+elapsed=135.94637370109558, throughput(example/s)=27.91541912213151
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5700368615060558, avg_acc_norm: 0.7480252764612955, count: 3798
+elapsed=136.26338744163513, throughput(example/s)=27.87249070574276
+acc: 5.0, acc_norm: 6.0, avg_acc: 0.5703022339027596, avg_acc_norm: 0.7482260183968462, count: 3805
+elapsed=136.58277869224548, throughput(example/s)=27.858563403323334
+acc: 6.0, acc_norm: 7.0, avg_acc: 0.5708289611752361, avg_acc_norm: 0.748688352570829, count: 3812
+elapsed=136.9271388053894, throughput(example/s)=27.839623563725272
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.570979570455736, avg_acc_norm: 0.748821372446307, count: 3818
+elapsed=137.28886580467224, throughput(example/s)=27.809975540420446
+acc: 5.0, acc_norm: 8.0, avg_acc: 0.5710925248301097, avg_acc_norm: 0.7493465760585468, count: 3826
+elapsed=137.62638115882874, throughput(example/s)=27.79990266244505
+acc: 7.0, acc_norm: 6.0, avg_acc: 0.5717266562336984, avg_acc_norm: 0.7493479394887845, count: 3834
+elapsed=137.98062086105347, throughput(example/s)=27.78651071486944
+acc: 7.0, acc_norm: 7.0, avg_acc: 0.5723581467985425, avg_acc_norm: 0.7496095783446122, count: 3842
+elapsed=138.35405611991882, throughput(example/s)=27.769334038677798
+acc: 6.0, acc_norm: 8.0, avg_acc: 0.5725785510257076, avg_acc_norm: 0.7499350817969359, count: 3851
+elapsed=138.7257251739502, throughput(example/s)=27.75981163674708
+acc: 11.0, acc_norm: 12.0, avg_acc: 0.5733505821474774, avg_acc_norm: 0.7503234152652005, count: 3865
+elapsed=139.13286805152893, throughput(example/s)=27.77920166619844
+acc: 13.0, acc_norm: 15.0, avg_acc: 0.5743365112084514, avg_acc_norm: 0.7510950785879927, count: 3881
+elapsed=139.5450427532196, throughput(example/s)=27.81180845573575
+acc: 13.0, acc_norm: 19.0, avg_acc: 0.5742827868852459, avg_acc_norm: 0.7515368852459017, count: 3904
+elapsed=139.9867811203003, throughput(example/s)=27.888347519363442
+acc: 12.0, acc_norm: 12.0, avg_acc: 0.5748533537362918, avg_acc_norm: 0.7513389441469013, count: 3921
+elapsed=140.4340763092041, throughput(example/s)=27.920573859629652
+acc: 16.0, acc_norm: 20.0, avg_acc: 0.5759959401167216, avg_acc_norm: 0.7526008627251967, count: 3941
+elapsed=140.8831169605255, throughput(example/s)=27.973543494954342
+acc: 14.0, acc_norm: 18.0, avg_acc: 0.5766220651350669, avg_acc_norm: 0.7533451148699823, count: 3961
+elapsed=141.34669423103333, throughput(example/s)=28.02329422381598
+acc: 15.0, acc_norm: 22.0, avg_acc: 0.5770582329317269, avg_acc_norm: 0.7545180722891566, count: 3984
+elapsed=141.84531998634338, throughput(example/s)=28.086933008319008
+acc: 18.0, acc_norm: 37.0, avg_acc: 0.5757952286282306, avg_acc_norm: 0.7562127236580517, count: 4024
+elapsed=142.83533215522766, throughput(example/s)=28.172301203646725
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.5756521739130435, avg_acc_norm: 0.7560248447204969, count: 4025
+elapsed=145.2509160041809, throughput(example/s)=27.71066861901335
+acc: 0.0, acc_norm: 2.0, avg_acc: 0.5753662776260243, avg_acc_norm: 0.7561460144027812, count: 4027
+elapsed=145.4177212715149, throughput(example/s)=27.6926358409993
+acc: 1.0, acc_norm: 3.0, avg_acc: 0.5750434135450261, avg_acc_norm: 0.756139915653684, count: 4031
+elapsed=145.59413719177246, throughput(example/s)=27.68655440219053
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.5752168525402727, avg_acc_norm: 0.7563816604708798, count: 4035
+elapsed=145.79049682617188, throughput(example/s)=27.676701073397048
+acc: 2.0, acc_norm: 4.0, avg_acc: 0.574857708487998, avg_acc_norm: 0.7562484533531304, count: 4041
+elapsed=146.019184589386, throughput(example/s)=27.67444573371311
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.5749258160237388, avg_acc_norm: 0.756429277942631, count: 4044
+elapsed=146.2509002685547, throughput(example/s)=27.65111183981886
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.575098814229249, avg_acc_norm: 0.7564229249011858, count: 4048
+elapsed=146.4891209602356, throughput(example/s)=27.633451368029082
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.5749567794517165, avg_acc_norm: 0.7562361076809089, count: 4049
+elapsed=146.7456681728363, throughput(example/s)=27.59195586769286
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.5749197728955814, avg_acc_norm: 0.7563564551962478, count: 4051
+elapsed=147.00150799751282, throughput(example/s)=27.557540430595722
+acc: 0.0, acc_norm: 2.0, avg_acc: 0.5746360720453985, avg_acc_norm: 0.7564766839378239, count: 4053
+elapsed=147.27714490890503, throughput(example/s)=27.519544885982764
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5747409965466206, avg_acc_norm: 0.7565367538233844, count: 4054
+elapsed=147.55865097045898, throughput(example/s)=27.473821245571056
+acc: 4.0, acc_norm: 3.0, avg_acc: 0.5751601774273041, avg_acc_norm: 0.7565303104977822, count: 4058
+elapsed=147.838063955307, throughput(example/s)=27.44895253245995
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.5754368693083928, avg_acc_norm: 0.7565838050701452, count: 4063
+elapsed=148.1216161251068, throughput(example/s)=27.430162499498383
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.5756085566756823, avg_acc_norm: 0.7565773297270716, count: 4067
+elapsed=148.44193148612976, throughput(example/s)=27.397918898542596
+acc: 5.0, acc_norm: 6.0, avg_acc: 0.5758468335787923, avg_acc_norm: 0.7567501227295041, count: 4074
+elapsed=148.75035667419434, throughput(example/s)=27.38816962249859
+acc: 5.0, acc_norm: 6.0, avg_acc: 0.5759431651151397, avg_acc_norm: 0.7567368936795689, count: 4082
+elapsed=149.09506177902222, throughput(example/s)=27.37850570832481
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.5759354365370506, avg_acc_norm: 0.7566642210809489, count: 4089
+elapsed=149.44300889968872, throughput(example/s)=27.361601122101852
+acc: 12.0, acc_norm: 15.0, avg_acc: 0.5766138855054811, avg_acc_norm: 0.7573690621193666, count: 4105
+elapsed=149.7974214553833, throughput(example/s)=27.40367597864601
+acc: 8.0, acc_norm: 7.0, avg_acc: 0.577016520894072, avg_acc_norm: 0.7570456754130224, count: 4116
+elapsed=150.16985702514648, throughput(example/s)=27.408962634297247
+acc: 12.0, acc_norm: 15.0, avg_acc: 0.5771276595744681, avg_acc_norm: 0.7570116054158608, count: 4136
+elapsed=150.57759737968445, throughput(example/s)=27.46756537475487
+acc: 10.0, acc_norm: 15.0, avg_acc: 0.5773121387283237, avg_acc_norm: 0.7577071290944123, count: 4152
+elapsed=150.99494051933289, throughput(example/s)=27.49761009024267
+acc: 13.0, acc_norm: 20.0, avg_acc: 0.577522166307213, avg_acc_norm: 0.7586867960699737, count: 4173
+elapsed=151.4445607662201, throughput(example/s)=27.55463767656681
+acc: 24.0, acc_norm: 35.0, avg_acc: 0.5777355803465464, avg_acc_norm: 0.7597911227154047, count: 4213
+elapsed=152.70360231399536, throughput(example/s)=27.58939498583051
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5778357854769814, avg_acc_norm: 0.7598481252966303, count: 4214
+elapsed=155.88951468467712, throughput(example/s)=27.03196561054024
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5777619724988146, avg_acc_norm: 0.7596017069701281, count: 4218
+elapsed=156.55442571640015, throughput(example/s)=26.94270686183569
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5778620526191041, avg_acc_norm: 0.7596586868926286, count: 4219
+elapsed=156.80834650993347, throughput(example/s)=26.905455569820294
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5779620853080568, avg_acc_norm: 0.7597156398104266, count: 4220
+elapsed=157.5784785747528, throughput(example/s)=26.78030679169235
+acc: 2.0, acc_norm: 1.0, avg_acc: 0.5781620085267646, avg_acc_norm: 0.7595926101373757, count: 4222
+elapsed=157.85508966445923, throughput(example/s)=26.74604923398029
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5783617424242424, avg_acc_norm: 0.7597064393939394, count: 4224
+elapsed=158.1322901248932, throughput(example/s)=26.7118119687249
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.5786237881295815, avg_acc_norm: 0.7597540789784819, count: 4229
+elapsed=158.4156219959259, throughput(example/s)=26.695599504124413
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5787234042553191, avg_acc_norm: 0.7598108747044917, count: 4230
+elapsed=159.00833559036255, throughput(example/s)=26.602378952618754
+acc: 4.0, acc_norm: 3.0, avg_acc: 0.5791213982050071, avg_acc_norm: 0.7598016060462919, count: 4234
+elapsed=159.323317527771, throughput(example/s)=26.57489227376896
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5793201133144475, avg_acc_norm: 0.759915014164306, count: 4236
+elapsed=159.63659572601318, throughput(example/s)=26.53526893839752
+acc: 2.0, acc_norm: 4.0, avg_acc: 0.5792452830188679, avg_acc_norm: 0.7601415094339623, count: 4240
+elapsed=159.95349287986755, throughput(example/s)=26.507704981375028
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.5796418473138548, avg_acc_norm: 0.7603675777568332, count: 4244
+elapsed=160.2725305557251, throughput(example/s)=26.47989636954291
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.5795053003533569, avg_acc_norm: 0.7604240282685513, count: 4245
+elapsed=160.62095546722412, throughput(example/s)=26.428681037613572
+acc: 5.0, acc_norm: 5.0, avg_acc: 0.5798635615149377, avg_acc_norm: 0.7605269348388615, count: 4251
+elapsed=160.96757173538208, throughput(example/s)=26.409045959817963
+acc: 7.0, acc_norm: 7.0, avg_acc: 0.580417938483212, avg_acc_norm: 0.7607419582061516, count: 4259
+elapsed=161.32147359848022, throughput(example/s)=26.400701065999456
+acc: 14.0, acc_norm: 16.0, avg_acc: 0.5813844714686623, avg_acc_norm: 0.7614593077642656, count: 4276
+elapsed=161.69146013259888, throughput(example/s)=26.445428821617206
+acc: 12.0, acc_norm: 13.0, avg_acc: 0.5824201445558406, avg_acc_norm: 0.7621823268827232, count: 4289
+elapsed=162.06083917617798, throughput(example/s)=26.465369559992126
+acc: 7.0, acc_norm: 8.0, avg_acc: 0.5828292228943694, avg_acc_norm: 0.7624476500697999, count: 4298
+elapsed=162.43555188179016, throughput(example/s)=26.459724796747697
+acc: 8.0, acc_norm: 13.0, avg_acc: 0.5826570832367262, avg_acc_norm: 0.7628101089728727, count: 4313
+elapsed=162.84843969345093, throughput(example/s)=26.484748690984546
+acc: 14.0, acc_norm: 14.0, avg_acc: 0.5837375837375838, avg_acc_norm: 0.7632247632247632, count: 4329
+elapsed=163.25685262680054, throughput(example/s)=26.516497962238333
+acc: 9.0, acc_norm: 11.0, avg_acc: 0.5841971895876527, avg_acc_norm: 0.7636489288182446, count: 4341
+elapsed=163.6723313331604, throughput(example/s)=26.522503618304015
+acc: 11.0, acc_norm: 13.0, avg_acc: 0.5848450057405281, avg_acc_norm: 0.764179104477612, count: 4355
+elapsed=164.11768412590027, throughput(example/s)=26.53583630060933
+acc: 16.0, acc_norm: 20.0, avg_acc: 0.585427135678392, avg_acc_norm: 0.7647327546825035, count: 4378
+elapsed=164.5645604133606, throughput(example/s)=26.603540817069874
+acc: 17.0, acc_norm: 22.0, avg_acc: 0.5863636363636363, avg_acc_norm: 0.7659090909090909, count: 4400
+elapsed=165.03138828277588, throughput(example/s)=26.66159477772037
+acc: 19.0, acc_norm: 20.0, avg_acc: 0.5873446327683616, avg_acc_norm: 0.7661016949152543, count: 4425
+elapsed=165.5321967601776, throughput(example/s)=26.73195962239855
+acc: 24.0, acc_norm: 36.0, avg_acc: 0.587589605734767, avg_acc_norm: 0.7674731182795699, count: 4464
+elapsed=166.52503442764282, throughput(example/s)=26.806780225826422
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.587458006718925, avg_acc_norm: 0.7673012318029115, count: 4465
+elapsed=168.97102212905884, throughput(example/s)=26.42464929039528
+acc: 3.0, acc_norm: 5.0, avg_acc: 0.5873406396779244, avg_acc_norm: 0.7673898456721091, count: 4471
+elapsed=169.168315410614, throughput(example/s)=26.429299063171253
+acc: 1.0, acc_norm: 3.0, avg_acc: 0.5871703173893608, avg_acc_norm: 0.767545820295038, count: 4474
+elapsed=169.401202917099, throughput(example/s)=26.41067432200863
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5872625698324022, avg_acc_norm: 0.7675977653631285, count: 4475
+elapsed=169.6379358768463, throughput(example/s)=26.37971263249017
+acc: 2.0, acc_norm: 1.0, avg_acc: 0.5874469510833147, avg_acc_norm: 0.7674782220236765, count: 4477
+elapsed=170.14624547958374, throughput(example/s)=26.31265819225618
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5875390799464046, avg_acc_norm: 0.7675301473872265, count: 4478
+elapsed=170.96644568443298, throughput(example/s)=26.192274057480365
+acc: 3.0, acc_norm: 5.0, avg_acc: 0.5875529779165737, avg_acc_norm: 0.7677894267231764, count: 4483
+elapsed=171.24798727035522, throughput(example/s)=26.178409868972825
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.5875278396436525, avg_acc_norm: 0.7674832962138085, count: 4490
+elapsed=171.56384587287903, throughput(example/s)=26.171015094444112
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.5876724521584334, avg_acc_norm: 0.7676902536715621, count: 4494
+elapsed=171.87767958641052, throughput(example/s)=26.146501458560053
+acc: 4.0, acc_norm: 8.0, avg_acc: 0.5873861869864535, avg_acc_norm: 0.7679324894514767, count: 4503
+elapsed=172.19585919380188, throughput(example/s)=26.150454610711588
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5875693673695893, avg_acc_norm: 0.7680355160932297, count: 4505
+elapsed=172.5450737476349, throughput(example/s)=26.109119792020437
+acc: 2.0, acc_norm: 4.0, avg_acc: 0.5873614190687362, avg_acc_norm: 0.7680709534368071, count: 4510
+elapsed=172.89959120750427, throughput(example/s)=26.0845035462655
+acc: 6.0, acc_norm: 10.0, avg_acc: 0.5872594558725945, avg_acc_norm: 0.7684140676841407, count: 4521
+elapsed=173.25169157981873, throughput(example/s)=26.094983308818843
+acc: 5.0, acc_norm: 8.0, avg_acc: 0.5873261205564142, avg_acc_norm: 0.7688231397659527, count: 4529
+elapsed=173.62872529029846, throughput(example/s)=26.08439353815298
+acc: 9.0, acc_norm: 12.0, avg_acc: 0.587626596213122, avg_acc_norm: 0.7692646411272567, count: 4542
+elapsed=174.04189157485962, throughput(example/s)=26.09716522212341
+acc: 11.0, acc_norm: 15.0, avg_acc: 0.5878482123272647, avg_acc_norm: 0.7696863347225269, count: 4559
+elapsed=174.45852136611938, throughput(example/s)=26.132286140568986
+acc: 17.0, acc_norm: 21.0, avg_acc: 0.5888646288209607, avg_acc_norm: 0.7707423580786026, count: 4580
+elapsed=174.90299272537231, throughput(example/s)=26.185944154720012
+acc: 15.0, acc_norm: 22.0, avg_acc: 0.5893089960886571, avg_acc_norm: 0.771838331160365, count: 4602
+elapsed=175.366042137146, throughput(example/s)=26.24225274127462
+acc: 31.0, acc_norm: 38.0, avg_acc: 0.5907818220977816, avg_acc_norm: 0.7732069782468232, count: 4643
+elapsed=176.21801257133484, throughput(example/s)=26.348044290423868
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.590869939707149, avg_acc_norm: 0.7732558139534884, count: 4644
+elapsed=178.71703171730042, throughput(example/s)=25.98521223956992
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5909580193756727, avg_acc_norm: 0.7733046286329387, count: 4645
+elapsed=178.92041158676147, throughput(example/s)=25.961263775360603
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.590830822212656, avg_acc_norm: 0.7731381833835558, count: 4646
+elapsed=179.39395928382874, throughput(example/s)=25.89830793939564
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5909188723907898, avg_acc_norm: 0.7731870023671186, count: 4647
+elapsed=179.90818643569946, throughput(example/s)=25.829841832466432
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5910068846815835, avg_acc_norm: 0.7732358003442341, count: 4648
+elapsed=180.18592047691345, throughput(example/s)=25.79557818778372
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5910948591094859, avg_acc_norm: 0.7732845773284577, count: 4649
+elapsed=180.4674575328827, throughput(example/s)=25.760877132947435
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.5911922663802363, avg_acc_norm: 0.7731471535982815, count: 4655
+elapsed=180.74694871902466, throughput(example/s)=25.754238359156513
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.5912408759124088, avg_acc_norm: 0.7732932589094031, count: 4658
+elapsed=181.03197646141052, throughput(example/s)=25.73026097957295
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.5912894228706286, avg_acc_norm: 0.7734391761424587, count: 4661
+elapsed=181.34848308563232, throughput(example/s)=25.70189681597219
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.5912987569652808, avg_acc_norm: 0.7734676382340334, count: 4666
+elapsed=181.66609120368958, throughput(example/s)=25.684485030111304
+acc: 4.0, acc_norm: 6.0, avg_acc: 0.5912689920821742, avg_acc_norm: 0.773592980954419, count: 4673
+elapsed=182.01303720474243, throughput(example/s)=25.673985071428955
+acc: 5.0, acc_norm: 6.0, avg_acc: 0.591579397307117, avg_acc_norm: 0.7738833083992306, count: 4679
+elapsed=182.36478304862976, throughput(example/s)=25.657366086698264
+acc: 7.0, acc_norm: 12.0, avg_acc: 0.5914322250639387, avg_acc_norm: 0.7742966751918159, count: 4692
+elapsed=182.7215597629547, throughput(example/s)=25.678414775393485
+acc: 9.0, acc_norm: 12.0, avg_acc: 0.5918367346938775, avg_acc_norm: 0.7748724489795918, count: 4704
+elapsed=183.0961208343506, throughput(example/s)=25.691423600698617
+acc: 5.0, acc_norm: 7.0, avg_acc: 0.5917674517292595, avg_acc_norm: 0.7748779970294929, count: 4713
+elapsed=183.4737024307251, throughput(example/s)=25.687605022193882
+acc: 14.0, acc_norm: 17.0, avg_acc: 0.592600422832981, avg_acc_norm: 0.7756871035940803, count: 4730
+elapsed=183.8861255645752, throughput(example/s)=25.72244091541843
+acc: 13.0, acc_norm: 18.0, avg_acc: 0.5930918281381634, avg_acc_norm: 0.7765374894692502, count: 4748
+elapsed=184.32854175567627, throughput(example/s)=25.758354917673994
+acc: 11.0, acc_norm: 18.0, avg_acc: 0.593035452066289, avg_acc_norm: 0.777218376337319, count: 4767
+elapsed=184.77908992767334, throughput(example/s)=25.798373624774914
+acc: 12.0, acc_norm: 22.0, avg_acc: 0.5924457429048414, avg_acc_norm: 0.7777545909849749, count: 4792
+elapsed=185.27996850013733, throughput(example/s)=25.863562255497946
+acc: 12.0, acc_norm: 25.0, avg_acc: 0.5916165179497821, avg_acc_norm: 0.7785847686241959, count: 4819
+elapsed=185.94025135040283, throughput(example/s)=25.916927426964886
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.59149377593361, avg_acc_norm: 0.7784232365145228, count: 4820
+elapsed=188.90302729606628, throughput(example/s)=25.515737195919314
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5915785106824311, avg_acc_norm: 0.7784691972619788, count: 4821
+elapsed=189.3419325351715, throughput(example/s)=25.461871733586893
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.591832504145937, avg_acc_norm: 0.7786069651741293, count: 4824
+elapsed=189.82851433753967, throughput(example/s)=25.412409810163204
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5919170984455958, avg_acc_norm: 0.7786528497409326, count: 4825
+elapsed=190.0893201828003, throughput(example/s)=25.382804227823087
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5920016576875259, avg_acc_norm: 0.7786987152921674, count: 4826
+elapsed=190.3489546775818, throughput(example/s)=25.353435789413236
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5920861818935157, avg_acc_norm: 0.7787445618396519, count: 4827
+elapsed=190.62809920310974, throughput(example/s)=25.321555532361185
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.591963545981773, avg_acc_norm: 0.7785832642916322, count: 4828
+elapsed=190.9115331172943, throughput(example/s)=25.289200296944454
+acc: 5.0, acc_norm: 5.0, avg_acc: 0.5923856817711566, avg_acc_norm: 0.7788123318849576, count: 4833
+elapsed=191.19568181037903, throughput(example/s)=25.277767542852747
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.5926002480363787, avg_acc_norm: 0.7790409260024803, count: 4838
+elapsed=191.509996175766, throughput(example/s)=25.262388891490193
+acc: 5.0, acc_norm: 5.0, avg_acc: 0.59302085484204, avg_acc_norm: 0.7792690481106752, count: 4843
+elapsed=191.8255796432495, throughput(example/s)=25.2468936051534
+acc: 1.0, acc_norm: 3.0, avg_acc: 0.5928600907965332, avg_acc_norm: 0.7794056954189021, count: 4846
+elapsed=192.14060997962952, throughput(example/s)=25.221112811673525
+acc: 5.0, acc_norm: 4.0, avg_acc: 0.593279736136879, avg_acc_norm: 0.7794269222840652, count: 4851
+elapsed=192.49101161956787, throughput(example/s)=25.201176715655365
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.5934925864909391, avg_acc_norm: 0.7794481054365733, count: 4856
+elapsed=192.83973789215088, throughput(example/s)=25.18153184130444
+acc: 6.0, acc_norm: 8.0, avg_acc: 0.59375, avg_acc_norm: 0.7798108552631579, count: 4864
+elapsed=193.19410586357117, throughput(example/s)=25.17675152799348
+acc: 4.0, acc_norm: 6.0, avg_acc: 0.593474245844449, avg_acc_norm: 0.7796018879540324, count: 4873
+elapsed=193.54617261886597, throughput(example/s)=25.17745473373935
+acc: 3.0, acc_norm: 7.0, avg_acc: 0.5929946743138058, avg_acc_norm: 0.7795985251945924, count: 4882
+elapsed=193.91593480110168, throughput(example/s)=25.17585780151299
+acc: 10.0, acc_norm: 9.0, avg_acc: 0.5935839803841438, avg_acc_norm: 0.7795259501430323, count: 4894
+elapsed=194.29294991493225, throughput(example/s)=25.188767796992902
+acc: 11.0, acc_norm: 13.0, avg_acc: 0.5941320293398533, avg_acc_norm: 0.7799511002444988, count: 4908
+elapsed=194.70532178878784, throughput(example/s)=25.20732332793704
+acc: 10.0, acc_norm: 10.0, avg_acc: 0.5947154471544716, avg_acc_norm: 0.7800813008130081, count: 4920
+elapsed=195.12262415885925, throughput(example/s)=25.21491303845103
+acc: 16.0, acc_norm: 17.0, avg_acc: 0.5959084464249544, avg_acc_norm: 0.7808385659307272, count: 4937
+elapsed=195.5671420097351, throughput(example/s)=25.244527016477246
+acc: 13.0, acc_norm: 19.0, avg_acc: 0.5960064542154094, avg_acc_norm: 0.781363453005244, count: 4958
+elapsed=196.02976202964783, throughput(example/s)=25.292077838926033
+acc: 16.0, acc_norm: 22.0, avg_acc: 0.5965863453815261, avg_acc_norm: 0.7823293172690763, count: 4980
+elapsed=196.53296947479248, throughput(example/s)=25.339259938464117
+acc: 22.0, acc_norm: 39.0, avg_acc: 0.5957404458598726, avg_acc_norm: 0.7832404458598726, count: 5024
+elapsed=197.6292335987091, throughput(example/s)=25.421340297262663
+acc: 2.0, acc_norm: 1.0, avg_acc: 0.5959013131715082, avg_acc_norm: 0.7831277357739753, count: 5026
+elapsed=200.66991138458252, throughput(example/s)=25.046106640111606
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.5957827730256614, avg_acc_norm: 0.7829719514621046, count: 5027
+elapsed=200.92779636383057, throughput(example/s)=25.018937603323664
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.5959435275402665, avg_acc_norm: 0.7830582620799363, count: 5029
+elapsed=201.46283054351807, throughput(example/s)=24.962421040310378
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.5958250497017893, avg_acc_norm: 0.7831013916500994, count: 5030
+elapsed=201.74414467811584, throughput(example/s)=24.93256995401477
+acc: 3.0, acc_norm: 2.0, avg_acc: 0.5960659646334194, avg_acc_norm: 0.7830319888734353, count: 5033
+elapsed=202.02956676483154, throughput(example/s)=24.91219518308705
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5961462058005562, avg_acc_norm: 0.7830750893921334, count: 5034
+elapsed=202.34367322921753, throughput(example/s)=24.878465037537495
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.5961882072662299, avg_acc_norm: 0.7832042882668255, count: 5037
+elapsed=202.6556761264801, throughput(example/s)=24.85496629690422
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.5962301587301587, avg_acc_norm: 0.7833333333333333, count: 5040
+elapsed=202.97886109352112, throughput(example/s)=24.830171835863514
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.5963521015067407, avg_acc_norm: 0.7835051546391752, count: 5044
+elapsed=203.32527613639832, throughput(example/s)=24.807540389697017
+acc: 6.0, acc_norm: 8.0, avg_acc: 0.5964773401939442, avg_acc_norm: 0.7836928557292697, count: 5053
+elapsed=203.6764988899231, throughput(example/s)=24.808949621285922
+acc: 6.0, acc_norm: 8.0, avg_acc: 0.5967200158071527, avg_acc_norm: 0.7840347757360205, count: 5061
+elapsed=204.0336697101593, throughput(example/s)=24.804729568357125
+acc: 7.0, acc_norm: 8.0, avg_acc: 0.5970414201183432, avg_acc_norm: 0.7842209072978303, count: 5070
+elapsed=204.40902662277222, throughput(example/s)=24.803209935324723
+acc: 8.0, acc_norm: 12.0, avg_acc: 0.5970883336612237, avg_acc_norm: 0.7845760377729687, count: 5083
+elapsed=204.78235864639282, throughput(example/s)=24.821474044925186
+acc: 10.0, acc_norm: 10.0, avg_acc: 0.5976447497546614, avg_acc_norm: 0.7846908734052993, count: 5095
+elapsed=205.19752883911133, throughput(example/s)=24.829733714750642
+acc: 17.0, acc_norm: 18.0, avg_acc: 0.5987485334376222, avg_acc_norm: 0.785295267892061, count: 5114
+elapsed=205.6159679889679, throughput(example/s)=24.871609194643803
+acc: 12.0, acc_norm: 12.0, avg_acc: 0.5995708991613029, avg_acc_norm: 0.7856446264872246, count: 5127
+elapsed=206.0658574104309, throughput(example/s)=24.880395347533565
+acc: 12.0, acc_norm: 16.0, avg_acc: 0.5998056365403304, avg_acc_norm: 0.7860058309037901, count: 5145
+elapsed=206.533686876297, throughput(example/s)=24.911190410703263
+acc: 25.0, acc_norm: 47.0, avg_acc: 0.5983843046739757, avg_acc_norm: 0.7868820927101365, count: 5199
+elapsed=207.81810069084167, throughput(example/s)=25.017070133531032
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.5983464718323399, avg_acc_norm: 0.7869640453758893, count: 5201
+elapsed=210.5248794555664, throughput(example/s)=24.70491855143291
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.5983858570330515, avg_acc_norm: 0.787086856264412, count: 5204
+elapsed=211.2816562652588, throughput(example/s)=24.63062857414611
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5984630163304515, avg_acc_norm: 0.7871277617675312, count: 5205
+elapsed=211.56209921836853, throughput(example/s)=24.602705395863666
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.5985401459854015, avg_acc_norm: 0.787168651555897, count: 5206
+elapsed=211.84720420837402, throughput(example/s)=24.574315339462075
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.5985023041474654, avg_acc_norm: 0.7872503840245776, count: 5208
+elapsed=212.1296980381012, throughput(example/s)=24.551017835628922
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.5986955687703818, avg_acc_norm: 0.7874544408210243, count: 5213
+elapsed=212.76888298988342, throughput(example/s)=24.500763113222078
+acc: 2.0, acc_norm: 4.0, avg_acc: 0.5985051743963204, avg_acc_norm: 0.7874664622460713, count: 5218
+elapsed=213.09035468101501, throughput(example/s)=24.487265075001023
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.598621217924167, avg_acc_norm: 0.7876292608196094, count: 5222
+elapsed=213.4405632019043, throughput(example/s)=24.465827496248895
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.5987370838117106, avg_acc_norm: 0.7876004592422503, count: 5226
+elapsed=213.79636883735657, throughput(example/s)=24.44382020339937
+acc: 7.0, acc_norm: 7.0, avg_acc: 0.5992738390980317, avg_acc_norm: 0.7878845786355819, count: 5233
+elapsed=214.1490297317505, throughput(example/s)=24.43625360598184
+acc: 7.0, acc_norm: 11.0, avg_acc: 0.5992373689227836, avg_acc_norm: 0.7881792183031459, count: 5245
+elapsed=214.51937055587769, throughput(example/s)=24.450006479176157
+acc: 10.0, acc_norm: 14.0, avg_acc: 0.5995436394751854, avg_acc_norm: 0.7887431070545731, count: 5259
+elapsed=214.89392709732056, throughput(example/s)=24.472538945310998
+acc: 13.0, acc_norm: 15.0, avg_acc: 0.5999620996778473, avg_acc_norm: 0.7888952056092476, count: 5277
+elapsed=215.3109290599823, throughput(example/s)=24.508741953038108
+acc: 10.0, acc_norm: 15.0, avg_acc: 0.5996978851963746, avg_acc_norm: 0.7888972809667674, count: 5296
+elapsed=215.75831770896912, throughput(example/s)=24.545983006521393
+acc: 13.0, acc_norm: 15.0, avg_acc: 0.6, avg_acc_norm: 0.7888993414863593, count: 5315
+elapsed=216.20621132850647, throughput(example/s)=24.583012520044214
+acc: 12.0, acc_norm: 21.0, avg_acc: 0.599887556221889, avg_acc_norm: 0.7897301349325337, count: 5336
+elapsed=216.70329308509827, throughput(example/s)=24.623529822892817
+acc: 23.0, acc_norm: 30.0, avg_acc: 0.6004842615012107, avg_acc_norm: 0.7904637735146209, count: 5369
+elapsed=217.4999122619629, throughput(example/s)=24.685067429054538
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6005586592178771, avg_acc_norm: 0.7905027932960894, count: 5370
+elapsed=220.42207741737366, throughput(example/s)=24.362350917470923
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6006330292310557, avg_acc_norm: 0.7905417985477565, count: 5371
+elapsed=221.13817930221558, throughput(example/s)=24.28798146456562
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.6005212211466865, avg_acc_norm: 0.7905807892777365, count: 5372
+elapsed=221.65974164009094, throughput(example/s)=24.235343595782584
+acc: 2.0, acc_norm: 4.0, avg_acc: 0.6004464285714286, avg_acc_norm: 0.7907366071428571, count: 5376
+elapsed=221.94285821914673, throughput(example/s)=24.22245096389508
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6004090740052064, avg_acc_norm: 0.79081442915582, count: 5378
+elapsed=222.22354364395142, throughput(example/s)=24.200856092083026
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.6005944640535018, avg_acc_norm: 0.7908229611740665, count: 5383
+elapsed=222.5102732181549, throughput(example/s)=24.192141433049095
+acc: 3.0, acc_norm: 2.0, avg_acc: 0.6007054018934472, avg_acc_norm: 0.790607016892519, count: 5387
+elapsed=222.8252739906311, throughput(example/s)=24.17589308215773
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6006680274633512, avg_acc_norm: 0.7904991649656709, count: 5389
+elapsed=223.14398002624512, throughput(example/s)=24.150326615874523
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6007787873168923, avg_acc_norm: 0.7904691266456517, count: 5393
+elapsed=223.46814393997192, throughput(example/s)=24.133193684414675
+acc: 5.0, acc_norm: 6.0, avg_acc: 0.6008146639511202, avg_acc_norm: 0.7904091834845399, count: 5401
+elapsed=223.82142281532288, throughput(example/s)=24.130844724619656
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.6009250693802035, avg_acc_norm: 0.7905642923219242, count: 5405
+elapsed=224.17850494384766, throughput(example/s)=24.110250897399137
+acc: 5.0, acc_norm: 8.0, avg_acc: 0.6009606502863477, avg_acc_norm: 0.790873822279697, count: 5413
+elapsed=224.54719138145447, throughput(example/s)=24.10629127310948
+acc: 6.0, acc_norm: 7.0, avg_acc: 0.6011805939863494, avg_acc_norm: 0.790997970854086, count: 5421
+elapsed=224.92262768745422, throughput(example/s)=24.101621325235715
+acc: 10.0, acc_norm: 11.0, avg_acc: 0.601693355420578, avg_acc_norm: 0.7912755383765875, count: 5433
+elapsed=225.33263778686523, throughput(example/s)=24.111021170128478
+acc: 9.0, acc_norm: 10.0, avg_acc: 0.6022414109865882, avg_acc_norm: 0.7916590115744994, count: 5443
+elapsed=225.74507308006287, throughput(example/s)=24.111268191751776
+acc: 9.0, acc_norm: 17.0, avg_acc: 0.6017942145734163, avg_acc_norm: 0.7920175759794947, count: 5462
+elapsed=226.18867254257202, throughput(example/s)=24.147982030231738
+acc: 10.0, acc_norm: 17.0, avg_acc: 0.6016423357664233, avg_acc_norm: 0.7925182481751825, count: 5480
+elapsed=226.63701128959656, throughput(example/s)=24.179634071319715
+acc: 16.0, acc_norm: 17.0, avg_acc: 0.6025827573663151, avg_acc_norm: 0.7930156420516552, count: 5498
+elapsed=227.10265016555786, throughput(example/s)=24.20931678248562
+acc: 8.0, acc_norm: 16.0, avg_acc: 0.6018484958318231, avg_acc_norm: 0.7930409568684306, count: 5518
+elapsed=227.60212326049805, throughput(example/s)=24.244062054221125
+acc: 27.0, acc_norm: 35.0, avg_acc: 0.6025917926565875, avg_acc_norm: 0.7939164866810655, count: 5556
+elapsed=228.62126898765564, throughput(example/s)=24.302200860848146
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.6024833543278747, avg_acc_norm: 0.7939535720712615, count: 5557
+elapsed=231.6200680732727, throughput(example/s)=23.991876205830533
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.602554875854624, avg_acc_norm: 0.7939906441165887, count: 5558
+elapsed=232.09025263786316, throughput(example/s)=23.947580464192527
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.6024464831804281, avg_acc_norm: 0.7938478143550999, count: 5559
+elapsed=232.3453073501587, throughput(example/s)=23.925596188703068
+acc: 1.0, acc_norm: 0.0, avg_acc: 0.6025179856115108, avg_acc_norm: 0.793705035971223, count: 5560
+elapsed=232.88830971717834, throughput(example/s)=23.874105174072987
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.6024096385542169, avg_acc_norm: 0.7937421327099442, count: 5561
+elapsed=233.45425248146057, throughput(example/s)=23.82051275952499
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6025525795434118, avg_acc_norm: 0.7938162861765234, count: 5563
+elapsed=233.7382471561432, throughput(example/s)=23.8001271408687
+acc: 3.0, acc_norm: 2.0, avg_acc: 0.6027667984189723, avg_acc_norm: 0.7937477542220626, count: 5566
+elapsed=234.04861974716187, throughput(example/s)=23.78138356899024
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.6030520646319569, avg_acc_norm: 0.7938958707360861, count: 5570
+elapsed=234.36961889266968, throughput(example/s)=23.765878983447934
+acc: 1.0, acc_norm: 3.0, avg_acc: 0.6029068724205994, avg_acc_norm: 0.7940068185896285, count: 5573
+elapsed=234.69226741790771, throughput(example/s)=23.745988997909198
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6030123722431415, avg_acc_norm: 0.7939752555137171, count: 5577
+elapsed=235.0409173965454, throughput(example/s)=23.727783493079446
+acc: 1.0, acc_norm: 4.0, avg_acc: 0.6027593621214836, avg_acc_norm: 0.794122917039957, count: 5581
+elapsed=235.3973650932312, throughput(example/s)=23.708846519117134
+acc: 4.0, acc_norm: 3.0, avg_acc: 0.6028279935564704, avg_acc_norm: 0.7938070520851978, count: 5587
+elapsed=235.75079560279846, throughput(example/s)=23.69875353215427
+acc: 6.0, acc_norm: 7.0, avg_acc: 0.6028229408611756, avg_acc_norm: 0.7936394497051992, count: 5597
+elapsed=236.1223361492157, throughput(example/s)=23.70381426542815
+acc: 7.0, acc_norm: 7.0, avg_acc: 0.6031038173385658, avg_acc_norm: 0.7936139850160542, count: 5606
+elapsed=236.49912643432617, throughput(example/s)=23.70410446973359
+acc: 10.0, acc_norm: 11.0, avg_acc: 0.6032734388898773, avg_acc_norm: 0.7934531222202456, count: 5621
+elapsed=236.91334319114685, throughput(example/s)=23.725974756368426
+acc: 14.0, acc_norm: 17.0, avg_acc: 0.6037234042553191, avg_acc_norm: 0.7937943262411348, count: 5640
+elapsed=237.3317530155182, throughput(example/s)=23.764203181153018
+acc: 8.0, acc_norm: 10.0, avg_acc: 0.6036434382737884, avg_acc_norm: 0.7935974531305271, count: 5654
+elapsed=237.7789294719696, throughput(example/s)=23.77838950051509
+acc: 16.0, acc_norm: 23.0, avg_acc: 0.6039098274040156, avg_acc_norm: 0.7942937654103558, count: 5678
+elapsed=238.22819685935974, throughput(example/s)=23.834290293319313
+acc: 12.0, acc_norm: 21.0, avg_acc: 0.6035783195930539, avg_acc_norm: 0.7947728468689703, count: 5701
+elapsed=238.69535756111145, throughput(example/s)=23.88400033519887
+acc: 23.0, acc_norm: 38.0, avg_acc: 0.6029590948651001, avg_acc_norm: 0.7953002610966058, count: 5745
+elapsed=239.65106964111328, throughput(example/s)=23.97235284033307
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6029232643118149, avg_acc_norm: 0.7953714981729598, count: 5747
+elapsed=244.72122144699097, throughput(example/s)=23.48386448064888
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6029923451635352, avg_acc_norm: 0.7954070981210856, count: 5748
+elapsed=245.26315140724182, throughput(example/s)=23.436052122056687
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6030614019829535, avg_acc_norm: 0.7954426856844669, count: 5749
+elapsed=245.8330307006836, throughput(example/s)=23.385791500897824
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6030945757997218, avg_acc_norm: 0.7953755215577191, count: 5752
+elapsed=246.14436316490173, throughput(example/s)=23.368400259267812
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6030587417448732, avg_acc_norm: 0.7954466458116093, count: 5754
+elapsed=246.46528840065002, throughput(example/s)=23.34608673431688
+acc: 2.0, acc_norm: 4.0, avg_acc: 0.6029871483153872, avg_acc_norm: 0.7955887460923932, count: 5758
+elapsed=246.78424429893494, throughput(example/s)=23.33212161237171
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6031938899496615, avg_acc_norm: 0.795695191806978, count: 5761
+elapsed=247.10925817489624, throughput(example/s)=23.31357409491531
+acc: 6.0, acc_norm: 7.0, avg_acc: 0.603502080443828, avg_acc_norm: 0.7959431345353676, count: 5768
+elapsed=247.4564962387085, throughput(example/s)=23.309147618561237
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.6036036036036037, avg_acc_norm: 0.796084546084546, count: 5772
+elapsed=247.81031823158264, throughput(example/s)=23.29200834408346
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.6037735849056604, avg_acc_norm: 0.7962610351393457, count: 5777
+elapsed=248.16212391853333, throughput(example/s)=23.279136673961066
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.6038388379733702, avg_acc_norm: 0.7961265779007436, count: 5783
+elapsed=248.52001023292542, throughput(example/s)=23.26975600306745
+acc: 8.0, acc_norm: 8.0, avg_acc: 0.6041774555498015, avg_acc_norm: 0.7961332642844813, count: 5793
+elapsed=248.88856506347656, throughput(example/s)=23.275476711927496
+acc: 8.0, acc_norm: 10.0, avg_acc: 0.6044107512060648, avg_acc_norm: 0.7963473466574776, count: 5804
+elapsed=249.26307034492493, throughput(example/s)=23.284636556745244
+acc: 11.0, acc_norm: 12.0, avg_acc: 0.6049510056730273, avg_acc_norm: 0.7966305655836342, count: 5817
+elapsed=249.64181661605835, throughput(example/s)=23.301384675254035
+acc: 8.0, acc_norm: 8.0, avg_acc: 0.6050780579859324, avg_acc_norm: 0.796363012523589, count: 5829
+elapsed=250.06896829605103, throughput(example/s)=23.309569514835516
+acc: 10.0, acc_norm: 12.0, avg_acc: 0.6053397227451651, avg_acc_norm: 0.796508642820469, count: 5843
+elapsed=250.47014689445496, throughput(example/s)=23.328129409618498
+acc: 9.0, acc_norm: 11.0, avg_acc: 0.6055327868852459, avg_acc_norm: 0.7966188524590164, count: 5856
+elapsed=250.91269874572754, throughput(example/s)=23.338794844873167
+acc: 13.0, acc_norm: 18.0, avg_acc: 0.6056841388699796, avg_acc_norm: 0.7969707283866576, count: 5876
+elapsed=251.36543655395508, throughput(example/s)=23.37632444840414
+acc: 14.0, acc_norm: 18.0, avg_acc: 0.6056958806577386, avg_acc_norm: 0.7969147313103916, count: 5899
+elapsed=251.83067917823792, throughput(example/s)=23.424469247548952
+acc: 11.0, acc_norm: 19.0, avg_acc: 0.6053031582502956, avg_acc_norm: 0.7971626414457017, count: 5921
+elapsed=252.33137130737305, throughput(example/s)=23.46517584921075
+acc: 31.0, acc_norm: 40.0, avg_acc: 0.606035205364627, avg_acc_norm: 0.7979882648784576, count: 5965
+elapsed=253.33641576766968, throughput(example/s)=23.545766138376234
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6061012403620516, avg_acc_norm: 0.7980221253771371, count: 5966
+elapsed=257.25280380249023, throughput(example/s)=23.19119524380573
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6061672532260768, avg_acc_norm: 0.7980559745265627, count: 5967
+elapsed=257.5148961544037, throughput(example/s)=23.17147508399762
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.605964148098509, avg_acc_norm: 0.797956106550511, count: 5969
+elapsed=257.7751829624176, throughput(example/s)=23.155836537104705
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6060301507537689, avg_acc_norm: 0.7979899497487437, count: 5970
+elapsed=258.0560562610626, throughput(example/s)=23.134508395185442
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6059946416610851, avg_acc_norm: 0.7978901540522438, count: 5972
+elapsed=258.34203815460205, throughput(example/s)=23.116640414620093
+acc: 4.0, acc_norm: 3.0, avg_acc: 0.6062583668005355, avg_acc_norm: 0.7978580990629184, count: 5976
+elapsed=258.6265912055969, throughput(example/s)=23.106672721249065
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6062228169956507, avg_acc_norm: 0.7979257276681164, count: 5978
+elapsed=259.2551770210266, throughput(example/s)=23.058363071820782
+acc: 2.0, acc_norm: 1.0, avg_acc: 0.6062531349272697, avg_acc_norm: 0.7976926935295101, count: 5981
+elapsed=259.57748770713806, throughput(example/s)=23.041289338418732
+acc: 6.0, acc_norm: 7.0, avg_acc: 0.6064451494406412, avg_acc_norm: 0.7977959592586409, count: 5989
+elapsed=259.8984885215759, throughput(example/s)=23.043612273654347
+acc: 2.0, acc_norm: 5.0, avg_acc: 0.6061718098415346, avg_acc_norm: 0.7978315262718932, count: 5995
+elapsed=260.2487246990204, throughput(example/s)=23.035655628796118
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.6062677112852142, avg_acc_norm: 0.7979663277212868, count: 5999
+elapsed=260.59818959236145, throughput(example/s)=23.020113874865693
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.6063280599500417, avg_acc_norm: 0.7980016652789342, count: 6005
+elapsed=260.9518880844116, throughput(example/s)=23.01190477708875
+acc: 6.0, acc_norm: 7.0, avg_acc: 0.6066200931470392, avg_acc_norm: 0.7982368596141052, count: 6012
+elapsed=261.32609724998474, throughput(example/s)=23.005739048897656
+acc: 4.0, acc_norm: 8.0, avg_acc: 0.6062769843905679, avg_acc_norm: 0.7982397874460312, count: 6022
+elapsed=261.6980996131897, throughput(example/s)=23.01124849168178
+acc: 9.0, acc_norm: 11.0, avg_acc: 0.6066633515663848, avg_acc_norm: 0.7986076578816509, count: 6033
+elapsed=262.072594165802, throughput(example/s)=23.020339151461148
+acc: 12.0, acc_norm: 16.0, avg_acc: 0.6069421487603306, avg_acc_norm: 0.7990082644628099, count: 6050
+elapsed=262.4882621765137, throughput(example/s)=23.04864967992968
+acc: 14.0, acc_norm: 15.0, avg_acc: 0.6075490357672655, avg_acc_norm: 0.7992417999011043, count: 6067
+elapsed=262.9073522090912, throughput(example/s)=23.076570316583968
+acc: 12.0, acc_norm: 17.0, avg_acc: 0.6074244415243101, avg_acc_norm: 0.7992772667542707, count: 6088
+elapsed=263.3546998500824, throughput(example/s)=23.11711165005091
+acc: 16.0, acc_norm: 22.0, avg_acc: 0.6075576639947653, avg_acc_norm: 0.799607394078194, count: 6113
+elapsed=263.8216001987457, throughput(example/s)=23.17096096526922
+acc: 13.0, acc_norm: 17.0, avg_acc: 0.607795172863666, avg_acc_norm: 0.7999021526418787, count: 6132
+elapsed=264.31968879699707, throughput(example/s)=23.199179856440818
+acc: 12.0, acc_norm: 33.0, avg_acc: 0.6062915518080104, avg_acc_norm: 0.8007134749473002, count: 6167
+elapsed=265.1158378124237, throughput(example/s)=23.261529944368363
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.606355382619974, avg_acc_norm: 0.8007457846952011, count: 6168
+elapsed=268.7403516769409, throughput(example/s)=22.95152165096032
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6064191927378829, avg_acc_norm: 0.8007780839682282, count: 6169
+elapsed=269.4791684150696, throughput(example/s)=22.892307543780525
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6065467509317777, avg_acc_norm: 0.8008426511100308, count: 6171
+elapsed=270.0019860267639, throughput(example/s)=22.85538743921795
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.6064484769928711, avg_acc_norm: 0.8008749189889826, count: 6172
+elapsed=270.56457114219666, throughput(example/s)=22.811560190400066
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.6065414507772021, avg_acc_norm: 0.8010038860103627, count: 6176
+elapsed=270.85313391685486, throughput(example/s)=22.802025255118064
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.6064432572446171, avg_acc_norm: 0.8010361016674761, count: 6177
+elapsed=271.16951417922974, throughput(example/s)=22.7791092914571
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6065706424987862, avg_acc_norm: 0.8011005016993041, count: 6179
+elapsed=271.4803144931793, throughput(example/s)=22.760397974105196
+acc: 2.0, acc_norm: 1.0, avg_acc: 0.6066979453162918, avg_acc_norm: 0.8010030739362562, count: 6181
+elapsed=271.8022925853729, throughput(example/s)=22.74079420451743
+acc: 7.0, acc_norm: 7.0, avg_acc: 0.6071428571428571, avg_acc_norm: 0.8012281835811248, count: 6188
+elapsed=272.1273593902588, throughput(example/s)=22.739352683482913
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.6072351421188631, avg_acc_norm: 0.8013565891472868, count: 6192
+elapsed=272.4752953052521, throughput(example/s)=22.724996015008067
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.6071370902632004, avg_acc_norm: 0.8013886646213467, count: 6193
+elapsed=272.8299686908722, throughput(example/s)=22.699119270936578
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.6072293045021785, avg_acc_norm: 0.801516862998225, count: 6197
+elapsed=273.1830587387085, throughput(example/s)=22.68442277720906
+acc: 6.0, acc_norm: 8.0, avg_acc: 0.6073155011279407, avg_acc_norm: 0.8016435707379955, count: 6206
+elapsed=273.5418481826782, throughput(example/s)=22.687570626690636
+acc: 8.0, acc_norm: 11.0, avg_acc: 0.6074300418140881, avg_acc_norm: 0.8018655516243165, count: 6218
+elapsed=273.91218161582947, throughput(example/s)=22.70070634799639
+acc: 5.0, acc_norm: 8.0, avg_acc: 0.607257546563905, avg_acc_norm: 0.8018625561978163, count: 6228
+elapsed=274.286728143692, throughput(example/s)=22.706166069899325
+acc: 13.0, acc_norm: 15.0, avg_acc: 0.6076861489191353, avg_acc_norm: 0.8020816653322658, count: 6245
+elapsed=274.6977598667145, throughput(example/s)=22.73407691067493
+acc: 6.0, acc_norm: 8.0, avg_acc: 0.607576726342711, avg_acc_norm: 0.8019501278772379, count: 6256
+elapsed=275.11257553100586, throughput(example/s)=22.739782025321972
+acc: 9.0, acc_norm: 10.0, avg_acc: 0.6078493937460114, avg_acc_norm: 0.8020102105934908, count: 6268
+elapsed=275.55768942832947, throughput(example/s)=22.74659804632402
+acc: 11.0, acc_norm: 16.0, avg_acc: 0.607858733693923, avg_acc_norm: 0.8022589882278078, count: 6286
+elapsed=276.0079622268677, throughput(example/s)=22.77470529938247
+acc: 14.0, acc_norm: 18.0, avg_acc: 0.6082474226804123, avg_acc_norm: 0.8026962727993656, count: 6305
+elapsed=276.4609134197235, throughput(example/s)=22.806117226516346
+acc: 15.0, acc_norm: 26.0, avg_acc: 0.6079267329859467, avg_acc_norm: 0.8032528027790936, count: 6333
+elapsed=276.93240904808044, throughput(example/s)=22.8683960168074
+acc: 27.0, acc_norm: 43.0, avg_acc: 0.607680250783699, avg_acc_norm: 0.8040752351097179, count: 6380
+elapsed=278.0545926094055, throughput(example/s)=22.945134407336486
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.6075850180222536, avg_acc_norm: 0.8039492242595204, count: 6381
+elapsed=281.3661916255951, throughput(example/s)=22.6786308729337
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.6074898151049828, avg_acc_norm: 0.8038232528987778, count: 6382
+elapsed=282.0952408313751, throughput(example/s)=22.62356493924297
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6075513081623062, avg_acc_norm: 0.8038539871533762, count: 6383
+elapsed=282.35812640190125, throughput(example/s)=22.606043188268657
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6076127819548872, avg_acc_norm: 0.8038847117794486, count: 6384
+elapsed=283.2083377838135, throughput(example/s)=22.54170922352298
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6077356717820231, avg_acc_norm: 0.803946132164109, count: 6386
+elapsed=283.49184703826904, throughput(example/s)=22.526221006764768
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6077970878346641, avg_acc_norm: 0.8039768279317363, count: 6387
+elapsed=283.80979800224304, throughput(example/s)=22.504508459392657
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6077633432462044, avg_acc_norm: 0.8040381906401628, count: 6389
+elapsed=284.1253275871277, throughput(example/s)=22.486555683920148
+acc: 5.0, acc_norm: 5.0, avg_acc: 0.6080700656865812, avg_acc_norm: 0.8041914294651236, count: 6394
+elapsed=284.44677352905273, throughput(example/s)=22.478722189995
+acc: 2.0, acc_norm: 4.0, avg_acc: 0.6080025007814942, avg_acc_norm: 0.8043138480775243, count: 6398
+elapsed=284.7988967895508, throughput(example/s)=22.46497466149855
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.6079013116801999, avg_acc_norm: 0.8041848844472205, count: 6404
+elapsed=285.15480303764343, throughput(example/s)=22.457976971738415
+acc: 3.0, acc_norm: 6.0, avg_acc: 0.6076107298814722, avg_acc_norm: 0.8041172800998129, count: 6412
+elapsed=285.50882291793823, throughput(example/s)=22.45815010012127
+acc: 3.0, acc_norm: 6.0, avg_acc: 0.6074154852780806, avg_acc_norm: 0.8041751051565664, count: 6419
+elapsed=285.8804214000702, throughput(example/s)=22.453443885956244
+acc: 10.0, acc_norm: 9.0, avg_acc: 0.6077425373134329, avg_acc_norm: 0.8039490049751243, count: 6432
+elapsed=286.2593595981598, throughput(example/s)=22.469134315918968
+acc: 8.0, acc_norm: 10.0, avg_acc: 0.6077579519006983, avg_acc_norm: 0.8038789759503491, count: 6445
+elapsed=286.6337480545044, throughput(example/s)=22.48514016142461
+acc: 9.0, acc_norm: 13.0, avg_acc: 0.6078340300356092, avg_acc_norm: 0.8041492491097693, count: 6459
+elapsed=287.0468626022339, throughput(example/s)=22.501552329977404
+acc: 7.0, acc_norm: 12.0, avg_acc: 0.607600803336938, avg_acc_norm: 0.804263865286575, count: 6473
+elapsed=287.4637060165405, throughput(example/s)=22.5176252324095
+acc: 5.0, acc_norm: 10.0, avg_acc: 0.6073411474398519, avg_acc_norm: 0.8044417026526836, count: 6484
+elapsed=287.9118118286133, throughput(example/s)=22.520784954317065
+acc: 11.0, acc_norm: 17.0, avg_acc: 0.6072581885283715, avg_acc_norm: 0.8047055205289866, count: 6503
+elapsed=288.360800743103, throughput(example/s)=22.55160889844192
+acc: 14.0, acc_norm: 22.0, avg_acc: 0.6069842242303569, avg_acc_norm: 0.8048705774238015, count: 6529
+elapsed=288.82845544815063, throughput(example/s)=22.60511343963497
+acc: 10.0, acc_norm: 17.0, avg_acc: 0.6069355331500152, avg_acc_norm: 0.8053773296669722, count: 6546
+elapsed=289.33447337150574, throughput(example/s)=22.624334818184384
+acc: 22.0, acc_norm: 31.0, avg_acc: 0.6069583713157095, avg_acc_norm: 0.8056821634761471, count: 6582
+elapsed=290.12727880477905, throughput(example/s)=22.68659474943374
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6070180768646514, avg_acc_norm: 0.8057116816041319, count: 6583
+elapsed=293.98704743385315, throughput(example/s)=22.392142978615986
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6070777642770352, avg_acc_norm: 0.8057411907654921, count: 6584
+elapsed=295.1003563404083, throughput(example/s)=22.311054048356116
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6071374335611238, avg_acc_norm: 0.8057706909643129, count: 6585
+elapsed=295.41653847694397, throughput(example/s)=22.290559743031896
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.607164541590771, avg_acc_norm: 0.805859137826351, count: 6588
+elapsed=295.73035740852356, throughput(example/s)=22.277050140305008
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.6070670306339097, avg_acc_norm: 0.8057324840764332, count: 6594
+elapsed=296.0502727031708, throughput(example/s)=22.273244134489786
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.607094133697135, avg_acc_norm: 0.8058208276489314, count: 6597
+elapsed=296.3756070137024, throughput(example/s)=22.258916874002384
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.6072402302332627, avg_acc_norm: 0.8059678885186308, count: 6602
+elapsed=296.72995042800903, throughput(example/s)=22.249186475706775
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.6073861056455274, avg_acc_norm: 0.8061147268049039, count: 6607
+elapsed=297.08304500579834, throughput(example/s)=22.239572776262097
+acc: 5.0, acc_norm: 7.0, avg_acc: 0.6074074074074074, avg_acc_norm: 0.8061980347694634, count: 6615
+elapsed=297.44311356544495, throughput(example/s)=22.23954665047081
+acc: 7.0, acc_norm: 8.0, avg_acc: 0.6072721786360893, avg_acc_norm: 0.805823777911889, count: 6628
+elapsed=297.81975841522217, throughput(example/s)=22.255071440757806
+acc: 10.0, acc_norm: 11.0, avg_acc: 0.6077722548576593, avg_acc_norm: 0.8061455038409399, count: 6639
+elapsed=298.19448614120483, throughput(example/s)=22.26399316067909
+acc: 4.0, acc_norm: 9.0, avg_acc: 0.6074597683862235, avg_acc_norm: 0.8062866596480673, count: 6649
+elapsed=298.61204385757446, throughput(example/s)=22.266349053125587
+acc: 9.0, acc_norm: 13.0, avg_acc: 0.6073518379594899, avg_acc_norm: 0.8063015753938485, count: 6665
+elapsed=299.03395223617554, throughput(example/s)=22.288438988814274
+acc: 16.0, acc_norm: 18.0, avg_acc: 0.6077463735606401, avg_acc_norm: 0.8063406609839988, count: 6687
+elapsed=299.48482275009155, throughput(example/s)=22.32834351535751
+acc: 14.0, acc_norm: 18.0, avg_acc: 0.6080214701058595, avg_acc_norm: 0.8066199493066945, count: 6707
+elapsed=299.9466655254364, throughput(example/s)=22.360641976969156
+acc: 14.0, acc_norm: 17.0, avg_acc: 0.60820451843044, avg_acc_norm: 0.8066290130796671, count: 6728
+elapsed=300.4129412174225, throughput(example/s)=22.39583944930868
+acc: 25.0, acc_norm: 38.0, avg_acc: 0.6080342637719687, avg_acc_norm: 0.8071185940038399, count: 6771
+elapsed=307.6112554073334, throughput(example/s)=22.01154828042284
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.607944477259303, avg_acc_norm: 0.8071470761961016, count: 6772
+elapsed=309.11935234069824, throughput(example/s)=21.907395796223682
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6080283353010626, avg_acc_norm: 0.8071133412042503, count: 6776
+elapsed=309.6870150566101, throughput(example/s)=21.880155352207332
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6082017996754684, avg_acc_norm: 0.8071987018734327, count: 6779
+elapsed=309.97096061706543, throughput(example/s)=21.869790597496323
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6083173573219289, avg_acc_norm: 0.8072555670255125, count: 6781
+elapsed=310.29036378860474, throughput(example/s)=21.853724096375014
+acc: 0.0, acc_norm: 2.0, avg_acc: 0.6081379920389208, avg_acc_norm: 0.807312398643668, count: 6783
+elapsed=310.60900378227234, throughput(example/s)=21.837744293963485
+acc: 4.0, acc_norm: 3.0, avg_acc: 0.6083689406217769, avg_acc_norm: 0.8072786208928835, count: 6787
+elapsed=310.9333930015564, throughput(example/s)=21.827825999911266
+acc: 2.0, acc_norm: 4.0, avg_acc: 0.6083051097040201, avg_acc_norm: 0.8073921366514505, count: 6791
+elapsed=311.2559950351715, throughput(example/s)=21.81805365462158
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.6082413539367182, avg_acc_norm: 0.8073583517292127, count: 6795
+elapsed=311.6080152988434, throughput(example/s)=21.80624267152868
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6081200353045013, avg_acc_norm: 0.8072962636069432, count: 6798
+elapsed=311.9586606025696, throughput(example/s)=21.791348850098267
+acc: 9.0, acc_norm: 8.0, avg_acc: 0.6086381665932129, avg_acc_norm: 0.8074041427941825, count: 6807
+elapsed=312.3129982948303, throughput(example/s)=21.795442511726787
+acc: 7.0, acc_norm: 7.0, avg_acc: 0.6089508437270726, avg_acc_norm: 0.807483492296405, count: 6815
+elapsed=312.6882815361023, throughput(example/s)=21.794868571731733
+acc: 8.0, acc_norm: 9.0, avg_acc: 0.6093200468933178, avg_acc_norm: 0.8077373974208675, count: 6824
+elapsed=313.0588974952698, throughput(example/s)=21.79781521815111
+acc: 6.0, acc_norm: 8.0, avg_acc: 0.6093955802722084, avg_acc_norm: 0.8078442850870774, count: 6833
+elapsed=313.43747997283936, throughput(example/s)=21.800200794723423
+acc: 7.0, acc_norm: 11.0, avg_acc: 0.6094389246054939, avg_acc_norm: 0.8081531268264173, count: 6844
+elapsed=313.8534662723541, throughput(example/s)=21.806354670178948
+acc: 6.0, acc_norm: 10.0, avg_acc: 0.6091585241359195, avg_acc_norm: 0.8080793349861456, count: 6857
+elapsed=314.27141857147217, throughput(example/s)=21.818719726943826
+acc: 12.0, acc_norm: 15.0, avg_acc: 0.6093090909090909, avg_acc_norm: 0.8081454545454545, count: 6875
+elapsed=314.720027923584, throughput(example/s)=21.84481250004621
+acc: 11.0, acc_norm: 14.0, avg_acc: 0.6094022054556006, avg_acc_norm: 0.8081834010446894, count: 6892
+elapsed=315.1724257469177, throughput(example/s)=21.867395231885705
+acc: 12.0, acc_norm: 14.0, avg_acc: 0.6096396005210595, avg_acc_norm: 0.8082211608047475, count: 6909
+elapsed=315.63677859306335, throughput(example/s)=21.889084126370047
+acc: 17.0, acc_norm: 23.0, avg_acc: 0.609805335255948, avg_acc_norm: 0.808507570295602, count: 6935
+elapsed=316.1027271747589, throughput(example/s)=21.93907044707638
+acc: 29.0, acc_norm: 46.0, avg_acc: 0.6095047237331807, avg_acc_norm: 0.8091898081878042, count: 6986
+elapsed=317.3720030784607, throughput(example/s)=22.01202353149254
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.6094174896235867, avg_acc_norm: 0.8090739945613282, count: 6987
+elapsed=320.7675518989563, throughput(example/s)=21.7821283937128
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6094733829421866, avg_acc_norm: 0.8091013165426445, count: 6988
+elapsed=321.5064661502838, throughput(example/s)=21.735177160429348
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6095292602661325, avg_acc_norm: 0.8091286307053942, count: 6989
+elapsed=321.7656931877136, throughput(example/s)=21.720774302444713
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.6094420600858369, avg_acc_norm: 0.8091559370529328, count: 6990
+elapsed=322.04556155204773, throughput(example/s)=21.705003373785992
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6094979259047346, avg_acc_norm: 0.8091832355886139, count: 6991
+elapsed=322.33092308044434, throughput(example/s)=21.688890203858136
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6094666094666095, avg_acc_norm: 0.8092378092378092, count: 6993
+elapsed=322.61379384994507, throughput(example/s)=21.676072546521684
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.609578270192995, avg_acc_norm: 0.8092923516797713, count: 6995
+elapsed=322.9235212802887, throughput(example/s)=21.66147567159883
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6096898670858939, avg_acc_norm: 0.8093468629412606, count: 6997
+elapsed=323.24360847473145, throughput(example/s)=21.64621300020838
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6098571428571429, avg_acc_norm: 0.8094285714285714, count: 7000
+elapsed=323.56436491012573, throughput(example/s)=21.63402636116725
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6100242753105812, avg_acc_norm: 0.8095102099100385, count: 7003
+elapsed=323.88956809043884, throughput(example/s)=21.62156700905097
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6101912646303169, avg_acc_norm: 0.8095917784755924, count: 7006
+elapsed=324.2438507080078, throughput(example/s)=21.607194661369636
+acc: 7.0, acc_norm: 9.0, avg_acc: 0.6103192702394526, avg_acc_norm: 0.8097206385404789, count: 7016
+elapsed=324.59719133377075, throughput(example/s)=21.614481539939508
+acc: 8.0, acc_norm: 9.0, avg_acc: 0.61067615658363, avg_acc_norm: 0.8099644128113879, count: 7025
+elapsed=324.95705676078796, throughput(example/s)=21.61824109938115
+acc: 4.0, acc_norm: 7.0, avg_acc: 0.610550263045642, avg_acc_norm: 0.8100383904450448, count: 7033
+elapsed=325.3264727592468, throughput(example/s)=21.61828375154908
+acc: 6.0, acc_norm: 8.0, avg_acc: 0.6107087061496946, avg_acc_norm: 0.8102542252520949, count: 7041
+elapsed=325.70363450050354, throughput(example/s)=21.617812189286806
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.6109297374024131, avg_acc_norm: 0.8103619588360539, count: 7045
+elapsed=326.0845263004303, throughput(example/s)=21.604827680505316
+acc: 6.0, acc_norm: 9.0, avg_acc: 0.6109142452161588, avg_acc_norm: 0.8104890148830617, count: 7055
+elapsed=326.4944021701813, throughput(example/s)=21.608333720596736
+acc: 13.0, acc_norm: 18.0, avg_acc: 0.6111975116640747, avg_acc_norm: 0.8109712993072247, count: 7073
+elapsed=326.9100306034088, throughput(example/s)=21.635922235070897
+acc: 12.0, acc_norm: 14.0, avg_acc: 0.6113383161754337, avg_acc_norm: 0.8108870399097448, count: 7091
+elapsed=327.35599279403687, throughput(example/s)=21.66143329003131
+acc: 11.0, acc_norm: 18.0, avg_acc: 0.6110798650168728, avg_acc_norm: 0.8110236220472441, count: 7112
+elapsed=327.80790090560913, throughput(example/s)=21.69563326677678
+acc: 9.0, acc_norm: 15.0, avg_acc: 0.6108851171272268, avg_acc_norm: 0.8111937158086688, count: 7129
+elapsed=328.26959776878357, throughput(example/s)=21.71690600791276
+acc: 15.0, acc_norm: 23.0, avg_acc: 0.6108470785574504, avg_acc_norm: 0.8115739446463517, count: 7154
+elapsed=328.76786947250366, throughput(example/s)=21.760033945769514
+acc: 23.0, acc_norm: 30.0, avg_acc: 0.6110724718319656, avg_acc_norm: 0.8117957991375713, count: 7189
+elapsed=329.59375619888306, throughput(example/s)=21.811699599254613
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6111265646731572, avg_acc_norm: 0.8118219749652295, count: 7190
+elapsed=333.816987991333, throughput(example/s)=21.538748052530735
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6111806424697539, avg_acc_norm: 0.8118481435127243, count: 7191
+elapsed=334.39098954200745, throughput(example/s)=21.50476605200703
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6111497289031003, avg_acc_norm: 0.8117614347282079, count: 7193
+elapsed=335.0216484069824, throughput(example/s)=21.470254337898737
+acc: 5.0, acc_norm: 4.0, avg_acc: 0.6113349076260591, avg_acc_norm: 0.8116405056257814, count: 7199
+elapsed=335.34506916999817, throughput(example/s)=21.46743954762184
+acc: 5.0, acc_norm: 7.0, avg_acc: 0.6114349153483208, avg_acc_norm: 0.8118234804329725, count: 7206
+elapsed=335.6667492389679, throughput(example/s)=21.46772063761938
+acc: 7.0, acc_norm: 7.0, avg_acc: 0.611812006100097, avg_acc_norm: 0.812006100097047, count: 7213
+elapsed=336.0201334953308, throughput(example/s)=21.46597563952289
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.611919611919612, avg_acc_norm: 0.812058212058212, count: 7215
+elapsed=336.3718566894531, throughput(example/s)=21.44947580041177
+acc: 6.0, acc_norm: 7.0, avg_acc: 0.6121572971476046, avg_acc_norm: 0.8122403766269731, count: 7222
+elapsed=336.727698802948, throughput(example/s)=21.447597051486675
+acc: 10.0, acc_norm: 10.0, avg_acc: 0.6126935840707964, avg_acc_norm: 0.8125, count: 7232
+elapsed=337.1149230003357, throughput(example/s)=21.452624925752097
+acc: 5.0, acc_norm: 7.0, avg_acc: 0.612707182320442, avg_acc_norm: 0.8125690607734807, count: 7240
+elapsed=337.4763243198395, throughput(example/s)=21.453356808338263
+acc: 7.0, acc_norm: 8.0, avg_acc: 0.6127430699213902, avg_acc_norm: 0.8124396634946904, count: 7251
+elapsed=337.85423970222473, throughput(example/s)=21.461918034211525
+acc: 8.0, acc_norm: 13.0, avg_acc: 0.612494839686253, avg_acc_norm: 0.8124397963396175, count: 7267
+elapsed=338.26961517333984, throughput(example/s)=21.482863591742237
+acc: 7.0, acc_norm: 15.0, avg_acc: 0.6119423472889499, avg_acc_norm: 0.8124914207275223, count: 7285
+elapsed=338.68865180015564, throughput(example/s)=21.509430449705587
+acc: 13.0, acc_norm: 16.0, avg_acc: 0.6121303395399781, avg_acc_norm: 0.8125684556407448, count: 7304
+elapsed=339.14367508888245, throughput(example/s)=21.536595067225637
+acc: 14.0, acc_norm: 17.0, avg_acc: 0.6124539123310119, avg_acc_norm: 0.8127816468660385, count: 7323
+elapsed=339.61597537994385, throughput(example/s)=21.562589898214966
+acc: 34.0, acc_norm: 43.0, avg_acc: 0.6130782797449464, avg_acc_norm: 0.8133224799891466, count: 7371
+elapsed=340.7654802799225, throughput(example/s)=21.630712107180216
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6131307650569723, avg_acc_norm: 0.8133478024959305, count: 7372
+elapsed=344.00232768058777, throughput(example/s)=21.430087551166316
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6132356929753187, avg_acc_norm: 0.8133984269053431, count: 7374
+elapsed=344.7917356491089, throughput(example/s)=21.3868235157018
+acc: 1.0, acc_norm: 0.0, avg_acc: 0.6132881355932204, avg_acc_norm: 0.8132881355932203, count: 7375
+elapsed=345.077392578125, throughput(example/s)=21.372017288354556
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.61339297817541, avg_acc_norm: 0.813338755591704, count: 7377
+elapsed=345.3615894317627, throughput(example/s)=21.3602213614365
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6134453781512605, avg_acc_norm: 0.8133640552995391, count: 7378
+elapsed=345.67349219322205, throughput(example/s)=21.343840840060423
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6135193714440531, avg_acc_norm: 0.813329720942834, count: 7382
+elapsed=345.99631571769714, throughput(example/s)=21.33548730045747
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6136240520043337, avg_acc_norm: 0.8133802816901409, count: 7384
+elapsed=346.3240442276001, throughput(example/s)=21.321072339832465
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.6137501691703884, avg_acc_norm: 0.8135065638110706, count: 7389
+elapsed=346.6738109588623, throughput(example/s)=21.31398382693756
+acc: 6.0, acc_norm: 6.0, avg_acc: 0.6138975260240638, avg_acc_norm: 0.8134378802217115, count: 7397
+elapsed=347.02841353416443, throughput(example/s)=21.31525751643324
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6139189189189189, avg_acc_norm: 0.8133783783783783, count: 7400
+elapsed=347.3882865905762, throughput(example/s)=21.301812080732216
+acc: 4.0, acc_norm: 3.0, avg_acc: 0.6141274986493788, avg_acc_norm: 0.8133441383036196, count: 7404
+elapsed=347.7671058177948, throughput(example/s)=21.290110180458438
+acc: 10.0, acc_norm: 12.0, avg_acc: 0.6143993528380747, avg_acc_norm: 0.8135364702709991, count: 7417
+elapsed=348.14771032333374, throughput(example/s)=21.304175727916295
+acc: 11.0, acc_norm: 12.0, avg_acc: 0.6148048452220727, avg_acc_norm: 0.813728129205922, count: 7430
+elapsed=348.5597221851349, throughput(example/s)=21.316289654527584
+acc: 8.0, acc_norm: 12.0, avg_acc: 0.6148058578530162, avg_acc_norm: 0.813919118634959, count: 7443
+elapsed=348.97502613067627, throughput(example/s)=21.328173773709853
+acc: 11.0, acc_norm: 17.0, avg_acc: 0.6148793565683646, avg_acc_norm: 0.814343163538874, count: 7460
+elapsed=349.42123794555664, throughput(example/s)=21.349589520836005
+acc: 18.0, acc_norm: 22.0, avg_acc: 0.6153948950955499, avg_acc_norm: 0.8147801683816651, count: 7483
+elapsed=349.8750014305115, throughput(example/s)=21.387638354854555
+acc: 18.0, acc_norm: 19.0, avg_acc: 0.6160714285714286, avg_acc_norm: 0.8150319829424307, count: 7504
+elapsed=350.3421902656555, throughput(example/s)=21.419058875866217
+acc: 21.0, acc_norm: 32.0, avg_acc: 0.6158334438403394, avg_acc_norm: 0.8152764885293727, count: 7541
+elapsed=351.0945158004761, throughput(example/s)=21.478546831775304
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6158843808008486, avg_acc_norm: 0.8153009811721029, count: 7542
+elapsed=354.86373805999756, throughput(example/s)=21.253228186208357
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6159045725646123, avg_acc_norm: 0.8152418820410868, count: 7545
+elapsed=355.75093960762024, throughput(example/s)=21.208657968189343
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6158738571617861, avg_acc_norm: 0.815290844043991, count: 7547
+elapsed=356.06835746765137, throughput(example/s)=21.195368365990344
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6160264900662251, avg_acc_norm: 0.815364238410596, count: 7550
+elapsed=356.3912076950073, throughput(example/s)=21.184585469519057
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.6160158835208471, avg_acc_norm: 0.8153540701522171, count: 7555
+elapsed=356.74441504478455, throughput(example/s)=21.17762656228709
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.6160359883567081, avg_acc_norm: 0.815427361735909, count: 7558
+elapsed=357.0977625846863, throughput(example/s)=21.16507240284825
+acc: 4.0, acc_norm: 7.0, avg_acc: 0.6159947124917383, avg_acc_norm: 0.8155981493721084, count: 7565
+elapsed=357.45355558395386, throughput(example/s)=21.163588616824473
+acc: 5.0, acc_norm: 6.0, avg_acc: 0.6160855784469097, avg_acc_norm: 0.8156365557316428, count: 7572
+elapsed=357.82923412323, throughput(example/s)=21.160931745985682
+acc: 8.0, acc_norm: 7.0, avg_acc: 0.616328145608019, avg_acc_norm: 0.8154840411500923, count: 7582
+elapsed=358.20946431159973, throughput(example/s)=21.166386584929985
+acc: 11.0, acc_norm: 9.0, avg_acc: 0.616640337019484, avg_acc_norm: 0.8151658767772512, count: 7596
+elapsed=358.6265354156494, throughput(example/s)=21.180808584607966
+acc: 7.0, acc_norm: 8.0, avg_acc: 0.6165067683006965, avg_acc_norm: 0.8148245498751479, count: 7609
+elapsed=359.0450599193573, throughput(example/s)=21.192326115582837
+acc: 12.0, acc_norm: 12.0, avg_acc: 0.6170296510102335, avg_acc_norm: 0.8150091839412228, count: 7622
+elapsed=359.4944181442261, throughput(example/s)=21.20199818218629
+acc: 9.0, acc_norm: 14.0, avg_acc: 0.6168346642230659, avg_acc_norm: 0.815028145045163, count: 7639
+elapsed=359.94973707199097, throughput(example/s)=21.22240750094555
+acc: 11.0, acc_norm: 17.0, avg_acc: 0.6166601383992688, avg_acc_norm: 0.8151194672933804, count: 7659
+elapsed=360.4175977706909, throughput(example/s)=21.25034972591127
+acc: 28.0, acc_norm: 39.0, avg_acc: 0.6165325720218012, avg_acc_norm: 0.8152089281079679, count: 7706
+elapsed=361.46516847610474, throughput(example/s)=21.3187899472793
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.6164525755806409, avg_acc_norm: 0.8151031529778123, count: 7707
+elapsed=365.428386926651, throughput(example/s)=21.090315574052415
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6165520819820989, avg_acc_norm: 0.8151511220651186, count: 7709
+elapsed=365.9549973011017, throughput(example/s)=21.065431697485916
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6166018158236057, avg_acc_norm: 0.8151750972762646, count: 7710
+elapsed=366.24117517471313, throughput(example/s)=21.051701781816288
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6165715767634855, avg_acc_norm: 0.8150933609958506, count: 7712
+elapsed=367.16722345352173, throughput(example/s)=21.004053486752017
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.616770347330223, avg_acc_norm: 0.8151892172109901, count: 7716
+elapsed=367.48874497413635, throughput(example/s)=20.99656140637191
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6167897396035756, avg_acc_norm: 0.8151314937168027, count: 7719
+elapsed=367.815470457077, throughput(example/s)=20.986066710048252
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.6168091168091168, avg_acc_norm: 0.8152033152033152, count: 7722
+elapsed=368.1712861061096, throughput(example/s)=20.973933306071196
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.616768016561004, avg_acc_norm: 0.8151119161599172, count: 7729
+elapsed=368.5321192741394, throughput(example/s)=20.972391810035536
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.6167269906928645, avg_acc_norm: 0.8150206825232679, count: 7736
+elapsed=368.9039146900177, throughput(example/s)=20.97023016549011
+acc: 4.0, acc_norm: 6.0, avg_acc: 0.6165267914783732, avg_acc_norm: 0.8148482892188509, count: 7745
+elapsed=369.28144335746765, throughput(example/s)=20.973163258850168
+acc: 7.0, acc_norm: 7.0, avg_acc: 0.6166344294003868, avg_acc_norm: 0.8147001934235977, count: 7755
+elapsed=369.6625440120697, throughput(example/s)=20.978592842629993
+acc: 10.0, acc_norm: 13.0, avg_acc: 0.6168104003089201, avg_acc_norm: 0.8149053932295018, count: 7769
+elapsed=370.08103704452515, throughput(example/s)=20.992699496422176
+acc: 11.0, acc_norm: 12.0, avg_acc: 0.6171935235158057, avg_acc_norm: 0.8150860961192495, count: 7782
+elapsed=370.5031199455261, throughput(example/s)=21.00387171137496
+acc: 8.0, acc_norm: 12.0, avg_acc: 0.6172696946369002, avg_acc_norm: 0.8153707980497819, count: 7794
+elapsed=370.9566352367401, throughput(example/s)=21.010542094835323
+acc: 11.0, acc_norm: 16.0, avg_acc: 0.6172555043522785, avg_acc_norm: 0.8155401945724526, count: 7812
+elapsed=371.41392636299133, throughput(example/s)=21.033137008344575
+acc: 20.0, acc_norm: 22.0, avg_acc: 0.6177596325593263, avg_acc_norm: 0.8156417453431998, count: 7838
+elapsed=371.88404178619385, throughput(example/s)=21.076462335822082
+acc: 18.0, acc_norm: 23.0, avg_acc: 0.6182419539498791, avg_acc_norm: 0.8161811474367129, count: 7861
+elapsed=372.3874714374542, throughput(example/s)=21.109732745990957
+acc: 18.0, acc_norm: 26.0, avg_acc: 0.6182509505703422, avg_acc_norm: 0.8164765525982256, count: 7890
+elapsed=373.01126861572266, throughput(example/s)=21.15217598996534
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6182693525909033, avg_acc_norm: 0.8164196123147093, count: 7893
+elapsed=377.09747982025146, throughput(example/s)=20.9309274720221
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6183660544648512, avg_acc_norm: 0.8164661177960735, count: 7895
+elapsed=377.3802375793457, throughput(example/s)=20.920544357705126
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6182577867814637, avg_acc_norm: 0.8162826031906811, count: 7898
+elapsed=377.6667847633362, throughput(example/s)=20.912614819831877
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6184027338311606, avg_acc_norm: 0.8163523604607011, count: 7901
+elapsed=378.3023478984833, throughput(example/s)=20.885410952089092
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6184693232131563, avg_acc_norm: 0.8163187855787476, count: 7905
+elapsed=378.6226785182953, throughput(example/s)=20.87830562853626
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6185658277475654, avg_acc_norm: 0.8163652459845706, count: 7907
+elapsed=378.9763126373291, throughput(example/s)=20.8641008325151
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6185358452396005, avg_acc_norm: 0.8162852446579846, count: 7909
+elapsed=379.3336064815521, throughput(example/s)=20.84972136626295
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6185058778915434, avg_acc_norm: 0.8163316900518266, count: 7911
+elapsed=379.6905999183655, throughput(example/s)=20.835385447258602
+acc: 10.0, acc_norm: 15.0, avg_acc: 0.6185189857449224, avg_acc_norm: 0.8165762583575124, count: 7927
+elapsed=380.0656442642212, throughput(example/s)=20.85692332266991
+acc: 10.0, acc_norm: 11.0, avg_acc: 0.6184541792547835, avg_acc_norm: 0.8162134944612286, count: 7944
+elapsed=380.443382024765, throughput(example/s)=20.88089943297498
+acc: 9.0, acc_norm: 8.0, avg_acc: 0.6186525892408246, avg_acc_norm: 0.8159879336349924, count: 7956
+elapsed=380.85837411880493, throughput(example/s)=20.889654897067345
+acc: 12.0, acc_norm: 15.0, avg_acc: 0.6189162067235323, avg_acc_norm: 0.8162318113396889, count: 7972
+elapsed=381.2789809703827, throughput(example/s)=20.908574555331324
+acc: 13.0, acc_norm: 17.0, avg_acc: 0.6191489361702127, avg_acc_norm: 0.8165206508135169, count: 7990
+elapsed=381.7276430130005, throughput(example/s)=20.931153785286345
+acc: 14.0, acc_norm: 15.0, avg_acc: 0.6195054945054945, avg_acc_norm: 0.8165584415584416, count: 8008
+elapsed=382.19738388061523, throughput(example/s)=20.952524370238525
+acc: 34.0, acc_norm: 44.0, avg_acc: 0.6201117318435754, avg_acc_norm: 0.8172563625077591, count: 8055
+elapsed=383.2492949962616, throughput(example/s)=21.017651187273735
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6201588877855015, avg_acc_norm: 0.817279046673287, count: 8056
+elapsed=387.5385241508484, throughput(example/s)=20.787610774056162
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.6200819163460345, avg_acc_norm: 0.8171776095320838, count: 8057
+elapsed=388.0924367904663, throughput(example/s)=20.76051794936171
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6202233250620347, avg_acc_norm: 0.8172456575682382, count: 8060
+elapsed=388.3759984970093, throughput(example/s)=20.753084719940713
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.620240605233784, avg_acc_norm: 0.8171896316507503, count: 8063
+elapsed=388.66535687446594, throughput(example/s)=20.74535292993517
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.6202578725514505, avg_acc_norm: 0.8172576245970742, count: 8066
+elapsed=388.9834008216858, throughput(example/s)=20.73610334775581
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.6203692231445918, avg_acc_norm: 0.817370833849585, count: 8071
+elapsed=389.3030183315277, throughput(example/s)=20.73192248698877
+acc: 6.0, acc_norm: 6.0, avg_acc: 0.6204975863349425, avg_acc_norm: 0.8173041217972521, count: 8079
+elapsed=389.65262603759766, throughput(example/s)=20.733852308800955
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6205445544554455, avg_acc_norm: 0.8173267326732673, count: 8080
+elapsed=390.0092623233795, throughput(example/s)=20.71745668773476
+acc: 5.0, acc_norm: 4.0, avg_acc: 0.6207792207792208, avg_acc_norm: 0.8173160173160173, count: 8085
+elapsed=390.36393308639526, throughput(example/s)=20.71144210500264
+acc: 7.0, acc_norm: 9.0, avg_acc: 0.6208770846201359, avg_acc_norm: 0.8174181593576282, count: 8095
+elapsed=390.72532320022583, throughput(example/s)=20.717879081135845
+acc: 4.0, acc_norm: 6.0, avg_acc: 0.6207577440454153, avg_acc_norm: 0.817351598173516, count: 8103
+elapsed=391.10380840301514, throughput(example/s)=20.718284572801238
+acc: 3.0, acc_norm: 7.0, avg_acc: 0.6205153495253359, avg_acc_norm: 0.8174084576501048, count: 8111
+elapsed=391.4859230518341, throughput(example/s)=20.718497198495882
+acc: 7.0, acc_norm: 9.0, avg_acc: 0.6205368135927112, avg_acc_norm: 0.8174095050480177, count: 8122
+elapsed=391.8994607925415, throughput(example/s)=20.724703176612728
+acc: 10.0, acc_norm: 16.0, avg_acc: 0.6205455885967068, avg_acc_norm: 0.8177684934873434, count: 8138
+elapsed=392.32236099243164, throughput(example/s)=20.743145966530804
+acc: 12.0, acc_norm: 16.0, avg_acc: 0.6207234825260576, avg_acc_norm: 0.8180257510729614, count: 8155
+elapsed=392.7775902748108, throughput(example/s)=20.76238614910355
+acc: 12.0, acc_norm: 18.0, avg_acc: 0.6206727828746177, avg_acc_norm: 0.8182262996941896, count: 8175
+elapsed=393.2352554798126, throughput(example/s)=20.78908207257545
+acc: 18.0, acc_norm: 23.0, avg_acc: 0.6211271041717492, avg_acc_norm: 0.818736277140766, count: 8198
+elapsed=393.71100902557373, throughput(example/s)=20.82237939012646
+acc: 21.0, acc_norm: 31.0, avg_acc: 0.6210372889590672, avg_acc_norm: 0.8190210129964776, count: 8233
+elapsed=394.5397219657898, throughput(example/s)=20.867353885127635
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6211293260473588, avg_acc_norm: 0.8190649666059502, count: 8235
+elapsed=398.46464347839355, throughput(example/s)=20.66682737046038
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.6210539096648858, avg_acc_norm: 0.8189655172413793, count: 8236
+elapsed=398.75022435188293, throughput(example/s)=20.654533833520862
+acc: 0.0, acc_norm: 2.0, avg_acc: 0.6209031318281136, avg_acc_norm: 0.8190094683175528, count: 8238
+elapsed=399.07176089286804, throughput(example/s)=20.642903876657698
+acc: 2.0, acc_norm: 1.0, avg_acc: 0.620995145631068, avg_acc_norm: 0.8189320388349515, count: 8240
+elapsed=399.3976893424988, throughput(example/s)=20.631065776982712
+acc: 4.0, acc_norm: 2.0, avg_acc: 0.62117903930131, avg_acc_norm: 0.8187772925764192, count: 8244
+elapsed=399.7525351047516, throughput(example/s)=20.622758521943414
+acc: 3.0, acc_norm: 5.0, avg_acc: 0.6210909090909091, avg_acc_norm: 0.8187878787878788, count: 8250
+elapsed=400.11230754852295, throughput(example/s)=20.61921076746557
+acc: 8.0, acc_norm: 7.0, avg_acc: 0.6214579801404698, avg_acc_norm: 0.8188423347057399, count: 8258
+elapsed=400.4703974723816, throughput(example/s)=20.62075012815276
+acc: 7.0, acc_norm: 7.0, avg_acc: 0.621477808683033, avg_acc_norm: 0.8185995888257347, count: 8269
+elapsed=400.85217928886414, throughput(example/s)=20.628551938197525
+acc: 4.0, acc_norm: 6.0, avg_acc: 0.6214354760753987, avg_acc_norm: 0.8186321894635089, count: 8276
+elapsed=401.229727268219, throughput(example/s)=20.626587307843113
+acc: 8.0, acc_norm: 9.0, avg_acc: 0.6215759623506697, avg_acc_norm: 0.8186315916495717, count: 8287
+elapsed=401.64570236206055, throughput(example/s)=20.63261215360832
+acc: 10.0, acc_norm: 11.0, avg_acc: 0.6216574319441098, avg_acc_norm: 0.8184774753071549, count: 8302
+elapsed=402.0645663738251, throughput(example/s)=20.648424890745286
+acc: 11.0, acc_norm: 16.0, avg_acc: 0.6216346153846154, avg_acc_norm: 0.8186298076923076, count: 8320
+elapsed=402.5185332298279, throughput(example/s)=20.669855703885045
+acc: 21.0, acc_norm: 25.0, avg_acc: 0.6220651653090561, avg_acc_norm: 0.8188787733588884, count: 8348
+elapsed=402.99301743507385, throughput(example/s)=20.714999116194228
+acc: 18.0, acc_norm: 28.0, avg_acc: 0.6219861542134161, avg_acc_norm: 0.819288613034137, count: 8378
+elapsed=403.7291913032532, throughput(example/s)=20.751533900621595
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.62203126864781, avg_acc_norm: 0.8193101802124358, count: 8379
+elapsed=407.5613462924957, throughput(example/s)=20.55886819548049
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6220021477150698, avg_acc_norm: 0.8192339816251044, count: 8381
+elapsed=407.84784030914307, throughput(example/s)=20.54933034252999
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6220472440944882, avg_acc_norm: 0.8192555476020043, count: 8382
+elapsed=408.1320924758911, throughput(example/s)=20.53746851699768
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6220181297709924, avg_acc_norm: 0.8192986641221374, count: 8384
+elapsed=408.45028710365295, throughput(example/s)=20.526365789705963
+acc: 2.0, acc_norm: 1.0, avg_acc: 0.6220341003934661, avg_acc_norm: 0.8191248360558007, count: 8387
+elapsed=408.77452969551086, throughput(example/s)=20.517423153167915
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6221242102753606, avg_acc_norm: 0.8191679580402909, count: 8389
+elapsed=409.100887298584, throughput(example/s)=20.50594428038298
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.6223043012033838, avg_acc_norm: 0.8192541403550578, count: 8393
+elapsed=409.4517982006073, throughput(example/s)=20.49813930939906
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.6221428571428571, avg_acc_norm: 0.819047619047619, count: 8400
+elapsed=409.80829763412476, throughput(example/s)=20.497388775420763
+acc: 3.0, acc_norm: 7.0, avg_acc: 0.6218337495540492, avg_acc_norm: 0.8190034486859318, count: 8409
+elapsed=410.16970038414, throughput(example/s)=20.501270552468018
+acc: 7.0, acc_norm: 8.0, avg_acc: 0.62200047517225, avg_acc_norm: 0.8190781658351153, count: 8418
+elapsed=410.5488030910492, throughput(example/s)=20.504261458370646
+acc: 6.0, acc_norm: 6.0, avg_acc: 0.6221958456973293, avg_acc_norm: 0.8191097922848665, count: 8425
+elapsed=410.9264736175537, throughput(example/s)=20.502451267817527
+acc: 12.0, acc_norm: 14.0, avg_acc: 0.6225118483412322, avg_acc_norm: 0.8193127962085308, count: 8440
+elapsed=411.34050393104553, throughput(example/s)=20.518280887346865
+acc: 8.0, acc_norm: 14.0, avg_acc: 0.6224272533711852, avg_acc_norm: 0.8196120179796546, count: 8454
+elapsed=411.7591471672058, throughput(example/s)=20.531420025909046
+acc: 15.0, acc_norm: 17.0, avg_acc: 0.6227283455274959, avg_acc_norm: 0.8196837384942176, count: 8474
+elapsed=412.184490442276, throughput(example/s)=20.55875511207944
+acc: 13.0, acc_norm: 19.0, avg_acc: 0.622865889556105, avg_acc_norm: 0.8200871305781232, count: 8493
+elapsed=412.64495038986206, throughput(example/s)=20.5818585492829
+acc: 34.0, acc_norm: 39.0, avg_acc: 0.6237113402061856, avg_acc_norm: 0.8205248359887535, count: 8536
+elapsed=413.7514660358429, throughput(example/s)=20.630742609285484
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.6236382804263793, avg_acc_norm: 0.8205458592011245, count: 8537
+elapsed=417.628947019577, throughput(example/s)=20.44159070132611
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6236093219346528, avg_acc_norm: 0.82058789085373, count: 8539
+elapsed=417.9185137748718, throughput(example/s)=20.432212784427797
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6236533957845434, avg_acc_norm: 0.8206088992974239, count: 8540
+elapsed=418.23657727241516, throughput(example/s)=20.419065342621952
+acc: 3.0, acc_norm: 2.0, avg_acc: 0.6237855554254945, avg_acc_norm: 0.8205548402200632, count: 8543
+elapsed=418.561217546463, throughput(example/s)=20.410395521299513
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6238446238446238, avg_acc_norm: 0.8205218205218205, count: 8547
+elapsed=418.8875756263733, throughput(example/s)=20.404042748748164
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.6239476145930777, avg_acc_norm: 0.8206267539756782, count: 8552
+elapsed=419.2435085773468, throughput(example/s)=20.398646192567654
+acc: 5.0, acc_norm: 7.0, avg_acc: 0.6238757154538022, avg_acc_norm: 0.8205817077444224, count: 8561
+elapsed=419.6025822162628, throughput(example/s)=20.402638979918546
+acc: 11.0, acc_norm: 8.0, avg_acc: 0.6243583761082594, avg_acc_norm: 0.8204619692020532, count: 8572
+elapsed=419.98009276390076, throughput(example/s)=20.410491229685263
+acc: 6.0, acc_norm: 7.0, avg_acc: 0.6245483156545052, avg_acc_norm: 0.8206084625247698, count: 8579
+elapsed=420.3622763156891, throughput(example/s)=20.408586791354303
+acc: 11.0, acc_norm: 17.0, avg_acc: 0.6244475459409164, avg_acc_norm: 0.8207722726215398, count: 8598
+elapsed=420.77905774116516, throughput(example/s)=20.43352643583538
+acc: 12.0, acc_norm: 15.0, avg_acc: 0.62460824143935, avg_acc_norm: 0.8208937899013349, count: 8615
+elapsed=421.2005355358124, throughput(example/s)=20.4534402812209
+acc: 14.0, acc_norm: 21.0, avg_acc: 0.6247105141269106, avg_acc_norm: 0.8213293191292265, count: 8636
+elapsed=421.655695438385, throughput(example/s)=20.481165304838026
+acc: 31.0, acc_norm: 38.0, avg_acc: 0.6252592763309518, avg_acc_norm: 0.8217331182300069, count: 8678
+elapsed=422.78086376190186, throughput(example/s)=20.525999977348082
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6253024541997926, avg_acc_norm: 0.8217536582555593, count: 8679
+elapsed=425.9746663570404, throughput(example/s)=20.37445107762699
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6253456221198157, avg_acc_norm: 0.8217741935483871, count: 8680
+elapsed=426.5419878959656, throughput(example/s)=20.349696504244427
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6254319281271596, avg_acc_norm: 0.8218152499424096, count: 8682
+elapsed=426.83390164375305, throughput(example/s)=20.340464912850873
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.6254461715601612, avg_acc_norm: 0.8218767990788716, count: 8685
+elapsed=427.1526026725769, throughput(example/s)=20.33231202539873
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.625532404742719, avg_acc_norm: 0.821917808219178, count: 8687
+elapsed=427.46974658966064, throughput(example/s)=20.321905981194217
+acc: 3.0, acc_norm: 6.0, avg_acc: 0.6254457609570919, avg_acc_norm: 0.8220407224203382, count: 8693
+elapsed=427.82106733322144, throughput(example/s)=20.319242467854423
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.6255461025523109, avg_acc_norm: 0.8221430213842262, count: 8698
+elapsed=428.178599357605, throughput(example/s)=20.31395313322427
+acc: 8.0, acc_norm: 9.0, avg_acc: 0.6257464400551217, avg_acc_norm: 0.8222324299494718, count: 8708
+elapsed=428.5350863933563, throughput(example/s)=20.320389803524385
+acc: 7.0, acc_norm: 9.0, avg_acc: 0.6256880733944954, avg_acc_norm: 0.8221330275229358, count: 8720
+elapsed=428.9079096317291, throughput(example/s)=20.330704573592982
+acc: 13.0, acc_norm: 13.0, avg_acc: 0.62610188895249, avg_acc_norm: 0.8222095020034345, count: 8735
+elapsed=429.29135751724243, throughput(example/s)=20.347486263217306
+acc: 14.0, acc_norm: 17.0, avg_acc: 0.6263422435458076, avg_acc_norm: 0.8223669179803519, count: 8754
+elapsed=429.7139868736267, throughput(example/s)=20.37168969921018
+acc: 16.0, acc_norm: 17.0, avg_acc: 0.6267380898108047, avg_acc_norm: 0.822429906542056, count: 8774
+elapsed=430.17136430740356, throughput(example/s)=20.39652270700668
+acc: 17.0, acc_norm: 32.0, avg_acc: 0.6259645937358148, avg_acc_norm: 0.8225147526100771, count: 8812
+elapsed=431.18228363990784, throughput(example/s)=20.436832250183876
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6260070350618404, avg_acc_norm: 0.8225348916373539, count: 8813
+elapsed=434.2987220287323, throughput(example/s)=20.29248430396475
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6260494667574313, avg_acc_norm: 0.8225550260948491, count: 8814
+elapsed=434.5925953388214, throughput(example/s)=20.281063447775363
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.626091888825865, avg_acc_norm: 0.822575155984118, count: 8815
+elapsed=434.86835527420044, throughput(example/s)=20.270502309697424
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.6260208711433757, avg_acc_norm: 0.8225952813067151, count: 8816
+elapsed=435.15610814094543, throughput(example/s)=20.259396191549104
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6260346978115433, avg_acc_norm: 0.8225422383490192, count: 8819
+elapsed=435.47666668891907, throughput(example/s)=20.251372058700486
+acc: 5.0, acc_norm: 5.0, avg_acc: 0.6262466001813236, avg_acc_norm: 0.8226427923844062, count: 8824
+elapsed=435.8007688522339, throughput(example/s)=20.247784379177947
+acc: 7.0, acc_norm: 10.0, avg_acc: 0.626330088295223, avg_acc_norm: 0.822843558976681, count: 8834
+elapsed=436.1561424732208, throughput(example/s)=20.25421435063795
+acc: 5.0, acc_norm: 6.0, avg_acc: 0.6262580572204003, avg_acc_norm: 0.8226846092954879, count: 8843
+elapsed=436.51685309410095, throughput(example/s)=20.258095277007996
+acc: 4.0, acc_norm: 6.0, avg_acc: 0.6262146892655367, avg_acc_norm: 0.8227118644067797, count: 8850
+elapsed=436.89436984062195, throughput(example/s)=20.25661260690647
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.6263128176171654, avg_acc_norm: 0.8228119706380576, count: 8855
+elapsed=437.27411437034607, throughput(example/s)=20.250455512901283
+acc: 7.0, acc_norm: 10.0, avg_acc: 0.6261134287969331, avg_acc_norm: 0.8226406584733341, count: 8869
+elapsed=437.69216561317444, throughput(example/s)=20.26309972346703
+acc: 10.0, acc_norm: 11.0, avg_acc: 0.6261114237478898, avg_acc_norm: 0.822397298818233, count: 8885
+elapsed=438.1129193305969, throughput(example/s)=20.280159766974233
+acc: 14.0, acc_norm: 19.0, avg_acc: 0.6261367463792523, avg_acc_norm: 0.822499157965645, count: 8907
+elapsed=438.5649001598358, throughput(example/s)=20.309422839707025
+acc: 28.0, acc_norm: 34.0, avg_acc: 0.6267471765626748, avg_acc_norm: 0.822990048082299, count: 8943
+elapsed=439.3951606750488, throughput(example/s)=20.352977912320988
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6268306316377865, avg_acc_norm: 0.8230296254891001, count: 8945
+elapsed=442.7517261505127, throughput(example/s)=20.203196219632947
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.6267605633802817, avg_acc_norm: 0.8230494075564498, count: 8946
+elapsed=443.03800225257874, throughput(example/s)=20.192398743482574
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6268856855514583, avg_acc_norm: 0.8231087272320929, count: 8949
+elapsed=443.35144686698914, throughput(example/s)=20.184889579676526
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.6270523846755277, avg_acc_norm: 0.8231877582933095, count: 8953
+elapsed=443.67171931266785, throughput(example/s)=20.179334427422837
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6270240089335567, avg_acc_norm: 0.8232272473478504, count: 8955
+elapsed=444.0243909358978, throughput(example/s)=20.167811009492045
+acc: 1.0, acc_norm: 5.0, avg_acc: 0.6267157683294275, avg_acc_norm: 0.8232340140609307, count: 8961
+elapsed=444.38292479515076, throughput(example/s)=20.165041229094914
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.6266726137377342, avg_acc_norm: 0.8231489741302409, count: 8968
+elapsed=444.7445056438446, throughput(example/s)=20.16438626266393
+acc: 6.0, acc_norm: 10.0, avg_acc: 0.6265731150462189, avg_acc_norm: 0.8232542599398597, count: 8979
+elapsed=445.1325044631958, throughput(example/s)=20.171521760308558
+acc: 5.0, acc_norm: 7.0, avg_acc: 0.6265717146990096, avg_acc_norm: 0.8233003226883275, count: 8987
+elapsed=445.54063987731934, throughput(example/s)=20.170999445694992
+acc: 8.0, acc_norm: 12.0, avg_acc: 0.6264163519217951, avg_acc_norm: 0.8232614974450122, count: 9002
+elapsed=445.959285736084, throughput(example/s)=20.185699206019738
+acc: 18.0, acc_norm: 22.0, avg_acc: 0.6267449590073122, avg_acc_norm: 0.8235098604032794, count: 9026
+elapsed=446.41759037971497, throughput(example/s)=20.218737331391093
+acc: 32.0, acc_norm: 37.0, avg_acc: 0.6274401676408956, avg_acc_norm: 0.8238667696040587, count: 9067
+elapsed=451.5143737792969, throughput(example/s)=20.081309757886043
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6274812527569475, avg_acc_norm: 0.8238861932068814, count: 9068
+elapsed=453.09525966644287, throughput(example/s)=20.01345149069895
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.6275763253609611, avg_acc_norm: 0.8239832469965833, count: 9073
+elapsed=453.7016451358795, throughput(example/s)=19.997723387762278
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.6274380165289256, avg_acc_norm: 0.823801652892562, count: 9075
+elapsed=454.01845121383667, throughput(example/s)=19.988174435945545
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6275611368142763, avg_acc_norm: 0.8238598810310641, count: 9078
+elapsed=454.3415217399597, throughput(example/s)=19.980564323583334
+acc: 1.0, acc_norm: 0.0, avg_acc: 0.6276021588280648, avg_acc_norm: 0.823769137570217, count: 9079
+elapsed=454.6638820171356, throughput(example/s)=19.96859737290024
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6275740557207355, avg_acc_norm: 0.8238079506662261, count: 9081
+elapsed=455.02039790153503, throughput(example/s)=19.957347059340183
+acc: 4.0, acc_norm: 6.0, avg_acc: 0.6275998679432155, avg_acc_norm: 0.8239242874436008, count: 9087
+elapsed=455.37431478500366, throughput(example/s)=19.955012184405383
+acc: 5.0, acc_norm: 6.0, avg_acc: 0.6275975810885102, avg_acc_norm: 0.8238592633315008, count: 9095
+elapsed=455.7346668243408, throughput(example/s)=19.95678771460586
+acc: 5.0, acc_norm: 7.0, avg_acc: 0.6276642496154692, avg_acc_norm: 0.8239947264337508, count: 9102
+elapsed=456.1142086982727, throughput(example/s)=19.955528300634736
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.6277588668057538, avg_acc_norm: 0.8239815526518063, count: 9107
+elapsed=456.48981523513794, throughput(example/s)=19.95006174520889
+acc: 7.0, acc_norm: 6.0, avg_acc: 0.6278381046396841, avg_acc_norm: 0.8237358780300538, count: 9117
+elapsed=456.8747386932373, throughput(example/s)=19.955141372177053
+acc: 10.0, acc_norm: 13.0, avg_acc: 0.6277643967593606, avg_acc_norm: 0.823626012699803, count: 9134
+elapsed=457.29449343681335, throughput(example/s)=19.973999536607344
+acc: 10.0, acc_norm: 9.0, avg_acc: 0.6281027884089666, avg_acc_norm: 0.823619464188081, count: 9145
+elapsed=457.7106547355652, throughput(example/s)=19.97987135624661
+acc: 8.0, acc_norm: 14.0, avg_acc: 0.627879052505185, avg_acc_norm: 0.8237092020521777, count: 9161
+elapsed=458.133588552475, throughput(example/s)=19.996350909229815
+acc: 8.0, acc_norm: 14.0, avg_acc: 0.6276560967636482, avg_acc_norm: 0.8237986270022883, count: 9177
+elapsed=458.58916664123535, throughput(example/s)=20.011375469711812
+acc: 16.0, acc_norm: 18.0, avg_acc: 0.6281674823273519, avg_acc_norm: 0.8241435562805873, count: 9195
+elapsed=459.0405948162079, throughput(example/s)=20.030908167678554
+acc: 11.0, acc_norm: 21.0, avg_acc: 0.6277253498210218, avg_acc_norm: 0.8242759518385943, count: 9219
+elapsed=459.5114994049072, throughput(example/s)=20.062609993306182
+acc: 20.0, acc_norm: 30.0, avg_acc: 0.6275124270585692, avg_acc_norm: 0.8244002593473093, count: 9254
+elapsed=460.3199381828308, throughput(example/s)=20.103409025755642
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6275526742301458, avg_acc_norm: 0.8244192328471097, count: 9255
+elapsed=463.9461088180542, throughput(example/s)=19.948437596724265
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6275251161283353, avg_acc_norm: 0.8244571675488819, count: 9257
+elapsed=464.21405243873596, throughput(example/s)=19.941231747226524
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6275653488874487, avg_acc_norm: 0.8244761287535105, count: 9258
+elapsed=464.47942638397217, throughput(example/s)=19.931991546051105
+acc: 0.0, acc_norm: 1.0, avg_acc: 0.627497569931958, avg_acc_norm: 0.8244950858624042, count: 9259
+elapsed=465.34336495399475, throughput(example/s)=19.897135528977344
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6276182250053984, avg_acc_norm: 0.8245519326279421, count: 9262
+elapsed=465.6598610877991, throughput(example/s)=19.89005446671658
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.627630868861306, avg_acc_norm: 0.8245008094981112, count: 9265
+elapsed=465.9839663505554, throughput(example/s)=19.882658351017223
+acc: 3.0, acc_norm: 4.0, avg_acc: 0.6275482687951677, avg_acc_norm: 0.8243986624959552, count: 9271
+elapsed=466.30515146255493, throughput(example/s)=19.881830537195935
+acc: 2.0, acc_norm: 4.0, avg_acc: 0.6273579821062844, avg_acc_norm: 0.824296647623154, count: 9277
+elapsed=466.6626853942871, throughput(example/s)=19.879455311842186
+acc: 5.0, acc_norm: 7.0, avg_acc: 0.6274235243429557, avg_acc_norm: 0.8244291253769926, count: 9284
+elapsed=467.01720809936523, throughput(example/s)=19.87935313515189
+acc: 3.0, acc_norm: 7.0, avg_acc: 0.6272737057367345, avg_acc_norm: 0.8245614035087719, count: 9291
+elapsed=467.3758776187897, throughput(example/s)=19.87907473388712
+acc: 6.0, acc_norm: 9.0, avg_acc: 0.6271769511932918, avg_acc_norm: 0.8245538593850785, count: 9302
+elapsed=467.75748085975647, throughput(example/s)=19.886373560295738
+acc: 10.0, acc_norm: 10.0, avg_acc: 0.6273078574495492, avg_acc_norm: 0.8243881494203521, count: 9316
+elapsed=468.14283514022827, throughput(example/s)=19.89990938814533
+acc: 13.0, acc_norm: 12.0, avg_acc: 0.6276253750535791, avg_acc_norm: 0.8242606086583798, count: 9332
+elapsed=468.5657789707184, throughput(example/s)=19.91609378836685
+acc: 10.0, acc_norm: 14.0, avg_acc: 0.6276880282443564, avg_acc_norm: 0.8244356478014336, count: 9347
+elapsed=468.99174070358276, throughput(example/s)=19.92998850252161
+acc: 13.0, acc_norm: 15.0, avg_acc: 0.6278697277095568, avg_acc_norm: 0.8244527495995729, count: 9365
+elapsed=469.44842886924744, throughput(example/s)=19.948943108740014
+acc: 31.0, acc_norm: 39.0, avg_acc: 0.6279613300754276, avg_acc_norm: 0.8243917985764369, count: 9413
+elapsed=470.47120332717896, throughput(example/s)=20.007600748847395
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6279464854533872, avg_acc_norm: 0.8242726693565513, count: 9418
+elapsed=474.5547778606415, throughput(example/s)=19.8459702427982
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6280254777070063, avg_acc_norm: 0.8243099787685775, count: 9420
+elapsed=475.1692352294922, throughput(example/s)=19.824515775838115
+acc: 5.0, acc_norm: 4.0, avg_acc: 0.6281561638022491, avg_acc_norm: 0.8242096329301931, count: 9426
+elapsed=475.4956703186035, throughput(example/s)=19.823524352354575
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6281289775137887, avg_acc_norm: 0.8242469240560034, count: 9428
+elapsed=475.8535885810852, throughput(example/s)=19.8128168542612
+acc: 7.0, acc_norm: 7.0, avg_acc: 0.6282716965137226, avg_acc_norm: 0.8242026067606231, count: 9437
+elapsed=476.218647480011, throughput(example/s)=19.8165276600096
+acc: 5.0, acc_norm: 9.0, avg_acc: 0.6280694326841659, avg_acc_norm: 0.8241955969517358, count: 9448
+elapsed=476.57961773872375, throughput(example/s)=19.824599391868446
+acc: 6.0, acc_norm: 8.0, avg_acc: 0.628106164745691, avg_acc_norm: 0.8242571640054985, count: 9457
+elapsed=476.9610047340393, throughput(example/s)=19.82761673624318
+acc: 6.0, acc_norm: 11.0, avg_acc: 0.6278112131770668, avg_acc_norm: 0.8242001900538486, count: 9471
+elapsed=477.3473620414734, throughput(example/s)=19.8408973278816
+acc: 9.0, acc_norm: 11.0, avg_acc: 0.627965833596963, avg_acc_norm: 0.8243171991985658, count: 9483
+elapsed=477.7708840370178, throughput(example/s)=19.848425923052385
+acc: 7.0, acc_norm: 12.0, avg_acc: 0.6278433024431339, avg_acc_norm: 0.824452401010952, count: 9496
+elapsed=478.19654846191406, throughput(example/s)=19.85794341373484
+acc: 10.0, acc_norm: 15.0, avg_acc: 0.6276405675249606, avg_acc_norm: 0.8243825538623226, count: 9515
+elapsed=478.6577298641205, throughput(example/s)=19.878504840402517
+acc: 22.0, acc_norm: 30.0, avg_acc: 0.6274468753271224, avg_acc_norm: 0.8242436930807077, count: 9553
+elapsed=479.56678104400635, throughput(example/s)=19.920061975942804
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.627485869792757, avg_acc_norm: 0.8242620891773079, count: 9554
+elapsed=482.3706622123718, throughput(example/s)=19.806345510692957
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.6274201988487703, avg_acc_norm: 0.8241758241758241, count: 9555
+elapsed=482.9231770038605, throughput(example/s)=19.785755695721388
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.6275104602510461, avg_acc_norm: 0.8242677824267782, count: 9560
+elapsed=483.5049669742584, throughput(example/s)=19.772289124196256
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.6275227439088152, avg_acc_norm: 0.8243229112203283, count: 9563
+elapsed=483.8212285041809, throughput(example/s)=19.765565123228903
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.6274694261523989, avg_acc_norm: 0.8242918365213756, count: 9567
+elapsed=484.1466226577759, throughput(example/s)=19.760542679159684
+acc: 9.0, acc_norm: 10.0, avg_acc: 0.6275574112734864, avg_acc_norm: 0.8242171189979123, count: 9580
+elapsed=484.5034840106964, throughput(example/s)=19.772819631135
+acc: 6.0, acc_norm: 5.0, avg_acc: 0.6276595744680851, avg_acc_norm: 0.8240508969545265, count: 9588
+elapsed=484.8651247024536, throughput(example/s)=19.77457134266741
+acc: 9.0, acc_norm: 13.0, avg_acc: 0.6277471096760754, avg_acc_norm: 0.8242891365482762, count: 9601
+elapsed=485.24469661712646, throughput(example/s)=19.785893729355884
+acc: 12.0, acc_norm: 15.0, avg_acc: 0.6280158069883528, avg_acc_norm: 0.824563227953411, count: 9616
+elapsed=485.62730288505554, throughput(example/s)=19.801193101937347
+acc: 13.0, acc_norm: 13.0, avg_acc: 0.6284527518172378, avg_acc_norm: 0.8247144340602285, count: 9630
+elapsed=486.05276107788086, throughput(example/s)=19.81266391460118
+acc: 29.0, acc_norm: 33.0, avg_acc: 0.6289171579273969, avg_acc_norm: 0.8248009101251422, count: 9669
+elapsed=486.89184069633484, throughput(example/s)=19.858619906572578
+acc: 0.0, acc_norm: 0.0, avg_acc: 0.628852119958635, avg_acc_norm: 0.8247156153050672, count: 9670
+elapsed=491.1239860057831, throughput(example/s)=19.68952907115014
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.628890497363251, avg_acc_norm: 0.8247337400475648, count: 9671
+elapsed=491.4171402454376, throughput(example/s)=19.679818239896623
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6288638478238395, avg_acc_norm: 0.8246665977463041, count: 9673
+elapsed=491.7071678638458, throughput(example/s)=19.67227779497911
+acc: 5.0, acc_norm: 5.0, avg_acc: 0.6289905982022936, avg_acc_norm: 0.82467197024486, count: 9679
+elapsed=492.0274467468262, throughput(example/s)=19.67166682264445
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6289756299049979, avg_acc_norm: 0.8245559686080132, count: 9684
+elapsed=492.3427653312683, throughput(example/s)=19.669223723606883
+acc: 4.0, acc_norm: 5.0, avg_acc: 0.6290638868820312, avg_acc_norm: 0.8246465063474042, count: 9689
+elapsed=492.6684355735779, throughput(example/s)=19.66637052507698
+acc: 7.0, acc_norm: 9.0, avg_acc: 0.6291370244355088, avg_acc_norm: 0.8247241983709661, count: 9699
+elapsed=493.0268232822418, throughput(example/s)=19.672357652734927
+acc: 9.0, acc_norm: 9.0, avg_acc: 0.6294160057678443, avg_acc_norm: 0.8248017303532804, count: 9709
+elapsed=493.39089846611023, throughput(example/s)=19.678109243976834
+acc: 9.0, acc_norm: 12.0, avg_acc: 0.629500102859494, avg_acc_norm: 0.8249331413289447, count: 9722
+elapsed=493.75321555137634, throughput(example/s)=19.689998350984713
+acc: 12.0, acc_norm: 13.0, avg_acc: 0.6297627606038821, avg_acc_norm: 0.824997432474068, count: 9737
+elapsed=494.13261127471924, throughput(example/s)=19.705236565709267
+acc: 9.0, acc_norm: 11.0, avg_acc: 0.6298461538461538, avg_acc_norm: 0.825025641025641, count: 9750
+elapsed=494.51494097709656, throughput(example/s)=19.71629002904398
+acc: 15.0, acc_norm: 17.0, avg_acc: 0.6302211302211302, avg_acc_norm: 0.8252457002457002, count: 9768
+elapsed=494.93775820732117, throughput(example/s)=19.735814934346447
+acc: 10.0, acc_norm: 17.0, avg_acc: 0.6300837931739219, avg_acc_norm: 0.8254649499284692, count: 9786
+elapsed=495.3962550163269, throughput(example/s)=19.75388368585362
+acc: 18.0, acc_norm: 25.0, avg_acc: 0.6301202363969839, avg_acc_norm: 0.8256572243733442, count: 9814
+elapsed=496.02804708480835, throughput(example/s)=19.785171539548152
+Rank 0 finished in 496.7634253501892 seconds
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.63015792154865, avg_acc_norm: 0.8256749872643913, count: 9815
+elapsed=499.1294195652008, throughput(example/s)=19.664238602785616
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.6301690772051334, avg_acc_norm: 0.8257282542269301, count: 9818
+elapsed=499.4225115776062, throughput(example/s)=19.65870534947715
+acc: 4.0, acc_norm: 4.0, avg_acc: 0.6303196904907351, avg_acc_norm: 0.8257992262268377, count: 9822
+elapsed=500.03768968582153, throughput(example/s)=19.642519359233216
+acc: 1.0, acc_norm: 2.0, avg_acc: 0.6302931596091205, avg_acc_norm: 0.8258346905537459, count: 9824
+elapsed=500.3648669719696, throughput(example/s)=19.633672642628483
+acc: 7.0, acc_norm: 9.0, avg_acc: 0.6303640431157209, avg_acc_norm: 0.8259101077893024, count: 9834
+elapsed=500.6975607872009, throughput(example/s)=19.640598976633523
+acc: 9.0, acc_norm: 10.0, avg_acc: 0.630509851716433, avg_acc_norm: 0.8259191549867967, count: 9846
+elapsed=501.0592591762543, throughput(example/s)=19.65037032982268
+acc: 9.0, acc_norm: 8.0, avg_acc: 0.6307192857867505, avg_acc_norm: 0.8258090696966622, count: 9857
+elapsed=501.4259672164917, throughput(example/s)=19.657936853007495
+acc: 14.0, acc_norm: 12.0, avg_acc: 0.6311790923824959, avg_acc_norm: 0.8257698541329012, count: 9872
+elapsed=501.8140068054199, throughput(example/s)=19.67262743988711
+acc: 12.0, acc_norm: 14.0, avg_acc: 0.6314352179629817, avg_acc_norm: 0.8259330433903105, count: 9887
+elapsed=502.24027943611145, throughput(example/s)=19.68579662925601
+acc: 25.0, acc_norm: 30.0, avg_acc: 0.6317274742995364, avg_acc_norm: 0.8260431364644225, count: 9922
+elapsed=503.01868081092834, throughput(example/s)=19.72491356385514
+acc: 1.0, acc_norm: 1.0, avg_acc: 0.6317009270455461, avg_acc_norm: 0.8259774284562676, count: 9924
+elapsed=506.4905455112457, throughput(example/s)=19.593653006854904
+acc: 3.0, acc_norm: 3.0, avg_acc: 0.6317485898468976, avg_acc_norm: 0.8259468170829976, count: 9928
+elapsed=506.7858374118805, throughput(example/s)=19.590129137589155
+acc: 2.0, acc_norm: 3.0, avg_acc: 0.6317591380525627, avg_acc_norm: 0.8259993958312355, count: 9931
+elapsed=507.1096224784851, throughput(example/s)=19.58353689181147
+acc: 2.0, acc_norm: 2.0, avg_acc: 0.6318332829960737, avg_acc_norm: 0.8260344306855935, count: 9933
+elapsed=507.4387149810791, throughput(example/s)=19.57477761697858
+Rank 1 finished in 507.6458897590637 seconds
+acc: 5.0, acc_norm: 6.0, avg_acc: 0.6319549250427609, avg_acc_norm: 0.8261394506489587, count: 9939
+elapsed=507.77165484428406, throughput(example/s)=19.57375900206156
+acc: 7.0, acc_norm: 7.0, avg_acc: 0.6321503971046547, avg_acc_norm: 0.8261787473610134, count: 9947
+elapsed=508.12795662879944, throughput(example/s)=19.57577785326726
+acc: 6.0, acc_norm: 8.0, avg_acc: 0.632245102963335, avg_acc_norm: 0.8263184329482672, count: 9955
+elapsed=508.4885654449463, throughput(example/s)=19.57762804614693
+acc: 7.0, acc_norm: 5.0, avg_acc: 0.6323765556001606, avg_acc_norm: 0.8260738659173023, count: 9964
+elapsed=508.8674476146698, throughput(example/s)=19.58073766892837
+acc: 5.0, acc_norm: 5.0, avg_acc: 0.6324340587704342, avg_acc_norm: 0.8259953866212015, count: 9971
+elapsed=509.25357007980347, throughput(example/s)=19.579636915333705
+acc: 11.0, acc_norm: 12.0, avg_acc: 0.6326489734601903, avg_acc_norm: 0.8260390585878818, count: 9985
+elapsed=509.6740427017212, throughput(example/s)=19.5909525764167
+acc: 13.0, acc_norm: 16.0, avg_acc: 0.6328101569529141, avg_acc_norm: 0.8261521543536939, count: 10003
+elapsed=510.09761667251587, throughput(example/s)=19.609972038787145
+Rank 2 finished in 510.5300283432007 seconds
+acc: 15.0, acc_norm: 16.0, avg_acc: 0.6330439988027536, avg_acc_norm: 0.8260999700688416, count: 10023
+elapsed=510.5561773777008, throughput(example/s)=19.631532129294275
+acc: 16.0, acc_norm: 18.0, avg_acc: 0.6334395538737303, avg_acc_norm: 0.8263294164509062, count: 10042
+elapsed=511.12783646583557, throughput(example/s)=19.64674839358161
+Rank 3 finished in 511.127956867218 seconds

@@ -73,7 +73,7 @@ class Attention(nn.Module):
         bias=False,
     )
 
-  def forward(self, x: torch.Tensor, start_pos: int, freqs_cis: torch.Tensor, mask: Optional[torch.Tensor], phase: int, cache_k = None, cache_v = None, cont2ctx = None):
+  def forward(self, x: torch.Tensor, start_pos: int, freqs_cis: torch.Tensor, mask: Optional[torch.Tensor], use_cache: bool, gen_cache: bool, cache_k = None, cache_v = None, cont2ctx = None):
     bsz, seqlen, _ = x.shape
     xq, xk, xv = self.wq(x), self.wk(x), self.wv(x)
 
@@ -83,32 +83,34 @@ class Attention(nn.Module):
 
     xq, xk = apply_rotary_emb(xq, xk, freqs_cis=freqs_cis)
 
-    if phase == 0:
-      cache_k = xk # (bsz, seqlen, n_heads, head_dim)
-      cache_v = xv
-      keys = xk
-      values = xv
-    elif phase == 1:
+    if use_cache:
       keys = torch.cat((cache_k[cont2ctx], xk), dim=1) # (bsz, start_pos + seqlen, n_heads, head_dim)
       values = torch.cat((cache_v[cont2ctx], xv), dim=1)
+    else:
+      keys = xk
+      values = xv
+
+    new_cache_k = None
+    new_cache_v = None
+    if gen_cache:
+      new_cache_k = keys # (bsz, seqlen, n_heads, head_dim)
+      new_cache_v = values
 
     xq = xq.transpose(1, 2)
     keys = keys.transpose(1, 2)
     values = values.transpose(1, 2)
 
-    if phase == 0:
+    if not use_cache:
       output = F.scaled_dot_product_attention(xq, keys, values, is_causal=True) # (bsz, n_heads, seqlen, head_dim)
-    if phase == 1:
+    if use_cache:
       output = F.scaled_dot_product_attention(xq, keys, values, attn_mask = mask) # (bsz, n_heads, seqlen, head_dim)
 
     output = output.transpose(
         1, 2
     ).contiguous().view(bsz, seqlen, -1)
 
-    if phase == 0:
-      return self.wo(output), cache_k, cache_v
-    elif phase == 1:
-      return self.wo(output)
+    return self.wo(output), new_cache_k, new_cache_v
+
 class FeedForward(nn.Module):
   def __init__(
       self,
@@ -160,19 +162,13 @@ class TransformerBlock(nn.Module):
     self.attention_norm = RMSNorm(args.dim, eps=args.norm_eps)
     self.ffn_norm = RMSNorm(args.dim, eps=args.norm_eps)
 
-  def forward(self, x: torch.Tensor, start_pos: int, freqs_cis: torch.Tensor, mask: Optional[torch.Tensor], phase: int, cache_k = None, cache_v = None, cont2ctx = None):
-    if phase == 0:
-      h, cache_k, cache_v = self.attention.forward(self.attention_norm(x), start_pos, freqs_cis, mask, phase)
-    if phase == 1:
-      h = self.attention.forward(self.attention_norm(x), start_pos, freqs_cis, mask, phase, cache_k, cache_v, cont2ctx)
+  def forward(self, x: torch.Tensor, start_pos: int, freqs_cis: torch.Tensor, mask: Optional[torch.Tensor], use_cache: bool, gen_cache: bool, cache_k = None, cache_v = None, cont2ctx = None):
+    h, new_cache_k, new_cache_v = self.attention.forward(self.attention_norm(x), start_pos, freqs_cis, mask, use_cache, gen_cache, cache_k, cache_v, cont2ctx)
 
     h = x + h
     out = h + self.feed_forward.forward(self.ffn_norm(h))
 
-    if phase == 0:
-      return out, cache_k, cache_v
-    if phase == 1:
-      return out
+    return out, new_cache_k, new_cache_v
 
 class TransformerBlocks(nn.Module):
   def __init__(self, params: ModelArgs, layer_idx, num_layers):
@@ -190,27 +186,27 @@ class TransformerBlocks(nn.Module):
     )
   
   @torch.inference_mode()
-  def forward(self, h: torch.Tensor, start_pos: int, phase: int, cache_k_list = None, cache_v_list = None, cont2ctx = None):
+  def forward(self, h: torch.Tensor, start_pos: int, use_cache: bool, gen_cache: bool, cache_k_list = None, cache_v_list = None, cont2ctx = None):
     _bsz, seqlen, _ = h.shape
     self.freqs_cis = self.freqs_cis.to(h.device)
     freqs_cis = self.freqs_cis[start_pos : start_pos + seqlen]
 
     mask = None
-    if phase == 1:
+    if use_cache:
       mask = torch.ones(seqlen, start_pos + seqlen, dtype=torch.bool, device=h.device).tril(diagonal=start_pos)
 
-    if phase == 0:
-      cache_k_list = []
-      cache_v_list = []
-      for i, layer in enumerate(self.layers):
-        h, cache_k, cache_v = layer(h, start_pos, freqs_cis, mask, phase)
-        cache_k_list.append(cache_k)
-        cache_v_list.append(cache_v)
-      return h, cache_k_list, cache_v_list
-    if phase == 1:
-      for i, layer in enumerate(self.layers):
-        h = layer(h, start_pos, freqs_cis, mask, phase, cache_k_list[i], cache_v_list[i], cont2ctx)
-      return h, None, None
+    if not use_cache:
+      cache_k_list = [None] * self.num_layers
+      cache_v_list = [None] * self.num_layers
+    
+    new_cache_k_list = []
+    new_cache_v_list = []
+
+    for i, layer in enumerate(self.layers):
+      h, new_cache_k, new_cache_v = layer(h, start_pos, freqs_cis, mask, use_cache, gen_cache, cache_k_list[i], cache_v_list[i], cont2ctx)
+      new_cache_k_list.append(new_cache_k)
+      new_cache_v_list.append(new_cache_v)
+    return h, new_cache_k_list, new_cache_v_list
   
   def custom_load(self, full_dict):
     local_dict = {}

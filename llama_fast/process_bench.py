@@ -1,4 +1,4 @@
-B = 33
+B = 79
 S = 171
 db = [[0 for _ in range(S)] for _ in range(B)]
 

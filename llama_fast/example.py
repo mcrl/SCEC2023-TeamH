@@ -211,10 +211,6 @@ def main(
   #docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset_typeF(dataset, tokenizer, DATA_LIMIT, CTX_THR, CONT_THR)
 
   d2h_stream = torch.cuda.Stream()
-  prev_cont_args = None
-  prev_ctx_args = None
-  nccl_handle = None
-  send_queue = []
 
   print(f'Rank {local_rank} waiting for other ranks...')
   dist.barrier()
@@ -272,7 +268,6 @@ def main(
       h = torch.empty((B, S, H), dtype=torch.float16, device='cuda')
       handle = dist.irecv(h, local_rank - 1, tag = batch_idx)
       handle.wait()
-      #print(f'Rank {local_rank} received from {local_rank - 1} h[0]={h[0, 0, 0]}')
 
     # run transformer
     if DEBUG_PERFORMANCE:
@@ -291,11 +286,10 @@ def main(
       BS_thr = B * S / elapsed
       print(f'Rank {local_rank} batch_idx={batch_idx} size={(B, S, H)} elapsed={elapsed} TFLOPS={TFLOPS} BS_thr={BS_thr}')
 
-    # run_grade(grade_queue, grade_state, d2h_stream)
-
+    run_grade(grade_queue, grade_state, d2h_stream)
+    
     # run epilog
     if local_rank < world_size - 1:
-      #print(f'Rank {local_rank} sending to {local_rank + 1} h[0]={h[0, 0, 0]}')
       dist.isend(h, local_rank + 1, tag = batch_idx)
     else:
       if batch.gen_cache:
@@ -333,7 +327,6 @@ def main(
 if __name__ == "__main__":
   if DEBUG_PROFILE:
     from torch.profiler import profile, record_function, ProfilerActivity
-    #with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA], record_shapes=True, profile_memory=True, with_flops=True) as prof:
     with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA]) as prof:
       fire.Fire(main)
     prof.export_chrome_trace(f'trace_{local_rank}.json')

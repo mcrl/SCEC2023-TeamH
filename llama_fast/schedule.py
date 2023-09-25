@@ -311,8 +311,8 @@ def preprocess_and_schedule_dataset(dataset, tokenizer, num_data, ctx_threshold,
       sum_cont_block_effective += cont_block_effective
       #print(f'cont_block_wasted: {cont_block_wasted}, cont_block_effective: {cont_block_effective}')
     assert sum_cont_block_wasted == total_cont_wasted
-    print(f'total_cont_wasted: {sum_cont_block_wasted}, total_cont_effective: {sum_cont_block_effective}')
-    print(f'total_cont_efficiency: {sum_cont_block_effective / (sum_cont_block_effective + sum_cont_block_wasted)}')
+    # print(f'total_cont_wasted: {sum_cont_block_wasted}, total_cont_effective: {sum_cont_block_effective}')
+    # print(f'total_cont_efficiency: {sum_cont_block_effective / (sum_cont_block_effective + sum_cont_block_wasted)}')
   assert sum_ctx_block_wasted == total_ctx_wasted
   print(f'total_ctx_wasted: {sum_ctx_block_wasted}, total_ctx_effective: {sum_ctx_block_effective}')
   print(f'total_ctx_efficiency: {sum_ctx_block_effective / (sum_ctx_block_effective + sum_ctx_block_wasted)}')

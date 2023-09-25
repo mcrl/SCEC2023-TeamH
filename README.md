@@ -5,6 +5,7 @@
 |-------|---------|------------------|------------------|
 | Heehoon Kim* | Seoul National University | csehydrogen@gmail.com | 010-2569-3426 |
 | Junyeol Ryu | Seoul National University | junyeol@aces.snu.ac.kr | 010-3329-7561 |
+
 (* is the team lead)
 
 ## Repository Organization

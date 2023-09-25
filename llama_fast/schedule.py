@@ -10,16 +10,20 @@ class Batch:
   gen_cache: bool
   seq_len: int # length excluding cache part
 
+  # Used when gen_cache = True
+  first_minibatch: bool
+  
   # Used when use_cache = True
   cache_mapping: tuple[int]
   cache_len: int
-  cache_dep: int
+  cache_dep: tuple[int]
 
-  def __init__(self, data_idx, use_cache, gen_cache, seq_len, cache_mapping = None, cache_len = 0, cache_dep = None):
+  def __init__(self, data_idx, use_cache, gen_cache, seq_len, first_minibatch = None, cache_mapping = None, cache_len = 0, cache_dep = None):
     self.data_idx = data_idx
     self.use_cache = use_cache
     self.gen_cache = gen_cache
     self.seq_len = seq_len
+    self.first_minibatch = first_minibatch
     self.cache_mapping = cache_mapping
     self.cache_len = cache_len
     self.cache_dep = cache_dep
@@ -216,7 +220,7 @@ def schedule_max_opt_32_128(lengths, thr):
 
   return idx, blocks, D[N - 1]
 
-def preprocess_and_schedule_dataset(dataset, tokenizer, num_data, ctx_threshold, cont_threshold, prefix_activity_label = True):
+def preprocess_and_schedule_dataset(dataset, tokenizer, num_data, ctx_threshold, ctx_minibatch_threshold, cont_threshold, prefix_activity_label = True):
   NUM_CHOICES = 4
   # encode the whole dataset
   whole_pe = []
@@ -249,11 +253,22 @@ def preprocess_and_schedule_dataset(dataset, tokenizer, num_data, ctx_threshold,
     ctx_block_start, ctx_block_end = s - ctx_block_size, s
     ctx_min_len = len(whole_ei[ctx_idx[ctx_block_start] * NUM_CHOICES]['ctx'])
 
-    data_idx = tuple(ctx_idx[j] * NUM_CHOICES for j in range(ctx_block_start, ctx_block_end))
-    batches.append(Batch(data_idx, use_cache = False, gen_cache = True, seq_len = ctx_min_len))
-    cache_dep = len(batches) - 1
+    # Minibath ctx
+    def evenDivide(num, div):
+      groupSize, remainder = divmod(num, div)
+      return [groupSize + (1 if x < remainder else 0) for x in range(div)]
+    ctx_minibatch_blocks = evenDivide(ctx_block_size, ctx_block_size * ctx_min_len // ctx_minibatch_threshold)
+    ctx_minibatch_block_start = ctx_block_start
+    cache_dep = []
+    for idx, ctx_minibatch in enumerate(ctx_minibatch_blocks):
+      data_idx = tuple(ctx_idx[j] * NUM_CHOICES for j in range(ctx_minibatch_block_start, ctx_minibatch_block_start + ctx_minibatch))
+      batches.append(Batch(data_idx, use_cache = False, gen_cache = True, first_minibatch = idx == 0, seq_len = ctx_min_len))
+      cache_dep.append(len(batches)-1)
+      ctx_minibatch_block_start += ctx_minibatch
+    cache_dep = tuple(cache_dep)
 
     # ctx schedule validation
+    data_idx = tuple(ctx_idx[j] * NUM_CHOICES for j in range(ctx_block_start, ctx_block_end))
     lengths = tuple(len(whole_ei[data_idx[j]]['ctx']) for j in range(ctx_block_size))
     min_S = min(lengths)
     ctx_block_wasted = sum(lengths[j] - min_S for j in range(ctx_block_size))
@@ -611,8 +626,6 @@ def preprocess_and_schedule_dataset_typeG(dataset, tokenizer, num_data, ctx_thre
   for i in range(1, len(idx)):
     if whole_ei[idx[i - 1] * NUM_CHOICES]['ctx'] == whole_ei[idx[i] * NUM_CHOICES]['ctx']:
       count += 1
-  print(f'count={count}')
-
 
 
   #encs = [whole_ei[i]['ctx'] + whole_ei[i]['cont'] for i in range(0, len(whole_ei))]

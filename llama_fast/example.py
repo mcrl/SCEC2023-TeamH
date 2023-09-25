@@ -25,7 +25,8 @@ NUM_CHOICES = 4
 DATA_LIMIT = 22222
 CTX_GRP_LIMIT = 22222
 CTX_THR = 10000
-CONT_THR = 2048
+CTX_MINIBATCH_THR = 1700
+CONT_THR = 1700
 DEBUG_SCHEDULE = False
 DEBUG_ANSWER = False
 DEBUG_PERFORMANCE = False
@@ -153,7 +154,8 @@ def main(
   max_batch_size: int = 32,
 ):
   local_rank, world_size = setup_model_parallel()
-  #if local_rank > 0:
+
+  # if local_rank > 0:
   #    sys.stdout = open(os.devnull, "w")
   #    sys.stderr = open(os.devnull, "w")
 
@@ -194,7 +196,7 @@ def main(
   #  logger.info(f'Rank {local_rank} {type(param)} {param.size()} {param.device} {param.dtype}')
 
   # Exp E
-  docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset(dataset, tokenizer, DATA_LIMIT, CTX_THR, CONT_THR)
+  docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset(dataset, tokenizer, DATA_LIMIT, CTX_THR, CTX_MINIBATCH_THR, CONT_THR)
   # Exp B
   #docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset_typeB(dataset, tokenizer, DATA_LIMIT, CTX_THR, CONT_THR)
   # Exp C
@@ -251,15 +253,15 @@ def main(
       logger.info(f'Rank {local_rank} ctx group id={batch_idx} size={(B, S, H)}')
 
     # load cache
-    cache_k_list, cache_v_list, ctx_logprobs = None, None, None
+    cache_k_list, cache_v_list, ctx_logprobs = [], [], None
     if batch.use_cache:
-      cache_k_list, cache_v_list = kv_cache[batch.cache_dep]
+      cache_k_list = [torch.cat(tuple(kv_cache[cache_dep][0][j] for cache_dep in batch.cache_dep)) for j in range(15)]
+      cache_v_list = [torch.cat(tuple(kv_cache[cache_dep][1][j] for cache_dep in batch.cache_dep)) for j in range(15)]
       if local_rank == world_size - 1:
-        ctx_logprobs = output_cache[batch.cache_dep]
+        ctx_logprobs = torch.cat(tuple(output_cache[cache_dep] for cache_dep in batch.cache_dep))
 
-    if batch.gen_cache:
-      # TODO currently only keep one element in cache
-      kv_cache.clear()
+    if batch.gen_cache and batch.first_minibatch:
+      kv_cache.clear() 
       if local_rank == world_size - 1:
         output_cache.clear()
 
@@ -289,7 +291,7 @@ def main(
       BS_thr = B * S / elapsed
       print(f'Rank {local_rank} batch_idx={batch_idx} size={(B, S, H)} elapsed={elapsed} TFLOPS={TFLOPS} BS_thr={BS_thr}')
 
-    run_grade(grade_queue, grade_state, d2h_stream)
+    # run_grade(grade_queue, grade_state, d2h_stream)
 
     # run epilog
     if local_rank < world_size - 1:

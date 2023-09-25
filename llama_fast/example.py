@@ -10,17 +10,12 @@ import time
 import json
 import numpy as np
 
-from pathlib import Path
-
 from fairscale.nn.model_parallel.initialize import initialize_model_parallel
 
 from model import ModelArgs, TransformerBlocks, PreTransformer, PostTransformer
 from tokenizer import Tokenizer
-from generation import LLaMA
 
 from datasets import load_dataset
-import re
-import math
 import logging
 import torch.distributed as dist
 
@@ -29,8 +24,6 @@ import schedule
 NUM_CHOICES = 4
 DATA_LIMIT = 22222
 CTX_GRP_LIMIT = 22222
-#DATA_LIMIT = 500
-#CTX_GRP_LIMIT = 2
 CTX_THR = 10000
 CONT_THR = 2048
 DEBUG_SCHEDULE = False
@@ -57,7 +50,6 @@ logger.addHandler(sh)
 logger.setLevel(logging.INFO)
 
 def make_input_cpu_tensor_from_docs(docs, batch):
-  cached_len = batch.cache_len
   encs = [doc['ctx'] + doc['cont'] for doc in docs]
   S = batch.seq_len
   bsz = len(encs)

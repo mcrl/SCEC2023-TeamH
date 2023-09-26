@@ -10,8 +10,6 @@ import time
 import json
 import numpy as np
 
-from fairscale.nn.model_parallel.initialize import initialize_model_parallel
-
 from model import ModelArgs, TransformerBlocks, PreTransformer, PostTransformer
 from tokenizer import Tokenizer
 
@@ -25,8 +23,8 @@ NUM_CHOICES = 4
 DATA_LIMIT = 22222
 CTX_GRP_LIMIT = 22222
 CTX_THR = 10000
-CTX_MINIBATCH_THR = 1700
-CONT_THR = 1700
+CTX_MINIBATCH_THR = 2048
+CONT_THR = 2048
 DEBUG_SCHEDULE = False
 DEBUG_ANSWER = False
 DEBUG_PERFORMANCE = False
@@ -139,7 +137,6 @@ def setup_model_parallel() -> Tuple[int, int]:
   world_size = int(os.environ.get("WORLD_SIZE", -1))
 
   torch.distributed.init_process_group("nccl")
-  initialize_model_parallel(world_size)
   torch.cuda.set_device(local_rank)
 
   # seed must be the same in all processes
@@ -251,10 +248,26 @@ def main(
     # load cache
     cache_k_list, cache_v_list, ctx_logprobs = [], [], None
     if batch.use_cache:
-      cache_k_list = [torch.cat(tuple(kv_cache[cache_dep][0][j] for cache_dep in batch.cache_dep)) for j in range(15)]
-      cache_v_list = [torch.cat(tuple(kv_cache[cache_dep][1][j] for cache_dep in batch.cache_dep)) for j in range(15)]
+      if kv_cache[batch.cache_dep[0]]['merged']:
+        cache_k_list = kv_cache[batch.cache_dep[0]]['k']
+        cache_v_list = kv_cache[batch.cache_dep[0]]['v']
+      else:
+        cache_k_list = [torch.cat(tuple(kv_cache[cache_dep]['k'][j] for cache_dep in batch.cache_dep)) for j in range(15)]
+        cache_v_list = [torch.cat(tuple(kv_cache[cache_dep]['v'][j] for cache_dep in batch.cache_dep)) for j in range(15)]
+        for cache_dep in batch.cache_dep[1:]:
+          kv_cache.pop(cache_dep)
+        kv_cache[batch.cache_dep[0]]['k'] = cache_k_list
+        kv_cache[batch.cache_dep[0]]['v'] = cache_v_list
+        kv_cache[batch.cache_dep[0]]['merged'] = True
       if local_rank == world_size - 1:
-        ctx_logprobs = torch.cat(tuple(output_cache[cache_dep] for cache_dep in batch.cache_dep))
+        if output_cache[batch.cache_dep[0]]['merged']:
+          ctx_logprobs = output_cache[batch.cache_dep[0]]['value']
+        else:
+          ctx_logprobs = torch.cat(tuple(output_cache[cache_dep]['value'] for cache_dep in batch.cache_dep))
+          for cache_dep in batch.cache_dep[1:]:
+            output_cache.pop(cache_dep)
+          output_cache[batch.cache_dep[0]]['value'] = ctx_logprobs
+          output_cache[batch.cache_dep[0]]['merged'] = True
 
     if batch.gen_cache and batch.first_minibatch:
       kv_cache.clear() 
@@ -311,9 +324,16 @@ def main(
 
     # update cache
     if batch.gen_cache:
-      kv_cache[batch_idx] = (new_cache_k_list, new_cache_v_list)
+      kv_cache[batch_idx] = {
+        'k': new_cache_k_list,
+        'v': new_cache_v_list,
+        'merged': False,
+      }
       if local_rank == world_size - 1:
-        output_cache[batch_idx] = ctx_logprobs
+        output_cache[batch_idx] = {
+          'value': ctx_logprobs,
+          'merged': False,
+        }
 
   # empty remaining grade queue
   run_grade(grade_queue, grade_state, d2h_stream)

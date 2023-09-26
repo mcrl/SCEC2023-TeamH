@@ -11,25 +11,29 @@
 ## Repository Organization
 ```
 .
-├── llama_fast/             # LLaMA python package
-│   ├── example.py/         #    - Main inference script
-│   ├── model.py/           #    - LLaMA model components
-│   ├── schedule.py/        #    - Batch scheduling module
-│   ├── tokenizer.py/       #    - LLaMA tokenizer
-├── tools/
-│   ├── repartition_ckpt.py # Script to repartition LLaMA model checkpoint
+├── llama_fast/             # ⚡ LLaMA python package
+│   ├── csrc/               #    - C extensions
+│   ├── build.py            #    - Package build script
+│   ├── example.py          #    - Main inference script
+│   ├── model.py            #    - LLaMA model components
+│   ├── schedule.py         #    - Batch scheduling module
+│   ├── tokenizer.py        #    - LLaMA tokenizer
+│   ├── run.sh              #    - Docker entry script 
+├── tools/                  # 🛠️ LLaMA tools
+│   ├── repartition_ckpt.py #    - Model ckpt repartition script
+├── Dockerfile              # 🐳 LLaMA Docker build script
 ```
 
 ## Setup
 Prepare <DATA_DIR> with the files from the original LLaMA 30B model checkpoint:
 ```
 <DATA_DIR>
-├── consolidated.00.pth  # Model parallel partition 0
-├── consolidated.01.pth  # Model parallel partition 1
-├── consolidated.02.pth  # Model parallel partition 2
-├── consolidated.03.pth  # Model parallel partition 3
-├── params.json          # Parameter metadata json file 
-├── tokenizer.model      # Tokenizer checkpoint 
+├── consolidated.00.pth     # Model parallel partition 0
+├── consolidated.01.pth     # Model parallel partition 1
+├── consolidated.02.pth     # Model parallel partition 2
+├── consolidated.03.pth     # Model parallel partition 3
+├── params.json             # Parameter metadata json file 
+├── tokenizer.model         # Tokenizer checkpoint 
 ```
 
 Then, execute the provided script to repartition the model checkpoint:
@@ -41,10 +45,10 @@ If the repartition is successful, the <DATA_DIR> would contain the following add
 ```
 <DATA_DIR>
 ├── ...
-├── 30B_cpu_0.pth  # Pipeline parallel partition 0
-├── 30B_cpu_1.pth  # Pipeline parallel partition 1
-├── 30B_cpu_2.pth  # Pipeline parallel partition 2
-├── 30B_cpu_3.pth  # Pipeline parallel partition 3
+├── 30B_cpu_0.pth           # Pipeline parallel partition 0
+├── 30B_cpu_1.pth           # Pipeline parallel partition 1
+├── 30B_cpu_2.pth           # Pipeline parallel partition 2
+├── 30B_cpu_3.pth           # Pipeline parallel partition 3
 ├── ...
 ```
 

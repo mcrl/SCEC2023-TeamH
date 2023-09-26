@@ -8,4 +8,6 @@ RUN pip install datasets
 COPY llama_fast /code
 WORKDIR /code
 
+RUN pip install -v --disable-pip-version-check --no-build-isolation --global-option="--cuda_ext" /code
+
 CMD ["/code/run.sh"]

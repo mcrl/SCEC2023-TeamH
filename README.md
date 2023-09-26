@@ -4,30 +4,48 @@
 | Name  | Affiliation | Email | Phone |
 |-------|---------|------------------|------------------|
 | Heehoon Kim* | Seoul National University | csehydrogen@gmail.com | 010-2569-3426 |
-| Junyeol Ryu | Seoul National University | junyeol@aces.snu.ac.kr | 010-3329-7561 |
+| Junyeol Ryu | Seoul National University | jyeol.ryu@gmail.com | 010-3329-7561 |
 
 (* is the team lead)
 
 ## Repository Organization
 ```
 .
-├── llama_fast/          # LLaMA python package
-│   ├── example.py/      #    - Main inference script
-│   ├── model.py/        #    - LLaMA model components
-│   ├── schedule.py/     #    - Batch scheduling module
-│   ├── tokenizer.py/    #    - LLaMA tokenizer
+├── llama_fast/             # LLaMA python package
+│   ├── example.py/         #    - Main inference script
+│   ├── model.py/           #    - LLaMA model components
+│   ├── schedule.py/        #    - Batch scheduling module
+│   ├── tokenizer.py/       #    - LLaMA tokenizer
+├── tools/
+│   ├── repartition_ckpt.py # Script to repartition LLaMA model checkpoint
 ```
 
 ## Setup
-In order to mount model and tokenizer to docker, <DATA_DIR> should contain the following:
+Prepare <DATA_DIR> with the files from the original LLaMA 30B model checkpoint:
 ```
 <DATA_DIR>
-├── 30B_cpu_0.pth        # Horizontal partition 1 of LLaMA model checkpoint 
-├── 30B_cpu_1.pth        # Horizontal partition 2 of LLaMA model checkpoint 
-├── 30B_cpu_2.pth        # Horizontal partition 3 of LLaMA model checkpoint 
-├── 30B_cpu_3.pth        # Horizontal partition 4 of LLaMA model checkpoint 
+├── consolidated.00.pth  # Model parallel partition 0
+├── consolidated.01.pth  # Model parallel partition 1
+├── consolidated.02.pth  # Model parallel partition 2
+├── consolidated.03.pth  # Model parallel partition 3
 ├── params.json          # Parameter metadata json file 
 ├── tokenizer.model      # Tokenizer checkpoint 
+```
+
+Then, execute the provided script to repartition the model checkpoint:
+```
+$ python tools/repartition_ckpt.py --data_dir <DATA_DIR>
+```
+
+If the repartition is successful, the <DATA_DIR> would contain the following additional files:
+```
+<DATA_DIR>
+├── ...
+├── 30B_cpu_0.pth  # Pipeline parallel partition 0
+├── 30B_cpu_1.pth  # Pipeline parallel partition 1
+├── 30B_cpu_2.pth  # Pipeline parallel partition 2
+├── 30B_cpu_3.pth  # Pipeline parallel partition 3
+├── ...
 ```
 
 ## How to Run

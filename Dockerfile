@@ -8,6 +8,7 @@ COPY llama_fast /code
 WORKDIR /code
 
 ENV TORCH_CUDA_ARCH_LIST="7.0+PTX"
-RUN pip install -v --disable-pip-version-check --no-build-isolation --global-option="--cuda_ext" /code
+RUN pip install -v --disable-pip-version-check --no-build-isolation --global-option="--cuda_ext" /code/apex_subset
+RUN pip install /code/teamh_c_helper
 
 CMD ["/code/run.sh"]

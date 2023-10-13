@@ -2,6 +2,7 @@
 
 import re
 from dataclasses import dataclass
+import teamh_c_helper
 
 @dataclass
 class Batch:
@@ -37,139 +38,143 @@ def process_example(example, prefix_activity_label = True):
     text = re.sub("\\[.*?\\]", "", text)
     text = text.replace("  ", " ")
     return text
-  ctx = example['ctx_a'] + " " + example['ctx_b'].capitalize()
+  ctx = example['ctx_a'] + " " + example['ctx_b'].capitalize().rstrip()
   if prefix_activity_label:
     query = preprocess(example["activity_label"] + ": " + ctx)
   else:
     query = preprocess(ctx)
+  endings = [preprocess(ending).lstrip() for ending in example["endings"]]
+
   out_example = {
     "query": query,
-    "choices": [preprocess(ending) for ending in example["endings"]],
+    "choices": endings,
     "gold": int(example["label"]),
   }
   return out_example
 
 def encode_input(tokenizer, example):
-  def encode_pair(context, continuation):
-    n_spaces = len(context) - len(context.rstrip())
-    if n_spaces > 0:
-        continuation = context[-n_spaces:] + continuation
-        context = context[:-n_spaces]
-    bos = False
-    whole_enc = tokenizer.encode(context + continuation, bos=bos, eos=False)
-    context_enc = tokenizer.encode(context, bos=bos, eos=False)
-    context_enc_len = len(context_enc)
-    continuation_enc = whole_enc[context_enc_len:]
-    return context_enc, continuation_enc
-  reqs = [(example['query'], ' {}'.format(choice)) for choice in example['choices']]
-  new_reqs = []
-  for ctx, cont in reqs:
-    ctx_enc, cont_enc = encode_pair(ctx, cont)
-    new_reqs.append({
-      "ctx": ctx_enc,
-      "cont": cont_enc
-    })
+  query_enc = tokenizer.encode(example['query'])
+  new_reqs = [{
+    'ctx': query_enc,
+    'cont': tokenizer.encode(choice),
+    } for choice in example['choices']]
   return new_reqs
 
 # length is minimum of each block
-def schedule_min(lengths, thr):
-  N = len(lengths)
-  idx = [i for i in range(N)]
-  idx.sort(key=lambda x: lengths[x])
-  # init
-  D = []
-  E = []
-  total_area = 0
-  for i in range(N):
-    total_area += lengths[idx[i]]
-    rect_area = lengths[idx[0]] * (i + 1)
-    penalty = total_area - rect_area
-    if rect_area >= thr:
-      D.append(penalty)
-      E.append(-1)
-    else:
-      D.append(2 ** 30)
-      E.append(-1)
-  # DP
-  for i in range(N):
+def schedule_min(lengths, thr, debug=False):
+  ctx_idx_c, ctx_blocks_c, total_ctx_wasted_c = teamh_c_helper.schedule_min_c(lengths, thr)
+
+  if debug:
+    N = len(lengths)
+    idx = [i for i in range(N)]
+    idx.sort(key=lambda x: lengths[x])
+    # init
+    D = []
+    E = []
     total_area = 0
-    for j in range(i - 1, -1, -1):
-      total_area += lengths[idx[j + 1]]
-      rect_area = lengths[idx[j + 1]] * (i - j)
+    for i in range(N):
+      total_area += lengths[idx[i]]
+      rect_area = lengths[idx[0]] * (i + 1)
       penalty = total_area - rect_area
-      if rect_area >= thr and D[i] > D[j] + penalty:
-        D[i] = D[j] + penalty
-        E[i] = j
-  blocks = []
-  i = N - 1
-  if E[i] == -1:
-    return None, None, None
-  while i >= 0:
-    blocks.append(i - E[i])
-    i = E[i]
-  blocks.reverse()
+      if rect_area >= thr:
+        D.append(penalty)
+        E.append(-1)
+      else:
+        D.append(2 ** 30)
+        E.append(-1)
+    # DP
+    for i in range(N):
+      total_area = 0
+      for j in range(i - 1, -1, -1):
+        total_area += lengths[idx[j + 1]]
+        rect_area = lengths[idx[j + 1]] * (i - j)
+        penalty = total_area - rect_area
+        if rect_area >= thr and D[i] > D[j] + penalty:
+          D[i] = D[j] + penalty
+          E[i] = j
+    blocks = []
+    i = N - 1
+    if E[i] == -1:
+      return None, None, None
+    while i >= 0:
+      blocks.append(i - E[i])
+      i = E[i]
+    blocks.reverse()
 
-  #logging
-  #print(f'total penalty: {D[N - 1]}')
-  #s = 0
-  #for i, block in enumerate(blocks):
-  #  s += block
-  #  cur_s = lengths[idx[s - block]]
-  #  print(f'block {i}: {block} x {cur_s} = {block * cur_s}')
-  #print(blocks)
-  #print(sum(blocks))
+    #logging
+    #print(f'total penalty: {D[N - 1]}')
+    #s = 0
+    #for i, block in enumerate(blocks):
+    #  s += block
+    #  cur_s = lengths[idx[s - block]]
+    #  print(f'block {i}: {block} x {cur_s} = {block * cur_s}')
+    #print(blocks)
+    #print(sum(blocks))
+    ctx_idx, ctx_blocks, total_ctx_wasted = idx, blocks, D[N - 1]
+    assert ctx_idx == ctx_idx_c, f'{ctx_idx} != {ctx_idx_c}'
+    assert ctx_blocks == ctx_blocks_c, f'{ctx_blocks} != {ctx_blocks_c}'
+    assert total_ctx_wasted == total_ctx_wasted_c, f'{total_ctx_wasted} != {total_ctx_wasted_c}'
 
-  return idx, blocks, D[N - 1]
+  assert ctx_blocks_c, "Failed to schedule"
+  return ctx_idx_c, ctx_blocks_c, total_ctx_wasted_c
 
 # length is maximum of each block
-def schedule_max(lengths, thr):
-  N = len(lengths)
-  idx = [i for i in range(N)]
-  idx.sort(key=lambda x: lengths[x])
-  # init
-  D = []
-  E = []
-  total_area = 0
-  for i in range(N):
-    total_area += lengths[idx[i]]
-    rect_area = lengths[idx[i]] * (i + 1)
-    penalty = rect_area - total_area
-    if rect_area >= thr:
-      D.append(penalty)
-      E.append(-1)
-    else:
-      D.append(2 ** 30)
-      E.append(-1)
-  # DP
-  for i in range(N):
+def schedule_max(lengths, thr, debug=False):
+  ctx_idx_c, ctx_blocks_c, total_ctx_wasted_c = teamh_c_helper.schedule_max_c(lengths, thr)
+
+  if debug:
+    N = len(lengths)
+    idx = [i for i in range(N)]
+    idx.sort(key=lambda x: lengths[x])
+    # init
+    D = []
+    E = []
     total_area = 0
-    for j in range(i - 1, -1, -1):
-      total_area += lengths[idx[j + 1]]
-      rect_area = lengths[idx[i]] * (i - j)
+    for i in range(N):
+      total_area += lengths[idx[i]]
+      rect_area = lengths[idx[i]] * (i + 1)
       penalty = rect_area - total_area
-      if rect_area >= thr and D[i] > D[j] + penalty:
-        D[i] = D[j] + penalty
-        E[i] = j
-  blocks = []
-  i = N - 1
-  if E[i] == -1:
-    return None, None, None
-  while i >= 0:
-    blocks.append(i - E[i])
-    i = E[i]
-  blocks.reverse()
+      if rect_area >= thr:
+        D.append(penalty)
+        E.append(-1)
+      else:
+        D.append(2 ** 30)
+        E.append(-1)
+    # DP
+    for i in range(N):
+      total_area = 0
+      for j in range(i - 1, -1, -1):
+        total_area += lengths[idx[j + 1]]
+        rect_area = lengths[idx[i]] * (i - j)
+        penalty = rect_area - total_area
+        if rect_area >= thr and D[i] > D[j] + penalty:
+          D[i] = D[j] + penalty
+          E[i] = j
+    blocks = []
+    i = N - 1
+    if E[i] == -1:
+      return None, None, None
+    while i >= 0:
+      blocks.append(i - E[i])
+      i = E[i]
+    blocks.reverse()
 
-  #logging
-  #print(f'total penalty: {D[N - 1]}')
-  #s = 0
-  #for i, block in enumerate(blocks):
-  #  s += block
-  #  cur_s = lengths[idx[s - 1]]
-  #  print(f'block {i}: {block} x {cur_s} = {block * cur_s}')
-  #print(blocks)
-  #print(sum(blocks))
+    #logging
+    #print(f'total penalty: {D[N - 1]}')
+    #s = 0
+    #for i, block in enumerate(blocks):
+    #  s += block
+    #  cur_s = lengths[idx[s - 1]]
+    #  print(f'block {i}: {block} x {cur_s} = {block * cur_s}')
+    #print(blocks)
+    #print(sum(blocks))
+    ctx_idx, ctx_blocks, total_ctx_wasted = idx, blocks, D[N - 1]
+    assert ctx_idx == ctx_idx_c, f'{ctx_idx} != {ctx_idx_c}'
+    assert ctx_blocks == ctx_blocks_c, f'{ctx_blocks} != {ctx_blocks_c}'
+    assert total_ctx_wasted == total_ctx_wasted_c, f'{total_ctx_wasted} != {total_ctx_wasted_c}'
 
-  return idx, blocks, D[N - 1]
+  assert ctx_blocks_c, "Failed to schedule"
+  return ctx_idx_c, ctx_blocks_c, total_ctx_wasted_c
 
 def schedule_max_opt_32_128(lengths, thr):
   N = len(lengths)
@@ -238,7 +243,6 @@ def preprocess_and_schedule_dataset(dataset, tokenizer, num_data, ctx_threshold,
   # whole_ei is list of {'ctx': [int], 'cont': [int]} with length num_data * NUM_CHOICES
 
   ctx_lengths = [len(whole_ei[i]['ctx']) for i in range(0, len(whole_ei), NUM_CHOICES)]
-  # TODO
   ctx_idx, ctx_blocks, total_ctx_wasted = schedule_min(ctx_lengths, ctx_threshold)
 
   # ctx_idx points to whole_pe [0, num_data)

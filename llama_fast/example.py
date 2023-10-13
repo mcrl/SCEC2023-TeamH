@@ -18,6 +18,8 @@ import logging
 import torch.distributed as dist
 
 import schedule
+import cProfile
+import pstats
 
 NUM_CHOICES = 4
 DATA_LIMIT = 22222
@@ -29,6 +31,7 @@ DEBUG_SCHEDULE = False
 DEBUG_ANSWER = False
 DEBUG_PERFORMANCE = False
 DEBUG_PROFILE = False
+DEBUG_PYTHON_PROFILE = False
 DEBUG_COMPARE_GOLD = False
 
 if DEBUG_COMPARE_GOLD:
@@ -350,5 +353,10 @@ if __name__ == "__main__":
     with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA]) as prof:
       fire.Fire(main)
     prof.export_chrome_trace(f'trace_{local_rank}.json')
+  elif DEBUG_PYTHON_PROFILE:
+    with cProfile.Profile() as pr:
+      fire.Fire(main)
+    pr.dump_stats(f'profile.prof')
+    pstats.Stats(pr).sort_stats(pstats.SortKey.CUMULATIVE).print_stats()
   else:
     fire.Fire(main)

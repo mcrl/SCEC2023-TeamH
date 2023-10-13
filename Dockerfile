@@ -2,7 +2,7 @@ FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
 
 RUN apt-get update
 
-RUN pip install fire sentencepiece datasets
+RUN pip install fire sentencepiece datasets pybind11
 
 COPY llama_fast /code
 WORKDIR /code

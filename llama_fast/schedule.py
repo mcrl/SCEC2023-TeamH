@@ -3,6 +3,8 @@
 import re
 from dataclasses import dataclass
 import teamh_c_helper
+from multiprocessing import Process, Queue
+import time
 
 @dataclass
 class Batch:
@@ -228,16 +230,52 @@ def schedule_max_opt_32_128(lengths, thr):
 def preprocess_and_schedule_dataset(dataset, tokenizer, num_data, ctx_threshold, ctx_minibatch_threshold, cont_threshold, prefix_activity_label = True):
   NUM_CHOICES = 4
   # encode the whole dataset
+  def _encode_dataset(dataset, start_idx, end_idx, proc_id, outq):
+    whole_pe = []
+    whole_ei = []
+    for i in range(start_idx, end_idx):
+      data = dataset[i]
+      if i >= num_data:
+        break
+      #if i % 200 == 0:
+      #  print(f'Process {proc_id} encoding {start_idx + i}...')
+      pe = process_example(data, prefix_activity_label=prefix_activity_label)
+      whole_pe.append(pe)
+      whole_ei.extend(encode_input(tokenizer, pe))
+    #print(f'Process {proc_id} putting result...')
+    outq.put((whole_pe, whole_ei))
+    #print(f'Process {proc_id} putting result... done!')
+
+  st = time.time()
+
+  NUM_PROC = 16
+  procs = []
+  outqs = [Queue() for _ in range(NUM_PROC)]
+  for proc_id in range(NUM_PROC):
+    start_idx = proc_id * (len(dataset) // NUM_PROC)
+    end_idx = (proc_id + 1) * (len(dataset) // NUM_PROC)
+    if proc_id == NUM_PROC - 1:
+      end_idx = len(dataset)
+    proc = Process(target=_encode_dataset, args=(dataset, start_idx, end_idx, proc_id, outqs[proc_id]))
+    proc.start()
+    procs.append(proc)
+    #print(f'Process {proc_id} started! Elapsed={time.time() - st}')
   whole_pe = []
   whole_ei = []
-  for i, data in enumerate(dataset):
-    if i == num_data:
-      break
-    if i % 1000 == 0:
-      print(f'Processing {i}...')
-    pe = process_example(data, prefix_activity_label=prefix_activity_label)
-    whole_pe.append(pe)
-    whole_ei.extend(encode_input(tokenizer, pe))
+  for proc_id, proc in enumerate(procs):
+    single_pe, single_ei = outqs[proc_id].get()
+    #print(f'Waiting for process {proc_id} to finish...')
+    proc.join()
+    whole_pe.extend(single_pe)
+    whole_ei.extend(single_ei)
+    #print(f'Process {proc_id} finished! Elapsed={time.time() - st}')
+  print(f'whole_pe len: {len(whole_pe)}, whole_ei len: {len(whole_ei)}')
+  assert len(whole_pe) == min(len(dataset), num_data)
+  assert len(whole_ei) == min(len(dataset), num_data) * NUM_CHOICES
+
+  print(f'Tokenization finished! Elapsed={time.time() - st}')
+
+  st = time.time()
 
   # whole_pe is list of {'query': str, 'choices': [str], 'gold': int} with length num_data
   # whole_ei is list of {'ctx': [int], 'cont': [int]} with length num_data * NUM_CHOICES
@@ -253,6 +291,7 @@ def preprocess_and_schedule_dataset(dataset, tokenizer, num_data, ctx_threshold,
   sum_ctx_block_wasted = 0
   sum_ctx_block_effective = 0
   for i, ctx_block_size in enumerate(ctx_blocks):
+    #print(f'Block {i} schedule! Elapsed={time.time() - st}')
     s += ctx_block_size
     ctx_block_start, ctx_block_end = s - ctx_block_size, s
     ctx_min_len = len(whole_ei[ctx_idx[ctx_block_start] * NUM_CHOICES]['ctx'])
@@ -321,6 +360,7 @@ def preprocess_and_schedule_dataset(dataset, tokenizer, num_data, ctx_threshold,
   print(f'total_ctx_wasted: {sum_ctx_block_wasted}, total_ctx_effective: {sum_ctx_block_effective}')
   print(f'total_ctx_efficiency: {sum_ctx_block_effective / (sum_ctx_block_effective + sum_ctx_block_wasted)}')
 
+  print(f'Scheduling finished! Elapsed={time.time() - st}')
   
   return whole_pe, whole_ei, batches
 

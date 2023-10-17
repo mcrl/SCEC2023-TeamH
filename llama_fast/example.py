@@ -20,7 +20,6 @@ import torch.distributed as dist
 
 import schedule
 import cProfile
-import pstats
 
 NUM_CHOICES = 4
 DATA_LIMIT = 22222
@@ -173,11 +172,15 @@ def main(
   max_seq_len: int = 512,
   max_batch_size: int = 32,
 ):
+  main_start_time = time.time()
+
   local_rank, world_size = setup_model_parallel()
 
   # if local_rank > 0:
   #    sys.stdout = open(os.devnull, "w")
   #    sys.stderr = open(os.devnull, "w")
+
+  preprocess_start_time = time.time()
 
   # Load tokenizer
   start_time = time.time()
@@ -188,6 +191,7 @@ def main(
   def _load_preprocess_and_schedule_dataset(q, cache_dir, tokenizer):
     start_time = time.time()
     dataset = load_dataset("hellaswag", cache_dir=cache_dir, split='validation')
+    print(f"Loaded dataset in {time.time() - start_time:.2f} seconds")
     docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset(dataset, tokenizer, DATA_LIMIT, CTX_THR, CTX_MINIBATCH_THR, CONT_THR)
     q.put((docs, tokenized_docs, batches))
     print(f"Loaded dataset and preprocessed in {time.time() - start_time:.2f} seconds")
@@ -198,7 +202,7 @@ def main(
 
   # Load model
   start_time = time.time()
-  checkpoint = torch.load(os.path.join(ckpt_dir, f'30B_cpu_{local_rank}.pth'), map_location="cpu")
+  checkpoint = torch.load(os.path.join(ckpt_dir, f'30B_cpu_{local_rank}.pth'), map_location="cpu", mmap=True)
   with open(os.path.join(ckpt_dir, 'params.json'), "r") as f:
     params = json.loads(f.read())
   model_args: ModelArgs = ModelArgs(
@@ -233,11 +237,15 @@ def main(
 
   # Join dataset process
   docs, tokenized_docs, batches = q.get()
+  p.join()
+
+  print(f'Rank {local_rank} total preprocess {time.time() - preprocess_start_time:.2f} seconds')
+  print(f'Rank {local_rank} total main {time.time() - main_start_time:.2f} seconds')
 
   d2h_stream = torch.cuda.Stream()
 
   print(f'Rank {local_rank} waiting for other ranks...')
-  dist.barrier()
+  #dist.barrier()
   start_time = time.time()
   print(f'Rank {local_rank} computation starting...')
 
@@ -386,6 +394,6 @@ if __name__ == "__main__":
     with cProfile.Profile() as pr:
       fire.Fire(main)
     pr.dump_stats(f'profile.prof')
-    pstats.Stats(pr).sort_stats(pstats.SortKey.CUMULATIVE).print_stats()
+    #pstats.Stats(pr).sort_stats(pstats.SortKey.CUMULATIVE).print_stats()
   else:
     fire.Fire(main)

@@ -101,12 +101,17 @@ def grade_from_db(data_idx, docs, logprobsum_db):
   pes = [docs[i] for i in data_idx]
 
   acc, acc_norm = 0, 0
+  sq_acc, sq_acc_norm = 0, 0
   for i, pe in enumerate(pes):
     ss = logprobsum_db[data_idx[i]]
     gold = pe["gold"]
-    acc += 1.0 if np.argmax(ss) == gold else 0.0
+    if np.argmax(ss) == gold:
+      acc += 1.0
+      sq_acc += 1.0 ** 2
     completion_len = np.array([float(len(i)) for i in pe["choices"]])
-    acc_norm += 1.0 if np.argmax(ss / completion_len) == gold else 0.0
+    if np.argmax(ss / completion_len) == gold:
+      acc_norm += 1.0
+      sq_acc_norm += 1.0 ** 2
     if DEBUG_COMPARE_GOLD:
       if gold_answer[data_idx[i]]['gold'] != np.argmax(ss / completion_len):
         print(f'gold mismatch: {gold_answer[data_idx[i]]} != {ss / completion_len}')
@@ -115,7 +120,7 @@ def grade_from_db(data_idx, docs, logprobsum_db):
     print(f'ctx="{pe["query"]}"')
     print(f'results: {ss}, normed_results: {ss / completion_len}, gold: {gold}')
 
-  return acc, acc_norm
+  return acc, acc_norm, sq_acc, sq_acc_norm
 
 def run_grade(grade_queue, grade_state, d2h_stream):
   if len(grade_queue) > 0:
@@ -125,15 +130,27 @@ def run_grade(grade_queue, grade_state, d2h_stream):
     done_idx = record_logprobs(ctx_logprobs_cpu, logprobs_cpu, batch, docs, tokenized_docs, logprobsum_db)
 
     if len(done_idx) > 0:
-      acc, acc_norm = grade_from_db(done_idx, docs, logprobsum_db)
+      acc, acc_norm, sq_acc, sq_acc_norm = grade_from_db(done_idx, docs, logprobsum_db)
       grade_state["sum_acc"] += acc
+      grade_state["sum_sq_acc"] += sq_acc
       grade_state["sum_acc_norm"] += acc_norm
+      grade_state["sum_sq_acc_norm"] += sq_acc_norm
       grade_state["count"] += len(done_idx)
       #print(f'acc: {acc}, acc_norm: {acc_norm}, sum_acc: {grade_state["sum_acc"]}, sum_acc_norm: {grade_state["sum_acc_norm"]}, avg_acc: {grade_state["sum_acc"] / grade_state["count"]}, avg_acc_norm: {grade_state["sum_acc_norm"] / grade_state["count"]}, count: {grade_state["count"]}')
       print(f'acc_norm: {acc_norm}, sum_acc_norm: {grade_state["sum_acc_norm"]}, avg_acc_norm: {grade_state["sum_acc_norm"] / grade_state["count"]}, count: {grade_state["count"]}')
 
       elapsed = time.time() - grade_state["start_time"]
       print(f'elapsed={elapsed}, throughput(example/s)={grade_state["count"] / elapsed}')
+
+def print_result(grade_state):
+  acc = grade_state['sum_acc'] / grade_state['count']
+  acc_norm = grade_state['sum_acc_norm'] / grade_state['count']
+  acc_stderr = ((grade_state['sum_sq_acc'] / grade_state['count']) - acc ** 2) ** 0.5
+  acc_norm_stderr = ((grade_state['sum_sq_acc_norm'] / grade_state['count']) - acc_norm ** 2) ** 0.5
+  print(f'|  Task   |Version| Metric |Value |   |Stderr|')
+  print(f'|---------|------:|--------|-----:|---|-----:|')
+  print(f'|hellaswag|      0|acc     |{acc:.4f}|±  |{acc_stderr:.4f}|')
+  print(f'|         |       |acc_norm|{acc_norm:.4f}|±  |{acc_norm_stderr:.4f}|')
 
 def setup_model_parallel() -> Tuple[int, int]:
   global local_rank, world_size
@@ -224,7 +241,9 @@ def main(
 
   grade_state = {
     "sum_acc": 0,
+    "sum_sq_acc": 0,
     "sum_acc_norm": 0,
+    "sum_sq_acc_norm": 0,
     "count": 0,
     "start_time": start_time,
   }
@@ -351,6 +370,9 @@ def main(
   print(f'Rank {local_rank} finished in {elapsed} seconds')
 
   dist.barrier() # this prevent isend result in wrong result
+
+  if local_rank == world_size - 1:
+    print_result(grade_state)
 
 if __name__ == "__main__":
   if DEBUG_PROFILE:

@@ -1,4 +1,4 @@
-FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
+FROM nvcr.io/nvidia/pytorch:23.05-py3
 
 RUN apt-get update
 

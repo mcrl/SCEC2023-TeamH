@@ -2,6 +2,7 @@
 # This software may be used and distributed according to the terms of the GNU General Public License version 3.
 
 from typing import Tuple
+from multiprocessing import Process, Queue
 import os
 import sys
 import torch
@@ -159,17 +160,33 @@ def main(
   #    sys.stdout = open(os.devnull, "w")
   #    sys.stderr = open(os.devnull, "w")
 
+  # Load tokenizer
   start_time = time.time()
-  dataset = load_dataset("hellaswag", cache_dir=cache_dir, split='validation')
+  tokenizer = Tokenizer(model_path=tokenizer_path)
+  print(f"Loaded tokenizer in {time.time() - start_time:.2f} seconds")
+
+  # Load and preprocess dataset with multiprocessing
+  def _load_preprocess_and_schedule_dataset(q, cache_dir, tokenizer):
+    start_time = time.time()
+    dataset = load_dataset("hellaswag", cache_dir=cache_dir, split='validation')
+    docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset(dataset, tokenizer, DATA_LIMIT, CTX_THR, CTX_MINIBATCH_THR, CONT_THR)
+    q.put((docs, tokenized_docs, batches))
+    print(f"Loaded dataset and preprocessed in {time.time() - start_time:.2f} seconds")
+
+  q = Queue()
+  p = Process(target=_load_preprocess_and_schedule_dataset, args=(q, cache_dir, tokenizer))
+  p.start()
+
+  # Load model
+  start_time = time.time()
   checkpoint = torch.load(os.path.join(ckpt_dir, f'30B_cpu_{local_rank}.pth'), map_location="cpu")
   with open(os.path.join(ckpt_dir, 'params.json'), "r") as f:
     params = json.loads(f.read())
   model_args: ModelArgs = ModelArgs(
     max_seq_len=max_seq_len, max_batch_size=max_batch_size, **params
   )
-  tokenizer = Tokenizer(model_path=tokenizer_path)
   model_args.vocab_size = tokenizer.n_words
-  print(f"Loaded dataset, ckpt, tokenizer in {time.time() - start_time:.2f} seconds")
+  print(f"Loaded ckpt in {time.time() - start_time:.2f} seconds")
 
   start_time = time.time()
   torch.set_default_tensor_type(torch.cuda.HalfTensor)
@@ -195,20 +212,8 @@ def main(
   #for param in tb.parameters():
   #  logger.info(f'Rank {local_rank} {type(param)} {param.size()} {param.device} {param.dtype}')
 
-  # Exp E
-  docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset(dataset, tokenizer, DATA_LIMIT, CTX_THR, CTX_MINIBATCH_THR, CONT_THR)
-  # Exp B
-  #docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset_typeB(dataset, tokenizer, DATA_LIMIT, CTX_THR, CONT_THR)
-  # Exp C
-  #docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset_typeC(dataset, tokenizer, DATA_LIMIT, CTX_THR, CONT_THR)
-  # Exp D
-  #docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset_typeD(dataset, tokenizer, DATA_LIMIT, CTX_THR, CONT_THR)
-  # Exp F
-  #docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset(dataset, tokenizer, DATA_LIMIT, CTX_THR, CONT_THR, prefix_activity_label=False)
-  # Exp G
-  #docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset_typeE(dataset, tokenizer, DATA_LIMIT, CTX_THR, CONT_THR)
-  # Exp H
-  #docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset_typeF(dataset, tokenizer, DATA_LIMIT, CTX_THR, CONT_THR)
+  # Join dataset process
+  docs, tokenized_docs, batches = q.get()
 
   d2h_stream = torch.cuda.Stream()
 

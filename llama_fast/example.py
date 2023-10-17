@@ -1,6 +1,3 @@
-# Copyright (c) Meta Platforms, Inc. and affiliates.
-# This software may be used and distributed according to the terms of the GNU General Public License version 3.
-
 from typing import Tuple
 from multiprocessing import Process, Queue
 import os
@@ -51,6 +48,7 @@ sh.setFormatter(formatter)
 logger.addHandler(sh)
 logger.setLevel(logging.INFO)
 
+# Given tokenized examples, retrun a Tensor suitable for input to the model
 def make_input_cpu_tensor_from_docs(docs, batch):
   encs = [doc['ctx'] + doc['cont'] for doc in docs]
   S = batch.seq_len
@@ -61,6 +59,7 @@ def make_input_cpu_tensor_from_docs(docs, batch):
     tokens[i, :l] = torch.tensor(encs[i][batch.cache_len : batch.cache_len + l]).long()
   return tokens
 
+# From model outputs, calculate log probabilities of each choice and save it to the table
 def record_logprobs(ctx_logprobs, logprobs, batch, docs, tokenized_docs, logprobsum_db):
   pes = [docs[i // NUM_CHOICES] for i in batch.data_idx]
   eis = [tokenized_docs[i] for i in batch.data_idx]
@@ -96,6 +95,7 @@ def record_logprobs(ctx_logprobs, logprobs, batch, docs, tokenized_docs, logprob
   
   return done_idx
 
+# From the table, calculate accuracy and normalized accuracy
 def grade_from_db(data_idx, docs, logprobsum_db):
   pes = [docs[i] for i in data_idx]
 
@@ -121,6 +121,7 @@ def grade_from_db(data_idx, docs, logprobsum_db):
 
   return acc, acc_norm, sq_acc, sq_acc_norm
 
+# Calculate accuracy for finished examples in the queue. Need to synchronize as the device to host communication is asynchronous.
 def run_grade(grade_queue, grade_state, d2h_stream):
   if len(grade_queue) > 0:
     d2h_stream.synchronize()
@@ -141,6 +142,7 @@ def run_grade(grade_queue, grade_state, d2h_stream):
       elapsed = time.time() - grade_state["start_time"]
       print(f'elapsed={elapsed}, throughput(example/s)={grade_state["count"] / elapsed}')
 
+# Mimic the print format of lm-evaluation-harness
 def print_result(grade_state):
   acc = grade_state['sum_acc'] / grade_state['count']
   acc_norm = grade_state['sum_acc_norm'] / grade_state['count']
@@ -196,11 +198,12 @@ def main(
     q.put((docs, tokenized_docs, batches))
     print(f"Loaded dataset and preprocessed in {time.time() - start_time:.2f} seconds")
 
+  # As (the dataset preprocess time) ~ (model checkpoint load time), we overlap them
   q = Queue()
   p = Process(target=_load_preprocess_and_schedule_dataset, args=(q, cache_dir, tokenizer))
   p.start()
 
-  # Load model
+  # Load model in cpu
   start_time = time.time()
   checkpoint = torch.load(os.path.join(ckpt_dir, f'30B_cpu_{local_rank}.pth'), map_location="cpu", mmap=True)
   with open(os.path.join(ckpt_dir, 'params.json'), "r") as f:
@@ -211,6 +214,7 @@ def main(
   model_args.vocab_size = tokenizer.n_words
   print(f"Loaded ckpt in {time.time() - start_time:.2f} seconds")
 
+  # Send parameters to gpu
   start_time = time.time()
   torch.set_default_tensor_type(torch.cuda.HalfTensor)
   if local_rank == 0:
@@ -245,6 +249,7 @@ def main(
   d2h_stream = torch.cuda.Stream()
 
   print(f'Rank {local_rank} waiting for other ranks...')
+  # We don't need barrier as we measure the whole execution time; no need to carefully measure the time of computation part only
   #dist.barrier()
   start_time = time.time()
   print(f'Rank {local_rank} computation starting...')
@@ -282,9 +287,10 @@ def main(
     if DEBUG_SCHEDULE:
       logger.info(f'Rank {local_rank} ctx group id={batch_idx} size={(B, S, H)}')
 
-    # load cache
+    # Load cache
     cache_k_list, cache_v_list, ctx_logprobs = [], [], None
     if batch.use_cache:
+      # Due to the context mini-batching, we need to merge the kv cache when we first access them
       if kv_cache[batch.cache_dep[0]]['merged']:
         cache_k_list = kv_cache[batch.cache_dep[0]]['k']
         cache_v_list = kv_cache[batch.cache_dep[0]]['v']
@@ -297,6 +303,7 @@ def main(
         kv_cache[batch.cache_dep[0]]['v'] = cache_v_list
         kv_cache[batch.cache_dep[0]]['merged'] = True
       if local_rank == world_size - 1:
+        # Same for the output cache
         if output_cache[batch.cache_dep[0]]['merged']:
           ctx_logprobs = output_cache[batch.cache_dep[0]]['value']
         else:
@@ -306,20 +313,23 @@ def main(
           output_cache[batch.cache_dep[0]]['value'] = ctx_logprobs
           output_cache[batch.cache_dep[0]]['merged'] = True
 
+    # Empty the cache if the batch is the first batch of a context group
     if batch.gen_cache and batch.first_minibatch:
       kv_cache.clear() 
       if local_rank == world_size - 1:
         output_cache.clear()
 
-    # run prolog
+    # Prolog
     if local_rank == 0:
+      # Run pre-transformer blocks
       h = pretb.forward(tokens)
     else:
+      # Receive tensor from previous rank
       h = torch.empty((B, S, H), dtype=torch.float16, device='cuda')
       handle = dist.irecv(h, local_rank - 1, tag = batch_idx)
       handle.wait()
 
-    # run transformer
+    # Run transformer blocks
     if DEBUG_PERFORMANCE:
       torch.cuda.synchronize()
       perf_start = time.time()
@@ -336,17 +346,21 @@ def main(
       BS_thr = B * S / elapsed
       print(f'Rank {local_rank} batch_idx={batch_idx} size={(B, S, H)} elapsed={elapsed} TFLOPS={TFLOPS} BS_thr={BS_thr}')
 
+    # While GPU is running, we can run the grading process
     run_grade(grade_queue, grade_state, d2h_stream)
     
-    # run epilog
+    # Epilog
     if local_rank < world_size - 1:
+      # Send tensor to next rank
       dist.isend(h, local_rank + 1, tag = batch_idx)
     else:
       if batch.gen_cache:
+        # Calculate log probabilities to be saved in cache
         ctx_h = h[:, -1, :] # [B, V]
         ctx_logits = posttb.forward(ctx_h)
         ctx_logprobs = torch.log_softmax(ctx_logits, dim=-1)
       if not batch.gen_cache:
+        # Calculate log probabilities, send to cpu, and queue grading process
         logits = posttb.forward(h)
         logprobs = torch.log_softmax(logits, dim=-1)
 
@@ -359,7 +373,7 @@ def main(
 
           grade_queue.append((ctx_logprobs_cpu, logprobs_cpu, batch, logprobsum_db, docs, tokenized_docs))
 
-    # update cache
+    # Update cache
     if batch.gen_cache:
       kv_cache[batch_idx] = {
         'k': new_cache_k_list,
@@ -372,7 +386,7 @@ def main(
           'merged': False,
         }
 
-  # empty remaining grade queue
+  # Empty remaining grade queue
   run_grade(grade_queue, grade_state, d2h_stream)
 
   torch.cuda.synchronize()

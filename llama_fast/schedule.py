@@ -62,7 +62,7 @@ def encode_input(tokenizer, example):
     } for choice in example['choices']]
   return new_reqs
 
-# length is minimum of each block
+# Solve DP; length is minimum of each block
 def schedule_min(lengths, thr, debug=False):
   ctx_idx_c, ctx_blocks_c, total_ctx_wasted_c = teamh_c_helper.schedule_min_c(lengths, thr)
 
@@ -120,7 +120,7 @@ def schedule_min(lengths, thr, debug=False):
   assert ctx_blocks_c, "Failed to schedule"
   return ctx_idx_c, ctx_blocks_c, total_ctx_wasted_c
 
-# length is maximum of each block
+# Solve DP; length is maximum of each block
 def schedule_max(lengths, thr, debug=False):
   ctx_idx_c, ctx_blocks_c, total_ctx_wasted_c = teamh_c_helper.schedule_max_c(lengths, thr)
 
@@ -178,58 +178,10 @@ def schedule_max(lengths, thr, debug=False):
   assert ctx_blocks_c, "Failed to schedule"
   return ctx_idx_c, ctx_blocks_c, total_ctx_wasted_c
 
-def schedule_max_opt_32_128(lengths, thr):
-  N = len(lengths)
-  idx = [i for i in range(N)]
-  idx.sort(key=lambda x: lengths[x])
-  # init
-  D = []
-  E = []
-  total_area = 0
-  for i in range(N):
-    total_area += lengths[idx[i]]
-    rect_area = lengths[idx[i]] * (i + 1)
-    penalty = rect_area - total_area
-    if rect_area >= thr and rect_area <= 4096:
-      D.append(penalty)
-      E.append(-1)
-    else:
-      D.append(2 ** 30)
-      E.append(-1)
-  # DP
-  for i in range(N):
-    total_area = 0
-    for j in range(i - 1, -1, -1):
-      total_area += lengths[idx[j + 1]]
-      rect_area = lengths[idx[i]] * (i - j)
-      penalty = rect_area - total_area
-      if rect_area >= thr and rect_area <= 4096 and D[i] > D[j] + penalty:
-        D[i] = D[j] + penalty
-        E[i] = j
-  blocks = []
-  i = N - 1
-  if E[i] == -1:
-    return None, None, None
-  while i >= 0:
-    blocks.append(i - E[i])
-    i = E[i]
-  blocks.reverse()
-
-  #logging
-  #print(f'total penalty: {D[N - 1]}')
-  #s = 0
-  #for i, block in enumerate(blocks):
-  #  s += block
-  #  cur_s = lengths[idx[s - 1]]
-  #  print(f'block {i}: {block} x {cur_s} = {block * cur_s}')
-  #print(blocks)
-  #print(sum(blocks))
-
-  return idx, blocks, D[N - 1]
-
 def preprocess_and_schedule_dataset(dataset, tokenizer, num_data, ctx_threshold, ctx_minibatch_threshold, cont_threshold, prefix_activity_label = True):
   NUM_CHOICES = 4
-  # encode the whole dataset
+
+  # Tokenization routine for single process
   def _encode_dataset(dataset, start_idx, end_idx, proc_id, outq):
     whole_pe = []
     whole_ei = []
@@ -248,6 +200,7 @@ def preprocess_and_schedule_dataset(dataset, tokenizer, num_data, ctx_threshold,
 
   st = time.time()
 
+  # Launch multiple processes to tokenize the dataset
   NUM_PROC = 16
   procs = []
   outqs = [Queue() for _ in range(NUM_PROC)]
@@ -260,6 +213,8 @@ def preprocess_and_schedule_dataset(dataset, tokenizer, num_data, ctx_threshold,
     proc.start()
     procs.append(proc)
     #print(f'Process {proc_id} started! Elapsed={time.time() - st}')
+
+  # Collect the results
   whole_pe = []
   whole_ei = []
   for proc_id, proc in enumerate(procs):
@@ -286,7 +241,6 @@ def preprocess_and_schedule_dataset(dataset, tokenizer, num_data, ctx_threshold,
   # ctx_idx points to whole_pe [0, num_data)
 
   batches = []
-  schedule_info = []
   s = 0
   sum_ctx_block_wasted = 0
   sum_ctx_block_effective = 0
@@ -364,6 +318,7 @@ def preprocess_and_schedule_dataset(dataset, tokenizer, num_data, ctx_threshold,
   
   return whole_pe, whole_ei, batches
 
+# For performance debugging only; calculate efficiency compared to optimal schedule
 def evaluate_schedule(whole_pe, whole_ei, batches):
   optimal = 0
   for i, ei in enumerate(whole_ei):
@@ -381,6 +336,7 @@ def evaluate_schedule(whole_pe, whole_ei, batches):
   wasted = reality - optimal
   print(f'optimal: {optimal}, reality: {reality}, wasted: {wasted}, efficiency: {optimal / reality}')
 
+# NOT USED; FOR COMPARISON ONLY
 def preprocess_and_schedule_dataset_typeB(dataset, tokenizer, num_data, ctx_threshold, cont_threshold):
   NUM_CHOICES = 4
   # encode the whole dataset
@@ -408,6 +364,7 @@ def preprocess_and_schedule_dataset_typeB(dataset, tokenizer, num_data, ctx_thre
 
   return whole_pe, whole_ei, batches
 
+# NOT USED; FOR COMPARISON ONLY
 def preprocess_and_schedule_dataset_typeC(dataset, tokenizer, num_data, ctx_threshold, cont_threshold):
   NUM_CHOICES = 4
   # encode the whole dataset
@@ -438,6 +395,7 @@ def preprocess_and_schedule_dataset_typeC(dataset, tokenizer, num_data, ctx_thre
 
   return whole_pe, whole_ei, batches
 
+# NOT USED; FOR COMPARISON ONLY
 def preprocess_and_schedule_dataset_typeD(dataset, tokenizer, num_data, ctx_threshold, cont_threshold):
   NUM_CHOICES = 4
   # encode the whole dataset
@@ -469,6 +427,7 @@ def preprocess_and_schedule_dataset_typeD(dataset, tokenizer, num_data, ctx_thre
 
   return whole_pe, whole_ei, batches
 
+# NOT USED; FOR COMPARISON ONLY
 def preprocess_and_schedule_dataset_typeE(dataset, tokenizer, num_data, ctx_threshold, cont_threshold, prefix_activity_label = True):
   NUM_CHOICES = 4
   # encode the whole dataset
@@ -556,6 +515,7 @@ def preprocess_and_schedule_dataset_typeE(dataset, tokenizer, num_data, ctx_thre
   
   return whole_pe, whole_ei, batches
 
+# NOT USED; FOR COMPARISON ONLY
 def preprocess_and_schedule_dataset_typeF(dataset, tokenizer, num_data, ctx_threshold, cont_threshold, prefix_activity_label = True):
   NUM_CHOICES = 4
   # encode the whole dataset
@@ -649,6 +609,7 @@ def preprocess_and_schedule_dataset_typeF(dataset, tokenizer, num_data, ctx_thre
   
   return whole_pe, whole_ei, batches
 
+# NOT USED; FOR COMPARISON ONLY
 def preprocess_and_schedule_dataset_typeG(dataset, tokenizer, num_data, ctx_threshold, cont_threshold, prefix_activity_label = True):
   NUM_CHOICES = 4
   # encode the whole dataset

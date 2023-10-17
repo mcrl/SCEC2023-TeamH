@@ -145,8 +145,10 @@ def run_grade(grade_queue, grade_state, d2h_stream):
 def print_result(grade_state):
   acc = grade_state['sum_acc'] / grade_state['count']
   acc_norm = grade_state['sum_acc_norm'] / grade_state['count']
-  acc_stderr = ((grade_state['sum_sq_acc'] / grade_state['count']) - acc ** 2) ** 0.5
-  acc_norm_stderr = ((grade_state['sum_sq_acc_norm'] / grade_state['count']) - acc_norm ** 2) ** 0.5
+  acc_stddev = ((grade_state['sum_sq_acc'] / grade_state['count']) - acc ** 2) ** 0.5
+  acc_norm_stddev = ((grade_state['sum_sq_acc_norm'] / grade_state['count']) - acc_norm ** 2) ** 0.5
+  acc_stderr = acc_stddev / (grade_state['count'] ** 0.5)
+  acc_norm_stderr = acc_norm_stddev / (grade_state['count'] ** 0.5)
   print(f'|  Task   |Version| Metric |Value |   |Stderr|')
   print(f'|---------|------:|--------|-----:|---|-----:|')
   print(f'|hellaswag|      0|acc     |{acc:.4f}|±  |{acc_stderr:.4f}|')

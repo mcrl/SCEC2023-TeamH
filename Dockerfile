@@ -23,13 +23,14 @@ RUN python /usr/local/pytorch-v2.1.0/setup.py install
 RUN pip install fire sentencepiece datasets pybind11
 RUN apt-get install bc
 
+# build csrc
+COPY deps /deps
+ENV TORCH_CUDA_ARCH_LIST="7.0+PTX"
+RUN pip install -v --disable-pip-version-check --no-build-isolation --global-option="--cuda_ext" /deps/apex_subset
+RUN pip install /deps/teamh_c_helper
+
 # copy llama code
 COPY llama_fast /code
 WORKDIR /code
-
-# build csrc
-ENV TORCH_CUDA_ARCH_LIST="7.0+PTX"
-RUN pip install -v --disable-pip-version-check --no-build-isolation --global-option="--cuda_ext" /code/apex_subset
-RUN pip install /code/teamh_c_helper
 
 CMD ["/code/run.sh"]

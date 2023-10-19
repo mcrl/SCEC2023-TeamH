@@ -13,7 +13,7 @@
 .
 ├── llama_fast/             # ⚡ LLaMA python package
 │   ├── apex_subset/        #    - C extensions for kernels
-│   ├── team_c_helper/      #    - C extensions for helper functions
+│   ├── teamh_c_helper/      #    - C extensions for helper functions
 │   ├── build.py            #    - Package build script
 │   ├── example.py          #    - Main inference script
 │   ├── model.py            #    - LLaMA model components

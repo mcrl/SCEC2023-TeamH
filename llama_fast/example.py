@@ -216,7 +216,7 @@ def main(
 
   # Send parameters to gpu
   start_time = time.time()
-  torch.set_default_tensor_type(torch.cuda.HalfTensor)
+  torch.set_default_dtype(torch.cuda.HalfTensor)
   if local_rank == 0:
     pretb = PreTransformer(model_args)
     tb = TransformerBlocks(model_args, 0, 15)
@@ -233,7 +233,7 @@ def main(
     posttb = PostTransformer(model_args)
     tb.custom_load(checkpoint)
     posttb.custom_load(checkpoint)
-  torch.set_default_tensor_type(torch.FloatTensor)
+  torch.set_default_dtype(torch.FloatTensor)
   print(f"Loaded model in gpu in {time.time() - start_time:.2f} seconds")
 
   #for param in tb.parameters():

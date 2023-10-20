@@ -17,6 +17,7 @@ import torch.distributed as dist
 
 import schedule
 import cProfile
+import teamh_c_helper
 
 NUM_CHOICES = 4
 DATA_LIMIT = 22222
@@ -251,6 +252,9 @@ def main(
   print(f'Rank {local_rank} waiting for other ranks...')
   # We don't need barrier as we measure the whole execution time; no need to carefully measure the time of computation part only
   #dist.barrier()
+  teamh_c_helper.init(local_rank, world_size)
+  torch.distributed.barrier() # barrier is necessary to ensure semaphore is initialized
+  teamh_c_helper.init_comm()
   start_time = time.time()
   print(f'Rank {local_rank} computation starting...')
 
@@ -271,6 +275,9 @@ def main(
   logprobsum_db = [[None for _ in range(NUM_CHOICES)] for _ in range(len(docs))]
 
   for batch_idx, batch in enumerate(batches):
+    batch_str = f'batch_idx={batch_idx} bsz={len(batch.data_idx)} use_cache={batch.use_cache} gen_cache={batch.gen_cache} seq_len={batch.seq_len} cache_len={batch.cache_len}'
+    torch.cuda.nvtx.range_push(batch_str)
+
     if not batch.use_cache:
       ctx_grp_count += 1
       if ctx_grp_count > CTX_GRP_LIMIT:
@@ -326,8 +333,9 @@ def main(
     else:
       # Receive tensor from previous rank
       h = torch.empty((B, S, H), dtype=torch.float16, device='cuda')
-      handle = dist.irecv(h, local_rank - 1, tag = batch_idx)
-      handle.wait()
+      teamh_c_helper.recv(h)
+      #handle = dist.irecv(h, local_rank - 1, tag = batch_idx)
+      #handle.wait()
 
     # Run transformer blocks
     if DEBUG_PERFORMANCE:
@@ -352,7 +360,8 @@ def main(
     # Epilog
     if local_rank < world_size - 1:
       # Send tensor to next rank
-      dist.isend(h, local_rank + 1, tag = batch_idx)
+      #dist.isend(h, local_rank + 1, tag = batch_idx)
+      teamh_c_helper.send(h, batch_idx == 0)
     else:
       if batch.gen_cache:
         # Calculate log probabilities to be saved in cache
@@ -386,6 +395,8 @@ def main(
           'merged': False,
         }
 
+    torch.cuda.nvtx.range_pop()
+
   # Empty remaining grade queue
   run_grade(grade_queue, grade_state, d2h_stream)
 
@@ -393,7 +404,9 @@ def main(
   elapsed = time.time() - grade_state['start_time']
   print(f'Rank {local_rank} finished in {elapsed} seconds')
 
-  dist.barrier() # this prevent isend result in wrong result
+  #dist.barrier() # this prevent isend result in wrong result
+  torch.distributed.barrier() # barrier is necessary so that semaphore is not destroyed too early (i.e. while other processes are still using it)
+  teamh_c_helper.finalize()
 
   if local_rank == world_size - 1:
     print_result(grade_state)

@@ -76,6 +76,8 @@ class Attention(nn.Module):
     )
 
   def forward(self, x: torch.Tensor, start_pos: int, freqs_cis: torch.Tensor, mask: Optional[torch.Tensor], use_cache: bool, gen_cache: bool, cache_k = None, cache_v = None, cont2ctx = None):
+    #torch.cuda.nvtx.range_push(f'Attention')
+
     bsz, seqlen, _ = x.shape
     xq, xk, xv = self.wq(x), self.wk(x), self.wv(x)
 
@@ -95,21 +97,27 @@ class Attention(nn.Module):
     new_cache_k = None
     new_cache_v = None
     if gen_cache:
-      new_cache_k = keys # (bsz, seqlen, n_heads, head_dim)
-      new_cache_v = values
+      cache_k.copy_(keys)
+      cache_v.copy_(values)
 
     xq = xq.transpose(1, 2)
     keys = keys.transpose(1, 2)
     values = values.transpose(1, 2)
+
+    #torch.cuda.nvtx.range_push(f'scaled_dot_Attention')
 
     if not use_cache:
       output = F.scaled_dot_product_attention(xq, keys, values, is_causal=True) # (bsz, n_heads, seqlen, head_dim)
     if use_cache:
       output = F.scaled_dot_product_attention(xq, keys, values, attn_mask = mask) # (bsz, n_heads, seqlen, head_dim)
 
+    #torch.cuda.nvtx.range_pop()
+
     output = output.transpose(
         1, 2
     ).contiguous().view(bsz, seqlen, -1)
+
+    #torch.cuda.nvtx.range_pop()
 
     return self.wo(output), new_cache_k, new_cache_v
 
@@ -314,12 +322,16 @@ class FusedRMSNorm(torch.nn.Module):
             init.ones_(self.weight)
 
     def forward(self, input):
+        #torch.cuda.nvtx.range_push(f'RMSNorm')
         if torch.jit.is_tracing() or torch.jit.is_scripting() or not input.is_cuda:
+            #torch.cuda.nvtx.range_pop()
             return manual_rms_norm(input, self.normalized_shape, self.weight, self.eps)
 
         if self.elementwise_affine:
+            #torch.cuda.nvtx.range_pop()
             return fused_rms_norm_affine(input, self.weight, self.normalized_shape, self.eps)
         else:
+            #torch.cuda.nvtx.range_pop()
             return fused_rms_norm(input, self.normalized_shape, self.eps)
 
     def extra_repr(self):
@@ -341,10 +353,14 @@ class TransformerBlock(nn.Module):
     self.ffn_norm = FusedRMSNorm(args.dim, eps=args.norm_eps)
 
   def forward(self, x: torch.Tensor, start_pos: int, freqs_cis: torch.Tensor, mask: Optional[torch.Tensor], use_cache: bool, gen_cache: bool, cache_k = None, cache_v = None, cont2ctx = None):
+    #torch.cuda.nvtx.range_push(f'TfBlock {self.layer_id}')
+
     h, new_cache_k, new_cache_v = self.attention.forward(self.attention_norm(x), start_pos, freqs_cis, mask, use_cache, gen_cache, cache_k, cache_v, cont2ctx)
 
     h = x + h
     out = h + self.feed_forward.forward(self.ffn_norm(h))
+
+    #torch.cuda.nvtx.range_pop()
 
     return out, new_cache_k, new_cache_v
 
@@ -365,6 +381,7 @@ class TransformerBlocks(nn.Module):
   
   @torch.inference_mode()
   def forward(self, h: torch.Tensor, start_pos: int, use_cache: bool, gen_cache: bool, cache_k_list = None, cache_v_list = None, cont2ctx = None):
+    #torch.cuda.nvtx.range_push(f'TfBlocks {self.layer_idx} {self.num_layers}')
     _bsz, seqlen, _ = h.shape
     self.freqs_cis = self.freqs_cis.to(h.device)
     freqs_cis = self.freqs_cis[start_pos : start_pos + seqlen]
@@ -373,10 +390,6 @@ class TransformerBlocks(nn.Module):
     if use_cache:
       mask = torch.ones(seqlen, start_pos + seqlen, dtype=torch.bool, device=h.device).tril(diagonal=start_pos)
 
-    if not use_cache:
-      cache_k_list = [None] * self.num_layers
-      cache_v_list = [None] * self.num_layers
-    
     new_cache_k_list = []
     new_cache_v_list = []
 
@@ -384,6 +397,9 @@ class TransformerBlocks(nn.Module):
       h, new_cache_k, new_cache_v = layer(h, start_pos, freqs_cis, mask, use_cache, gen_cache, cache_k_list[i], cache_v_list[i], cont2ctx)
       new_cache_k_list.append(new_cache_k)
       new_cache_v_list.append(new_cache_v)
+
+    #torch.cuda.nvtx.range_pop()
+
     return h, new_cache_k_list, new_cache_v_list
   
   def custom_load(self, full_dict):

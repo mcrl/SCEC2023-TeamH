@@ -17,6 +17,7 @@ import torch.distributed as dist
 
 import schedule
 import cProfile
+import teamh_c_helper
 
 NUM_CHOICES = 4
 DATA_LIMIT = 22222
@@ -24,6 +25,7 @@ CTX_GRP_LIMIT = 22222
 CTX_THR = 10000
 CTX_MINIBATCH_THR = 2048
 CONT_THR = 2048
+USE_CUSTOM_COMM = False
 DEBUG_SCHEDULE = False
 DEBUG_ANSWER = False
 DEBUG_PERFORMANCE = False
@@ -126,7 +128,7 @@ def run_grade(grade_queue, grade_state, d2h_stream):
   if len(grade_queue) > 0:
     d2h_stream.synchronize()
   while len(grade_queue) > 0:
-    ctx_logprobs_cpu, logprobs_cpu, batch, logprobsum_db, docs, tokenized_docs = grade_queue.pop(0)
+    ctx_logprobs_cpu, logprobs_cpu, batch, logprobsum_db, docs, tokenized_docs, logprobs_gpu, ctx_logprobs_gpu = grade_queue.pop(0)
     done_idx = record_logprobs(ctx_logprobs_cpu, logprobs_cpu, batch, docs, tokenized_docs, logprobsum_db)
 
     if len(done_idx) > 0:
@@ -251,6 +253,11 @@ def main(
   print(f'Rank {local_rank} waiting for other ranks...')
   # We don't need barrier as we measure the whole execution time; no need to carefully measure the time of computation part only
   #dist.barrier()
+  if USE_CUSTOM_COMM:
+    teamh_c_helper.init(local_rank, world_size)
+    torch.distributed.barrier() # barrier is necessary to ensure semaphore is initialized
+    teamh_c_helper.init_comm()
+
   start_time = time.time()
   print(f'Rank {local_rank} computation starting...')
 
@@ -267,14 +274,55 @@ def main(
   output_cache = {}
   grade_queue = []
   ctx_grp_count = 0
+  cache_k_list, cache_v_list, ctx_logprobs = None, None, None
   
   logprobsum_db = [[None for _ in range(NUM_CHOICES)] for _ in range(len(docs))]
 
+  buf_alloc_st = time.time()
+  max_bs, max_b, max_s = 0, 0, 0
   for batch_idx, batch in enumerate(batches):
+    if batch.gen_cache and batch.first_minibatch:
+      total_B = 0
+      for i in range(batch_idx, len(batches)):
+        if not batches[i].gen_cache:
+          break
+        total_B += len(batches[i].data_idx)
+      bs = total_B * batch.seq_len
+      max_bs = max(max_bs, bs)
+      max_b = max(max_b, total_B)
+      max_s = max(max_s, batch.seq_len)
+  print(f'Rank {local_rank} max_bs={max_bs} max_b={max_b} max_s={max_s}')
+
+  buf_cache_k_list = torch.empty(15 * max_bs * model_args.n_heads * (model_args.dim // model_args.n_heads), dtype=torch.float16, device='cuda')
+  buf_cache_v_list = torch.empty(15 * max_bs * model_args.n_heads * (model_args.dim // model_args.n_heads), dtype=torch.float16, device='cuda')
+  buf_ctx_logprobs = torch.empty(max_b * model_args.vocab_size, dtype=torch.float16, device='cuda')
+  print(f'Rank {local_rank} total buf_alloc {time.time() - buf_alloc_st:.2f} seconds')
+
+  for batch_idx, batch in enumerate(batches):
+    batch_str = f'batch_idx={batch_idx} bsz={len(batch.data_idx)} use_cache={batch.use_cache} gen_cache={batch.gen_cache} seq_len={batch.seq_len} cache_len={batch.cache_len}'
+    torch.cuda.nvtx.range_push(batch_str)
+
     if not batch.use_cache:
       ctx_grp_count += 1
       if ctx_grp_count > CTX_GRP_LIMIT:
         break
+
+    if batch.gen_cache and batch.first_minibatch:
+      total_B = 0
+      for i in range(batch_idx, len(batches)):
+        if not batches[i].gen_cache:
+          break
+        total_B += len(batches[i].data_idx)
+      del cache_k_list, cache_v_list
+      sz = 15 * total_B * batch.seq_len * model_args.n_heads * (model_args.dim // model_args.n_heads)
+      cache_k_list = buf_cache_k_list[:sz].view(15, total_B, batch.seq_len, model_args.n_heads, model_args.dim // model_args.n_heads)
+      cache_v_list = buf_cache_v_list[:sz].view(15, total_B, batch.seq_len, model_args.n_heads, model_args.dim // model_args.n_heads)
+      #print(f'Rank {local_rank} cache_k_list.size()={cache_k_list.size()} cache_v_list.size()={cache_v_list.size()}')
+      if local_rank == world_size - 1:
+        del ctx_logprobs
+        sz = total_B * model_args.vocab_size
+        ctx_logprobs = buf_ctx_logprobs[:sz].view(total_B, model_args.vocab_size)
+      offset_B = 0
 
     docs_in_batch = (tokenized_docs[i] for i in batch.data_idx)
     tokens = make_input_cpu_tensor_from_docs(docs_in_batch, batch).pin_memory().cuda(non_blocking=True)
@@ -287,38 +335,6 @@ def main(
     if DEBUG_SCHEDULE:
       logger.info(f'Rank {local_rank} ctx group id={batch_idx} size={(B, S, H)}')
 
-    # Load cache
-    cache_k_list, cache_v_list, ctx_logprobs = [], [], None
-    if batch.use_cache:
-      # Due to the context mini-batching, we need to merge the kv cache when we first access them
-      if kv_cache[batch.cache_dep[0]]['merged']:
-        cache_k_list = kv_cache[batch.cache_dep[0]]['k']
-        cache_v_list = kv_cache[batch.cache_dep[0]]['v']
-      else:
-        cache_k_list = [torch.cat(tuple(kv_cache[cache_dep]['k'][j] for cache_dep in batch.cache_dep)) for j in range(15)]
-        cache_v_list = [torch.cat(tuple(kv_cache[cache_dep]['v'][j] for cache_dep in batch.cache_dep)) for j in range(15)]
-        for cache_dep in batch.cache_dep[1:]:
-          kv_cache.pop(cache_dep)
-        kv_cache[batch.cache_dep[0]]['k'] = cache_k_list
-        kv_cache[batch.cache_dep[0]]['v'] = cache_v_list
-        kv_cache[batch.cache_dep[0]]['merged'] = True
-      if local_rank == world_size - 1:
-        # Same for the output cache
-        if output_cache[batch.cache_dep[0]]['merged']:
-          ctx_logprobs = output_cache[batch.cache_dep[0]]['value']
-        else:
-          ctx_logprobs = torch.cat(tuple(output_cache[cache_dep]['value'] for cache_dep in batch.cache_dep))
-          for cache_dep in batch.cache_dep[1:]:
-            output_cache.pop(cache_dep)
-          output_cache[batch.cache_dep[0]]['value'] = ctx_logprobs
-          output_cache[batch.cache_dep[0]]['merged'] = True
-
-    # Empty the cache if the batch is the first batch of a context group
-    if batch.gen_cache and batch.first_minibatch:
-      kv_cache.clear() 
-      if local_rank == world_size - 1:
-        output_cache.clear()
-
     # Prolog
     if local_rank == 0:
       # Run pre-transformer blocks
@@ -326,17 +342,27 @@ def main(
     else:
       # Receive tensor from previous rank
       h = torch.empty((B, S, H), dtype=torch.float16, device='cuda')
-      handle = dist.irecv(h, local_rank - 1, tag = batch_idx)
-      handle.wait()
+      if USE_CUSTOM_COMM:
+        teamh_c_helper.recv(h)
+      else:
+        handle = dist.irecv(h, local_rank - 1, tag = batch_idx)
+        handle.wait()
 
     # Run transformer blocks
     if DEBUG_PERFORMANCE:
       torch.cuda.synchronize()
       perf_start = time.time()
 
+    if batch.gen_cache:
+      partial_cache_k_list = cache_k_list[:, offset_B : offset_B + B, :, :, :]
+      partial_cache_v_list = cache_v_list[:, offset_B : offset_B + B, :, :, :]
+    else:
+      partial_cache_k_list = cache_k_list
+      partial_cache_v_list = cache_v_list
+
     h, new_cache_k_list, new_cache_v_list = tb.forward(
       h, batch.cache_len, use_cache = batch.use_cache, gen_cache = batch.gen_cache,
-      cache_k_list = cache_k_list, cache_v_list = cache_v_list, cont2ctx = cont2ctx_gpu)
+      cache_k_list = partial_cache_k_list, cache_v_list = partial_cache_v_list, cont2ctx = cont2ctx_gpu)
 
     if DEBUG_PERFORMANCE:
       torch.cuda.synchronize()
@@ -352,39 +378,37 @@ def main(
     # Epilog
     if local_rank < world_size - 1:
       # Send tensor to next rank
-      dist.isend(h, local_rank + 1, tag = batch_idx)
+      if USE_CUSTOM_COMM:
+        teamh_c_helper.send(h, batch_idx == 0)
+      else:
+        dist.isend(h, local_rank + 1, tag = batch_idx)
+      del h
     else:
       if batch.gen_cache:
         # Calculate log probabilities to be saved in cache
-        ctx_h = h[:, -1, :] # [B, V]
-        ctx_logits = posttb.forward(ctx_h)
-        ctx_logprobs = torch.log_softmax(ctx_logits, dim=-1)
+        h = h[:, -1, :] # [B, V]
+        h = posttb.forward(h)
+        h = torch.log_softmax(h, dim=-1)
+        ctx_logprobs[offset_B : offset_B + B, :].copy_(h)
+        del h
       if not batch.gen_cache:
         # Calculate log probabilities, send to cpu, and queue grading process
-        logits = posttb.forward(h)
-        logprobs = torch.log_softmax(logits, dim=-1)
+        h = posttb.forward(h)
+        logprobs = torch.log_softmax(h, dim=-1)
+        ctx_logprobs_copied = ctx_logprobs.clone()
 
+        # You also should hold gpu buffers until the grading process is finished (preventing freeing of the memory)
         with torch.cuda.stream(d2h_stream):
           torch.cuda.current_stream().wait_stream(torch.cuda.default_stream())
           logprobs_cpu = torch.empty_like(logprobs, device='cpu', pin_memory=True).copy_(logprobs, non_blocking=True)
-          ctx_logprobs_cpu = None
-          if ctx_logprobs is not None:
-            ctx_logprobs_cpu = torch.empty_like(ctx_logprobs, device='cpu', pin_memory=True).copy_(ctx_logprobs, non_blocking=True)
+          ctx_logprobs_cpu = torch.empty_like(ctx_logprobs_copied, device='cpu', pin_memory=True).copy_(ctx_logprobs_copied, non_blocking=True)
 
-          grade_queue.append((ctx_logprobs_cpu, logprobs_cpu, batch, logprobsum_db, docs, tokenized_docs))
+          grade_queue.append((ctx_logprobs_cpu, logprobs_cpu, batch, logprobsum_db, docs, tokenized_docs, logprobs, ctx_logprobs_copied))
+        del h, logprobs, ctx_logprobs_copied
 
-    # Update cache
-    if batch.gen_cache:
-      kv_cache[batch_idx] = {
-        'k': new_cache_k_list,
-        'v': new_cache_v_list,
-        'merged': False,
-      }
-      if local_rank == world_size - 1:
-        output_cache[batch_idx] = {
-          'value': ctx_logprobs,
-          'merged': False,
-        }
+    offset_B += B
+
+    torch.cuda.nvtx.range_pop()
 
   # Empty remaining grade queue
   run_grade(grade_queue, grade_state, d2h_stream)
@@ -393,7 +417,9 @@ def main(
   elapsed = time.time() - grade_state['start_time']
   print(f'Rank {local_rank} finished in {elapsed} seconds')
 
-  dist.barrier() # this prevent isend result in wrong result
+  #dist.barrier() # this prevent isend result in wrong result
+  torch.distributed.barrier() # barrier is necessary so that semaphore is not destroyed too early (i.e. while other processes are still using it)
+  teamh_c_helper.finalize()
 
   if local_rank == world_size - 1:
     print_result(grade_state)

@@ -6,6 +6,7 @@ CACHE_DIR=/data/cache
 NPROCS=4
 
 cd "$(dirname "$0")"
+python ../tools/download_dataset.py --cache_dir $CACHE_DIR
 
 start=$(date +%s.%N)
 
@@ -15,4 +16,7 @@ torchrun --nproc_per_node $NPROCS example.py --tokenizer_path $TOKENIZER_PATH --
 
 finish=$(date +%s.%N)
 time=$( echo "$finish - $start" | bc -l )
+
+echo '[Report from shell]'
 echo 'time:' $time
+echo '(Note: Discrepancy between reported times is overhead from torchrun and torch.dist, which should be 10 ~ 15 seconds.)'

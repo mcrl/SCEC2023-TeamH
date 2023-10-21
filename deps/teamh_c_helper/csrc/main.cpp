@@ -167,8 +167,6 @@ void init(int _rank, int _world_size) {
 
   close(fd);
 
-  printf("Rank %d shm init done! shared_ptr = %p\n", rank, shared_ptr);
-
   // We initialize semaphore for each rank
   mysem = (sem_t*)shared_ptr + rank;
   prevsem = mysem - 1;
@@ -176,8 +174,6 @@ void init(int _rank, int _world_size) {
   nextsem_rev = mysem_rev + 1;
   CHECK_ERRNO(sem_init(mysem, 1, 0));
   CHECK_ERRNO(sem_init(mysem_rev, 1, 0));
-
-  printf("Rank %d sem init done! mysem=%p prevsem=%p\n", rank, mysem, prevsem);
 
   if (rank < world_size - 1) {
     CHECK_CUDA(cudaSetDevice(rank + 1));
@@ -216,14 +212,12 @@ void init_comm() {
     CHECK_CUDA(cudaIpcGetEventHandle(myeventhandle, myevent));
 
     CHECK_ERRNO(sem_post(mysem));
-    printf("A %d\n", rank);
   }
 
   if (rank > 0) {
     CHECK_ERRNO(sem_wait(prevsem));
     CHECK_CUDA(cudaIpcOpenMemHandle(&mygpubuf, *previpchandle, cudaIpcMemLazyEnablePeerAccess));
     CHECK_CUDA(cudaIpcOpenEventHandle(&prevevent, *preveventhandle));
-    printf("B %d\n", rank);
   }
 
   if (rank > 0) {
@@ -231,13 +225,11 @@ void init_comm() {
     CHECK_CUDA(cudaIpcGetEventHandle(myeventhandle_rev, myevent_rev));
 
     CHECK_ERRNO(sem_post(mysem_rev));
-    printf("C %d\n", rank);
   }
 
   if (rank < world_size - 1) {
     CHECK_ERRNO(sem_wait(nextsem_rev));
     CHECK_CUDA(cudaIpcOpenEventHandle(&nextevent_rev, *nexteventhandle_rev));
-    printf("D %d\n", rank);
   }
 
   CHECK_CUDA(cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking));
@@ -289,7 +281,6 @@ void recv(torch::Tensor& tensor_to_recv) {
 }
 
 void finalize() {
-  printf("Rank %d finalize\n", rank);
   CHECK_ERRNO(sem_destroy(mysem));
   CHECK_ERRNO(sem_destroy(mysem_rev));
   munmap(shared_ptr, SHM_SIZE);
@@ -301,8 +292,6 @@ void finalize() {
   if (rank > 0) {
     CHECK_CUDA(cudaIpcCloseMemHandle(mygpubuf));
   }
-
-  printf("Rank %d finalize done\n", rank);
 }
 
 static std::chrono::steady_clock cpu_clock;
@@ -342,10 +331,6 @@ void test(int flag) {
     size_t us = get_duration_us(st, et);
     printf("Throughput: %f GB/s\n", (double)nbytes / us / 1e3);
   }
-
-
-
-
 }
 
 PYBIND11_MODULE(teamh_c_helper, m) {

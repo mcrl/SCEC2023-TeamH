@@ -224,11 +224,11 @@ def preprocess_and_schedule_dataset(dataset, tokenizer, num_data, ctx_threshold,
     whole_pe.extend(single_pe)
     whole_ei.extend(single_ei)
     #print(f'Process {proc_id} finished! Elapsed={time.time() - st}')
-  print(f'whole_pe len: {len(whole_pe)}, whole_ei len: {len(whole_ei)}')
+  #print(f'whole_pe len: {len(whole_pe)}, whole_ei len: {len(whole_ei)}')
   assert len(whole_pe) == min(len(dataset), num_data)
   assert len(whole_ei) == min(len(dataset), num_data) * NUM_CHOICES
 
-  print(f'Tokenization finished! Elapsed={time.time() - st}')
+  #print(f'Tokenization finished! Elapsed={time.time() - st}')
 
   st = time.time()
 
@@ -311,12 +311,27 @@ def preprocess_and_schedule_dataset(dataset, tokenizer, num_data, ctx_threshold,
     # print(f'total_cont_wasted: {sum_cont_block_wasted}, total_cont_effective: {sum_cont_block_effective}')
     # print(f'total_cont_efficiency: {sum_cont_block_effective / (sum_cont_block_effective + sum_cont_block_wasted)}')
   assert sum_ctx_block_wasted == total_ctx_wasted
-  print(f'total_ctx_wasted: {sum_ctx_block_wasted}, total_ctx_effective: {sum_ctx_block_effective}')
-  print(f'total_ctx_efficiency: {sum_ctx_block_effective / (sum_ctx_block_effective + sum_ctx_block_wasted)}')
+  #print(f'total_ctx_wasted: {sum_ctx_block_wasted}, total_ctx_effective: {sum_ctx_block_effective}')
+  #print(f'total_ctx_efficiency: {sum_ctx_block_effective / (sum_ctx_block_effective + sum_ctx_block_wasted)}')
 
-  print(f'Scheduling finished! Elapsed={time.time() - st}')
+  #print(f'Scheduling finished! Elapsed={time.time() - st}')
   
   return whole_pe, whole_ei, batches
+
+def max_sizes_of_batches(batches):
+  max_bs, max_b, max_s = 0, 0, 0
+  for batch_idx, batch in enumerate(batches):
+    if batch.gen_cache and batch.first_minibatch:
+      total_B = 0
+      for i in range(batch_idx, len(batches)):
+        if not batches[i].gen_cache:
+          break
+        total_B += len(batches[i].data_idx)
+      bs = total_B * batch.seq_len
+      max_bs = max(max_bs, bs)
+      max_b = max(max_b, total_B)
+      max_s = max(max_s, batch.seq_len)
+  return max_bs, max_b, max_s
 
 # For performance debugging only; calculate efficiency compared to optimal schedule
 def evaluate_schedule(whole_pe, whole_ei, batches):

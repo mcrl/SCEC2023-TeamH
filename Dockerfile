@@ -29,6 +29,8 @@ ENV TORCH_CUDA_ARCH_LIST="7.0+PTX"
 RUN pip install -v --disable-pip-version-check --no-build-isolation --global-option="--cuda_ext" /deps/apex_subset
 RUN pip install /deps/teamh_c_helper
 
+COPY tools /tools
+
 # copy llama code
 COPY llama_fast /code
 WORKDIR /code

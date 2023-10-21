@@ -179,14 +179,12 @@ void init(int _rank, int _world_size) {
 
   printf("Rank %d sem init done! mysem=%p prevsem=%p\n", rank, mysem, prevsem);
 
-  for (int i = 0; i < world_size; ++i) {
-    for (int j = 0; j < world_size; ++j) {
-      if (i == j) continue;
-      CHECK_CUDA(cudaSetDevice(i));
-      CHECK_CUDA(cudaDeviceEnablePeerAccess(j, 0));
-    }
+  if (rank < world_size - 1) {
+    CHECK_CUDA(cudaSetDevice(rank + 1));
+    CHECK_CUDA(cudaDeviceEnablePeerAccess(rank, 0));
+    CHECK_CUDA(cudaSetDevice(rank));
+    CHECK_CUDA(cudaDeviceEnablePeerAccess(rank + 1, 0));
   }
-  CHECK_CUDA(cudaSetDevice(rank));
 }
 
 void init_comm() {
@@ -321,14 +319,16 @@ size_t get_duration_us(
   return std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 }
 
-void test() {
+void test(int flag) {
   size_t nbytes = (size_t)10 * 1024 * 1024 * 1024;
   void *da, *db;
   CHECK_CUDA(cudaSetDevice(0));
-  CHECK_CUDA(cudaDeviceEnablePeerAccess(1, 0));
+  if (flag == 0)
+    CHECK_CUDA(cudaDeviceEnablePeerAccess(1, 0));
   CHECK_CUDA(cudaMalloc(&da, nbytes));
   CHECK_CUDA(cudaSetDevice(1));
-  CHECK_CUDA(cudaDeviceEnablePeerAccess(0, 0));
+  if (flag == 1)
+    CHECK_CUDA(cudaDeviceEnablePeerAccess(0, 0));
   CHECK_CUDA(cudaMalloc(&db, nbytes));
 
   for (int i = 0; i < 10; ++i) {

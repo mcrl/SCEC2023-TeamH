@@ -35,6 +35,7 @@ DEBUG_PERFORMANCE = False
 DEBUG_PROFILE = False
 DEBUG_PYTHON_PROFILE = False
 DEBUG_COMPARE_GOLD = False
+DEBUG_TURN_OFF_COMM = False
 
 if DEBUG_COMPARE_GOLD:
   gold_answer = []
@@ -370,13 +371,17 @@ def main(
         ctx_logprobs = buf_ctx_logprobs[:sz].view(total_B, model_args.vocab_size)
       offset_B = 0
 
-    docs_in_batch = (tokenized_docs[i] for i in batch.data_idx)
-    tokens = make_input_cpu_tensor_from_docs(docs_in_batch, batch).pin_memory().cuda(non_blocking=True)
+    if local_rank == 0:
+      docs_in_batch = (tokenized_docs[i] for i in batch.data_idx)
+      if DEBUG_TURN_OFF_COMM:
+        tokens = torch.randint(0, model_args.vocab_size, (len(batch.data_idx), batch.seq_len), dtype=torch.long, device='cuda')
+      else:
+        tokens = make_input_cpu_tensor_from_docs(docs_in_batch, batch).pin_memory().cuda(non_blocking=True)
     cont2ctx_gpu = None
     if batch.use_cache:
       cont2ctx_gpu = torch.Tensor(batch.cache_mapping).long().pin_memory().cuda(non_blocking=True)
-    B = tokens.size(0)
-    S = tokens.size(1)
+    B = len(batch.data_idx)
+    S = batch.seq_len
     H = model_args.dim
     if DEBUG_SCHEDULE:
       logger.info(f'Rank {local_rank} ctx group id={batch_idx} size={(B, S, H)}')
@@ -387,12 +392,15 @@ def main(
       h = pretb.forward(tokens)
     else:
       # Receive tensor from previous rank
-      h = torch.empty((B, S, H), dtype=torch.float16, device='cuda')
-      if USE_CUSTOM_COMM:
-        teamh_c_helper.recv(h)
+      if DEBUG_TURN_OFF_COMM:
+        h = torch.randn((B, S, H), dtype=torch.float16, device='cuda')
       else:
-        handle = dist.irecv(h, local_rank - 1, tag = batch_idx)
-        handle.wait()
+        h = torch.empty((B, S, H), dtype=torch.float16, device='cuda')
+        if USE_CUSTOM_COMM:
+          teamh_c_helper.recv(h)
+        else:
+          handle = dist.irecv(h, local_rank - 1, tag = batch_idx)
+          handle.wait()
 
     # Run transformer blocks
     if DEBUG_PERFORMANCE:
@@ -408,7 +416,8 @@ def main(
 
     h, new_cache_k_list, new_cache_v_list = tb.forward(
       h, batch.cache_len, use_cache = batch.use_cache, gen_cache = batch.gen_cache,
-      cache_k_list = partial_cache_k_list, cache_v_list = partial_cache_v_list, cont2ctx = cont2ctx_gpu)
+      cache_k_list = partial_cache_k_list, cache_v_list = partial_cache_v_list, cont2ctx = cont2ctx_gpu,
+      last_token_only = batch.gen_cache and local_rank == world_size - 1)
 
     if DEBUG_PERFORMANCE:
       torch.cuda.synchronize()
@@ -424,10 +433,13 @@ def main(
     # Epilog
     if local_rank < world_size - 1:
       # Send tensor to next rank
-      if USE_CUSTOM_COMM:
-        teamh_c_helper.send(h, batch_idx == 0)
+      if DEBUG_TURN_OFF_COMM:
+        pass
       else:
-        dist.isend(h, local_rank + 1, tag = batch_idx)
+        if USE_CUSTOM_COMM:
+          teamh_c_helper.send(h, batch_idx == 0)
+        else:
+          dist.isend(h, local_rank + 1, tag = batch_idx)
       del h
     else:
       if batch.gen_cache:

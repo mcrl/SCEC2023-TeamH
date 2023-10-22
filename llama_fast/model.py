@@ -62,17 +62,25 @@ class Attention(nn.Module):
 
     self.emb = RotaryEmbed()
 
-  def forward(self, x: torch.Tensor, start_pos: int, freqs_cis: torch.Tensor, mask: Optional[torch.Tensor], use_cache: bool, gen_cache: bool, cache_k = None, cache_v = None, cont2ctx = None):
+  def forward(self, x: torch.Tensor, start_pos: int, freqs_cis: torch.Tensor, mask: Optional[torch.Tensor], use_cache: bool, gen_cache: bool, cache_k = None, cache_v = None, cont2ctx = None, last_token_only = False):
     #torch.cuda.nvtx.range_push(f'Attention')
 
     bsz, seqlen, _ = x.shape
-    xq, xk, xv = self.wq(x), self.wk(x), self.wv(x)
-
-    xq = xq.view(bsz, seqlen, self.n_heads, self.head_dim)
+    xk, xv = self.wk(x), self.wv(x)
     xk = xk.view(bsz, seqlen, self.n_heads, self.head_dim)
     xv = xv.view(bsz, seqlen, self.n_heads, self.head_dim)
 
-    xq = self.emb(xq, freqs_cis)
+    if last_token_only:
+      xq = self.wq(x[:, -1:, :])
+      xq = xq.view(bsz, 1, self.n_heads, self.head_dim)
+    else:
+      xq = self.wq(x)
+      xq = xq.view(bsz, seqlen, self.n_heads, self.head_dim)
+
+    if last_token_only:
+      xq = self.emb(xq, freqs_cis[-1:])
+    else:
+      xq = self.emb(xq, freqs_cis)
     xk = self.emb(xk, freqs_cis)
 
     if use_cache:
@@ -94,16 +102,17 @@ class Attention(nn.Module):
 
     #torch.cuda.nvtx.range_push(f'scaled_dot_Attention')
 
-    if not use_cache:
-      output = F.scaled_dot_product_attention(xq, keys, values, is_causal=True) # (bsz, n_heads, seqlen, head_dim)
-    if use_cache:
-      output = F.scaled_dot_product_attention(xq, keys, values, attn_mask = mask) # (bsz, n_heads, seqlen, head_dim)
+    if last_token_only:
+      output = F.scaled_dot_product_attention(xq, keys, values)
+      output = output.transpose(1, 2).contiguous().view(bsz, 1, -1)
+    else:
+      if not use_cache:
+        output = F.scaled_dot_product_attention(xq, keys, values, is_causal=True) # (bsz, n_heads, seqlen, head_dim)
+      if use_cache:
+        output = F.scaled_dot_product_attention(xq, keys, values, attn_mask = mask) # (bsz, n_heads, seqlen, head_dim)
+      output = output.transpose(1, 2).contiguous().view(bsz, seqlen, -1)
 
     #torch.cuda.nvtx.range_pop()
-
-    output = output.transpose(
-        1, 2
-    ).contiguous().view(bsz, seqlen, -1)
 
     #torch.cuda.nvtx.range_pop()
 
@@ -185,11 +194,13 @@ class TransformerBlock(nn.Module):
     self.attention_norm = FusedRMSNorm(args.dim, eps=args.norm_eps)
     self.ffn_norm = FusedRMSNorm(args.dim, eps=args.norm_eps)
 
-  def forward(self, x: torch.Tensor, start_pos: int, freqs_cis: torch.Tensor, mask: Optional[torch.Tensor], use_cache: bool, gen_cache: bool, cache_k = None, cache_v = None, cont2ctx = None):
+  def forward(self, x: torch.Tensor, start_pos: int, freqs_cis: torch.Tensor, mask: Optional[torch.Tensor], use_cache: bool, gen_cache: bool, cache_k = None, cache_v = None, cont2ctx = None, last_token_only = False):
     #torch.cuda.nvtx.range_push(f'TfBlock {self.layer_id}')
 
-    h, new_cache_k, new_cache_v = self.attention.forward(self.attention_norm(x), start_pos, freqs_cis, mask, use_cache, gen_cache, cache_k, cache_v, cont2ctx)
+    h, new_cache_k, new_cache_v = self.attention.forward(self.attention_norm(x), start_pos, freqs_cis, mask, use_cache, gen_cache, cache_k, cache_v, cont2ctx, last_token_only)
 
+    if last_token_only:
+      x = x[:, -1:, :]
     h = x + h
     out = h + self.feed_forward.forward(self.ffn_norm(h))
 
@@ -213,7 +224,7 @@ class TransformerBlocks(nn.Module):
     )
   
   @torch.inference_mode()
-  def forward(self, h: torch.Tensor, start_pos: int, use_cache: bool, gen_cache: bool, cache_k_list = None, cache_v_list = None, cont2ctx = None):
+  def forward(self, h: torch.Tensor, start_pos: int, use_cache: bool, gen_cache: bool, cache_k_list = None, cache_v_list = None, cont2ctx = None, last_token_only = False):
     #torch.cuda.nvtx.range_push(f'TfBlocks {self.layer_idx} {self.num_layers}')
     _bsz, seqlen, _ = h.shape
     self.freqs_cis = self.freqs_cis.to(h.device)
@@ -227,7 +238,8 @@ class TransformerBlocks(nn.Module):
     new_cache_v_list = []
 
     for i, layer in enumerate(self.layers):
-      h, new_cache_k, new_cache_v = layer(h, start_pos, freqs_cis, mask, use_cache, gen_cache, cache_k_list[i], cache_v_list[i], cont2ctx)
+      h, new_cache_k, new_cache_v = layer(h, start_pos, freqs_cis, mask, use_cache, gen_cache, cache_k_list[i], cache_v_list[i], cont2ctx,
+                                          last_token_only = last_token_only and i == self.num_layers - 1)
       new_cache_k_list.append(new_cache_k)
       new_cache_v_list.append(new_cache_v)
 

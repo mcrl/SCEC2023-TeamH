@@ -24,9 +24,11 @@ RUN pip install fire sentencepiece datasets pybind11
 RUN apt-get install bc
 
 # build csrc
-COPY deps /deps
+COPY deps/apex_subset /deps/apex_subset
 ENV TORCH_CUDA_ARCH_LIST="7.0+PTX"
 RUN pip install -v --disable-pip-version-check --no-build-isolation --global-option="--cuda_ext" /deps/apex_subset
+
+COPY deps/teamh_c_helper /deps/teamh_c_helper
 RUN pip install /deps/teamh_c_helper
 
 COPY tools /tools

@@ -2,7 +2,7 @@
 #!/bin/bash
 
 MODEL_DIR=/data
-OUTPUT_DIR=/data
+OUTPUT_DIR=/data/tensorrt
 
 # use_rms norm plugin?
 

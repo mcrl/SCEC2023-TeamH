@@ -1,7 +1,7 @@
 #!/bin/bash
 
 MODEL_DIR=/data
-OUTPUT_DIR=/data
+OUTPUT_DIR=/data/tensorrt
 
 mpirun -n 4 --allow-run-as-root \
   python3 run.py --max_output_len=50 \

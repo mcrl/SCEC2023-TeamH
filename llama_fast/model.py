@@ -5,12 +5,14 @@ from typing import Optional, Tuple
 from dataclasses import dataclass
 import importlib
 import numbers
+import math
 
 import torch
 from torch import nn
 import torch.nn.functional as F
 from torch.nn.parameter import Parameter
 from torch.nn import init
+import teamh_c_helper
 
 @dataclass
 class ModelArgs:
@@ -31,6 +33,21 @@ def precompute_freqs_cis(dim: int, end: int, theta: float = 10000.0):
     freqs_cis = torch.polar(torch.ones_like(freqs), freqs)  # complex64
     freqs_cis = torch.view_as_real(freqs_cis).flatten(1)
     return freqs_cis
+
+class CustomLinear(nn.Module):
+  def __init__(self, original_linear):
+    super().__init__()
+
+    self.weight = original_linear.weight.transpose(0, 1).contiguous().detach()
+
+  def forward(self, x):
+    assert x.shape[-1] == self.weight.shape[0]
+    output_shape = x.shape[:-1] + (self.weight.shape[1],)
+    if not x.is_contiguous():
+      x = x.contiguous()
+    output = torch.empty(output_shape, dtype=x.dtype, device=x.device)
+    teamh_c_helper.cublas_nn(x, self.weight, output, math.prod(x.shape[:-1]), self.weight.shape[1], self.weight.shape[0])
+    return output
 
 class Attention(nn.Module):
   def __init__(self, args: ModelArgs):
@@ -117,6 +134,12 @@ class Attention(nn.Module):
     #torch.cuda.nvtx.range_pop()
 
     return self.wo(output), new_cache_k, new_cache_v
+  
+  def fix_weight(self):
+    self.wq = CustomLinear(self.wq)
+    self.wk = CustomLinear(self.wk)
+    self.wv = CustomLinear(self.wv)
+    self.wo = CustomLinear(self.wo)
 
 class FeedForward(nn.Module):
   def __init__(
@@ -141,6 +164,11 @@ class FeedForward(nn.Module):
 
   def forward(self, x):
     return self.w2(F.silu(self.w1(x)) * self.w3(x))
+
+  def fix_weight(self):
+    self.w1 = CustomLinear(self.w1)
+    self.w2 = CustomLinear(self.w2)
+    self.w3 = CustomLinear(self.w3)
 
 global fused_layer_norm_cuda
 fused_layer_norm_cuda = None
@@ -208,6 +236,10 @@ class TransformerBlock(nn.Module):
 
     return out, new_cache_k, new_cache_v
 
+  def fix_weight(self):
+    self.attention.fix_weight()
+    self.feed_forward.fix_weight()
+
 class TransformerBlocks(nn.Module):
   def __init__(self, params: ModelArgs, layer_idx, num_layers):
     super().__init__()
@@ -260,6 +292,8 @@ class TransformerBlocks(nn.Module):
       local_dict[f'layers.{i}.attention_norm.weight'] = full_dict[f'layers.{self.layer_idx + i}.attention_norm.weight']
       local_dict[f'layers.{i}.ffn_norm.weight'] = full_dict[f'layers.{self.layer_idx + i}.ffn_norm.weight']
     self.load_state_dict(local_dict)
+    for layer in self.layers:
+      layer.fix_weight()
 
 class PreTransformer(nn.Module):
   def __init__(self, params: ModelArgs):

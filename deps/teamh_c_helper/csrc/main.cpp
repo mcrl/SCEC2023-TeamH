@@ -17,6 +17,21 @@
 #include <cassert>
 #include <chrono>
 
+#include <cublas_v2.h>
+#include <cuda_runtime_api.h>
+
+#define CHECK_CUBLAS(call)                                                   \
+  do {                                                                       \
+    cublasStatus_t status_ = call;                                           \
+    if (status_ != CUBLAS_STATUS_SUCCESS) {                                  \
+      fprintf(stderr, "CUBLAS error (%s:%d): %s, %s\n", __FILE__, __LINE__,  \
+              cublasGetStatusName(status_), cublasGetStatusString(status_)); \
+      exit(EXIT_FAILURE);                                                    \
+    }                                                                        \
+  } while (0)
+
+static cublasHandle_t handle;
+
 #define CHECK_CUDA(call)                                              \
   do {                                                                \
     cudaError_t status_ = call;                                       \
@@ -195,6 +210,8 @@ void init(int _rank, int _world_size) {
     CHECK_CUDA(cudaSetDevice(rank));
     CHECK_CUDA(cudaDeviceEnablePeerAccess(rank + 1, 0));
   }
+
+  CHECK_CUBLAS(cublasCreate(&handle));
 }
 
 void init_comm() {
@@ -347,6 +364,21 @@ void test(int flag) {
   }
 }
 
+void cublas_nn(torch::Tensor& A, torch::Tensor& B, torch::Tensor& C, int M, int N, int K) {
+  __half alpha = __float2half(1.0f), beta = __float2half(0.0f);
+  int lda = K, ldb = N, ldc = N;
+  // A = M by K
+  // B = N by K
+  // C = M by N
+
+  // should do C^T = B^T (transposed) * A^T (normal)
+
+  CHECK_CUBLAS(cublasHgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, N, M, K, &alpha,
+                           (const __half*)B.data_ptr(), ldb,
+                           (const __half*)A.data_ptr(), lda, &beta,
+                           (__half*)C.data_ptr(), ldc)); 
+}
+
 PYBIND11_MODULE(teamh_c_helper, m) {
   m.doc() = "teamh_c_helper";
   m.def("schedule_min_c", &schedule_min_c, "schedule_min_c");
@@ -357,4 +389,5 @@ PYBIND11_MODULE(teamh_c_helper, m) {
   m.def("recv", &recv, "recv");
   m.def("finalize", &finalize, "finalize");
   m.def("test", &test, "test");
+  m.def("cublas_nn", &cublas_nn, "cublas_nn");
 }

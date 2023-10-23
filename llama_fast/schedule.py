@@ -39,13 +39,18 @@ def process_example(example, prefix_activity_label = True):
     text = text.replace(" [title]", ". ")
     text = re.sub("\\[.*?\\]", "", text)
     text = text.replace("  ", " ")
+    text = text.strip()
     return text
-  ctx = example['ctx_a'] + " " + example['ctx_b'].capitalize().rstrip()
+  ctx = example['ctx_a'] + " " + example['ctx_b'].capitalize()
   if prefix_activity_label:
-    query = preprocess(example["activity_label"] + ": " + ctx)
-  else:
-    query = preprocess(ctx)
-  endings = [preprocess(ending).lstrip() for ending in example["endings"]]
+    ctx = example['activity_label'] + ": " + ctx
+  query = preprocess(ctx)
+  endings = [preprocess(ending) for ending in example["endings"]]
+
+  assert query[0] != ' '
+  assert query[-1] != ' '
+  assert all([ending[0] != ' ' for ending in endings])
+  assert all([ending[-1] != ' ' for ending in endings])
 
   out_example = {
     "query": query,
@@ -60,6 +65,15 @@ def encode_input(tokenizer, example):
     'ctx': query_enc,
     'cont': tokenizer.encode(choice),
     } for choice in example['choices']]
+  minlen = min([len(x['cont']) for x in new_reqs])
+  for i in range(minlen):
+    if not (new_reqs[0]['cont'][i] == new_reqs[1]['cont'][i] == new_reqs[2]['cont'][i] == new_reqs[3]['cont'][i]):
+      break
+  if i > 0:
+    common_prefix = new_reqs[0]['cont'][:i]
+    for j in range(len(new_reqs)):
+      new_reqs[j]['ctx'] += common_prefix
+      new_reqs[j]['cont'] = new_reqs[j]['cont'][i:]
   return new_reqs
 
 # Solve DP; length is minimum of each block
@@ -201,7 +215,7 @@ def preprocess_and_schedule_dataset(dataset, tokenizer, num_data, ctx_threshold,
   st = time.time()
 
   # Launch multiple processes to tokenize the dataset
-  NUM_PROC = 16
+  NUM_PROC = 6
   procs = []
   outqs = [Queue() for _ in range(NUM_PROC)]
   for proc_id in range(NUM_PROC):
@@ -332,6 +346,14 @@ def max_sizes_of_batches(batches):
       max_b = max(max_b, total_B)
       max_s = max(max_s, batch.seq_len)
   return max_bs, max_b, max_s
+
+def estimate_time(batches):
+  elapsed_total = 0
+  for batch in batches:
+    bsz, seq_len, cache_len = len(batch.data_idx), batch.seq_len, batch.cache_len
+    elapsed = 1.73678180e-04 * bsz * seq_len +  6.30238571e-06 * bsz * cache_len + 2.99849698e-06 * seq_len * cache_len + 0.0218630280853217
+    elapsed_total += elapsed
+  return elapsed_total
 
 # For performance debugging only; calculate efficiency compared to optimal schedule
 def evaluate_schedule(whole_pe, whole_ei, batches):

@@ -1,26 +1,21 @@
 import time
 time_py_entered = time.time()
 
+import pickle
+from tokenizer import Tokenizer
 from typing import Tuple
 from multiprocessing import Process, Queue
 import os
 import sys
-import torch
 import fire
 import time
 import json
 import numpy as np
-
-from model import ModelArgs, TransformerBlocks, PreTransformer, PostTransformer
-from tokenizer import Tokenizer
-
-from datasets import load_dataset
 import logging
-import torch.distributed as dist
-
-import schedule
 import cProfile
-import teamh_c_helper
+import argparse
+
+print(f'[MAIN] import done: {time.time() - time_py_entered:.2f} seconds')
 
 NUM_CHOICES = 4
 DATA_LIMIT = 22222
@@ -173,63 +168,45 @@ def print_time(time_round2):
   print(f'|Computation|{computation_time:15.9f}|')
   print(f'|Total      |{total_time:15.9f}|')
 
-def setup_model_parallel() -> Tuple[int, int]:
-  global local_rank, world_size
-  local_rank = int(os.environ.get("LOCAL_RANK", -1))
-  world_size = int(os.environ.get("WORLD_SIZE", -1))
-
-  torch.distributed.init_process_group("nccl")
-  torch.cuda.set_device(local_rank)
-
-  # seed must be the same in all processes
-  torch.manual_seed(1)
-  return local_rank, world_size
-
 def main(
+  local_rank,
+  world_size,
   tokenizer_path: str,
   ckpt_dir: str,
   cache_dir: str,
   max_seq_len: int = 512,
   max_batch_size: int = 32,
 ):
-  print(f'[Rank Unknown] main entered: {time.time() - time_py_entered:.2f} seconds')
 
-  local_rank, world_size = setup_model_parallel()
-  torch.distributed.barrier()
-
-  if USE_CUSTOM_COMM:
-    teamh_c_helper.init(local_rank, world_size)
-    torch.distributed.barrier() # barrier is necessary to ensure semaphore is initialized
-    teamh_c_helper.init_comm()
-
-  print(f'[Rank {local_rank}] Communication setup done: {time.time() - time_py_entered:.2f} seconds')
+  print(f'[Rank {local_rank}] main entered: {time.time() - time_py_entered:.2f} seconds')
 
   # if local_rank > 0:
   #    sys.stdout = open(os.devnull, "w")
   #    sys.stderr = open(os.devnull, "w")
 
   # Time measurement complying to Round2 rule
-  torch.distributed.barrier()
   time_round2 = {}
   time_round2['start'] = time.time()
 
-  """================
-  Tokenizer Disk I/O
-  ================"""
-  tokenizer = Tokenizer(model_path=tokenizer_path)
-  print(f'[Rank {local_rank}] tokenizer loading done: {time.time() - time_py_entered:.2f} seconds')
-
   # Load and preprocess dataset with multiprocessing
-  def _load_preprocess_and_schedule_dataset(q, cache_dir, tokenizer):
+  def _load_preprocess_and_schedule_dataset(q,):
+    """================
+    Tokenizer Disk I/O
+    ================"""
+    tokenizer = Tokenizer(model_path=tokenizer_path)
+    print(f'[Rank {local_rank}] tokenizer loading done: {time.time() - time_py_entered:.2f} seconds')
+
     """================
     Dataset Disk I/O
     ================"""
-    dataset = load_dataset("hellaswag", cache_dir=cache_dir, split='validation')
+    #dataset = load_dataset("hellaswag", cache_dir=cache_dir, split='validation')
+    dataset = pickle.load(open('hellaswag_validation.pkl', 'rb'))
     print(f'[Rank {local_rank}] dataset loading done: {time.time() - time_py_entered:.2f} seconds')
 
     """================
     Dataset Tokenization and Scheduling
     ================"""
+    import schedule
     docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset(dataset, tokenizer, DATA_LIMIT, CTX_THR, CTX_MINIBATCH_THR, CONT_THR)
     max_bs, max_b, _ = schedule.max_sizes_of_batches(batches)
     q.put((docs, tokenized_docs, batches, max_bs, max_b))
@@ -237,8 +214,21 @@ def main(
 
   # As (the dataset preprocess time) ~ (model checkpoint load time), we overlap them
   q = Queue()
-  p = Process(target=_load_preprocess_and_schedule_dataset, args=(q, cache_dir, tokenizer))
+  p = Process(target=_load_preprocess_and_schedule_dataset, args=(q,))
   p.start()
+
+  global torch
+  import torch # ~ 2 seconds
+  from model import ModelArgs, TransformerBlocks, PreTransformer, PostTransformer
+  torch.cuda.set_device(local_rank)
+  torch.manual_seed(1)
+  print(f'[Rank {local_rank}] torch init done: {time.time() - time_py_entered:.2f} seconds')
+
+  import teamh_c_helper # ~0.6 seconds
+  if USE_CUSTOM_COMM:
+    teamh_c_helper.init(local_rank, world_size)
+    teamh_c_helper.init_comm()
+  print(f'[Rank {local_rank}] Communication setup done: {time.time() - time_py_entered:.2f} seconds')
 
   """================
   Model Checkpoint Disk I/O + Send to GPU
@@ -251,7 +241,7 @@ def main(
   model_args: ModelArgs = ModelArgs(
     max_seq_len=max_seq_len, max_batch_size=max_batch_size, **params
   )
-  model_args.vocab_size = tokenizer.n_words
+  model_args.vocab_size = 32000
   print(f'[Rank {local_rank}] checkpoint loading done: {time.time() - time_py_entered:.2f} seconds')
 
   # Send parameters to gpu
@@ -259,17 +249,22 @@ def main(
   if local_rank == 0:
     pretb = PreTransformer(model_args)
     tb = TransformerBlocks(model_args, 0, 15)
-    pretb.custom_load(checkpoint)
-    tb.custom_load(checkpoint)
   elif local_rank == 1:
     tb = TransformerBlocks(model_args, 15, 15)
-    tb.custom_load(checkpoint)
   elif local_rank == 2:
     tb = TransformerBlocks(model_args, 30, 15)
-    tb.custom_load(checkpoint)
   elif local_rank == 3:
     tb = TransformerBlocks(model_args, 45, 15)
     posttb = PostTransformer(model_args)
+  print(f'[Rank {local_rank}] model init done: {time.time() - time_py_entered:.2f} seconds')
+  if local_rank == 0:
+    pretb.custom_load(checkpoint)
+    tb.custom_load(checkpoint)
+  elif local_rank == 1:
+    tb.custom_load(checkpoint)
+  elif local_rank == 2:
+    tb.custom_load(checkpoint)
+  elif local_rank == 3:
     tb.custom_load(checkpoint)
     posttb.custom_load(checkpoint)
   torch.set_default_tensor_type(torch.FloatTensor)
@@ -306,6 +301,7 @@ def main(
     h, start_pos = ctx_len, use_cache = True, gen_cache = False,
     cache_k_list = partial_cache_k_list, cache_v_list = partial_cache_v_list, cont2ctx = cont2ctx_gpu)
   torch.cuda.nvtx.range_pop()
+  print(f'[Rank {local_rank}] GPU warmup done: {time.time() - time_py_entered:.2f} seconds')
   # WARMUP END
 
   """================
@@ -323,6 +319,7 @@ def main(
   buf_cache_k_list = torch.empty(15 * max_bs * model_args.n_heads * (model_args.dim // model_args.n_heads), dtype=torch.float16, device='cuda')
   buf_cache_v_list = torch.empty(15 * max_bs * model_args.n_heads * (model_args.dim // model_args.n_heads), dtype=torch.float16, device='cuda')
   buf_ctx_logprobs = torch.empty(max_b * model_args.vocab_size, dtype=torch.float16, device='cuda')
+  print(f'[Rank {local_rank}] cache setup done: {time.time() - time_py_entered:.2f} seconds')
 
   """================
   Misc. initialization
@@ -332,8 +329,7 @@ def main(
   ctx_grp_count = 0
   cache_k_list, cache_v_list, ctx_logprobs = None, None, None
   logprobsum_db = [[None for _ in range(NUM_CHOICES)] for _ in range(len(docs))]
-
-  print(f'[Rank {local_rank}] right before batch loop: {time.time() - time_py_entered:.2f} seconds')
+  print(f'[Rank {local_rank}] right before computation loop: {time.time() - time_py_entered:.2f} seconds')
 
   time_round2['preprocess_done'] = time.time()
   grade_state = {
@@ -476,18 +472,16 @@ def main(
   print(f'[Rank {local_rank}] Computation ONLY: {time.time() - time_round2["preprocess_done"]:.2f} seconds')
 
   if USE_CUSTOM_COMM:
-    torch.distributed.barrier() # barrier is necessary so that semaphore is not destroyed too early (i.e. while other processes are still using it)
     teamh_c_helper.finalize()
 
   # Time measurement complying to Round2 rule
-  torch.distributed.barrier()
   time_round2['end'] = time.time()
 
   if local_rank == world_size - 1:
     print_result(grade_state)
     print_time(time_round2)
 
-if __name__ == "__main__":
+def single_process(local_rank, world_size, tokenizer_path, ckpt_dir, cache_dir):
   if DEBUG_PROFILE:
     from torch.profiler import profile, record_function, ProfilerActivity
     with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA]) as prof:
@@ -499,4 +493,21 @@ if __name__ == "__main__":
     pr.dump_stats(f'profile.prof')
     #pstats.Stats(pr).sort_stats(pstats.SortKey.CUMULATIVE).print_stats()
   else:
-    fire.Fire(main)
+    main(local_rank, world_size, tokenizer_path, ckpt_dir, cache_dir)
+
+if __name__ == "__main__":
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--nproc_per_node', type=int, required=True)
+  parser.add_argument('--tokenizer_path', type=str, required=True)
+  parser.add_argument('--ckpt_dir', type=str, required=True)
+  parser.add_argument('--cache_dir', type=str, required=True)
+  args = parser.parse_args()
+  ps = []
+  for local_rank in range(args.nproc_per_node):
+    p = Process(target=single_process, args=(local_rank, args.nproc_per_node, args.tokenizer_path, args.ckpt_dir, args.cache_dir))
+    p.start()
+    print(f'[MAIN] process {local_rank} start: {time.time() - time_py_entered:.2f} seconds')
+    ps.append(p)
+  for local_rank in range(args.nproc_per_node):
+    p.join()
+    print(f'[MAIN] process {local_rank} joined: {time.time() - time_py_entered:.2f} seconds')

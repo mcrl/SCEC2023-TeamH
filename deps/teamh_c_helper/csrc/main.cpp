@@ -168,12 +168,26 @@ void init(int _rank, int _world_size) {
   close(fd);
 
   // We initialize semaphore for each rank
-  mysem = (sem_t*)shared_ptr + rank;
-  prevsem = mysem - 1;
-  mysem_rev = ((sem_t*)shared_ptr + world_size) + rank;
-  nextsem_rev = mysem_rev + 1;
-  CHECK_ERRNO(sem_init(mysem, 1, 0));
-  CHECK_ERRNO(sem_init(mysem_rev, 1, 0));
+  //mysem = (sem_t*)shared_ptr + rank;
+  //prevsem = mysem - 1;
+  //mysem_rev = ((sem_t*)shared_ptr + world_size) + rank;
+  //nextsem_rev = mysem_rev + 1;
+
+  char name[32];
+  sprintf(name, "/teamh_mysem_%d", rank);
+  mysem = sem_open(name, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR, 0);
+  if (rank > 0) {
+    sprintf(name, "/teamh_mysem_%d", rank - 1);
+    prevsem = sem_open(name, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR, 0);
+  }
+  sprintf(name, "/teamh_mysem_rev_%d", rank);
+  mysem_rev = sem_open(name, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR, 0);
+  if (rank < world_size - 1) {
+    sprintf(name, "/teamh_mysem_rev_%d", rank + 1);
+    nextsem_rev = sem_open(name, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR, 0);
+  }
+  //CHECK_ERRNO(sem_init(mysem, 1, 0));
+  //CHECK_ERRNO(sem_init(mysem_rev, 1, 0));
 
   if (rank < world_size - 1) {
     CHECK_CUDA(cudaSetDevice(rank + 1));

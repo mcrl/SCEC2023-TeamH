@@ -31,7 +31,7 @@ def precompute_freqs_cis(dim: int, end: int, theta: float = 10000.0):
     t = torch.arange(end, device=freqs.device)  # type: ignore
     freqs = torch.outer(t, freqs).float()  # type: ignore
     freqs_cis = torch.polar(torch.ones_like(freqs), freqs)  # complex64
-    freqs_cis = torch.view_as_real(freqs_cis).flatten(1)
+    freqs_cis = torch.view_as_real(freqs_cis).flatten(1).half()
     return freqs_cis
 
 class CustomLinear(nn.Module):
@@ -193,7 +193,7 @@ class FusedRMSNorm(torch.nn.Module):
   def forward(self, input):
     input_ = input.contiguous()
     weight_ = self.weight.contiguous()
-    output, invvar = fused_layer_norm_cuda.rms_forward_affine(
+    output = fused_layer_norm_cuda.rms_forward_affine(
         input_, self.normalized_shape, weight_, self.eps)
     return output
 

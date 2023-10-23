@@ -111,7 +111,6 @@ void check_args(
 
 void cuda_rms_norm(
     at::Tensor* output,
-    at::Tensor* invvar,
     at::Tensor* input,
     int n1,
     int n2,
@@ -127,7 +126,7 @@ void cuda_rms_norm(
 #define CHECK_CONTIGUOUS(x) TORCH_CHECK(x.is_contiguous(), #x " must be contiguous")
 #define CHECK_INPUT(x) CHECK_CUDA(x); CHECK_CONTIGUOUS(x)
 
-std::vector<at::Tensor> rms_norm_affine(
+at::Tensor rms_norm_affine(
     at::Tensor input,
     #ifdef VERSION_GE_1_1
     at::IntArrayRef normalized_shape,
@@ -142,10 +141,9 @@ std::vector<at::Tensor> rms_norm_affine(
   check_args(input,normalized_shape,gamma,n1,n2);
   at::Tensor output = at::empty_like(input);
   const auto stats_dtype = (input.scalar_type() == at::ScalarType::Half || input.scalar_type() == at::ScalarType::BFloat16) ? at::ScalarType::Float : input.scalar_type();
-  at::Tensor invvar = at::empty({n1}, input.options().dtype(stats_dtype));
-  cuda_rms_norm(&output,&invvar,&input,n1,n2,
+  cuda_rms_norm(&output,&input,n1,n2,
       normalized_shape,&gamma,epsilon);
-  return {output, invvar};
+  return output;
 }
 
 void cuda_rotary_emb(

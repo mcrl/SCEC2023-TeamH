@@ -353,7 +353,6 @@ template<typename T, typename U, typename V> __device__
 void cuApplyLayerNorm_(
   V* __restrict__ output_vals,
   U* __restrict__ mean,
-  U* __restrict__ invvar,
   const T* __restrict__ vals,
   const int n1,
   const int n2,
@@ -402,45 +401,27 @@ void cuApplyLayerNorm_(
       if (!rms_only) {
         mean[i1] = mu;
       }
-      invvar[i1] = c_invvar;
     }
     __syncthreads();
   }
 }
 
 template<typename T, typename U, typename V=T> __global__
-void cuApplyLayerNorm(
-  V* __restrict__ output_vals,
-  U* __restrict__ mean,
-  U* __restrict__ invvar,
-  const T* __restrict__ vals,
-  const int n1,
-  const int n2,
-  const U epsilon,
-  const V* __restrict__ gamma,
-  const V* __restrict__ beta
-  )
-{
-  cuApplyLayerNorm_<T, U, V>(output_vals, mean, invvar, vals, n1, n2, epsilon, gamma, beta, false);
-}
-
-template<typename T, typename U, typename V=T> __global__
 void cuApplyRMSNorm(
   V* __restrict__ output_vals,
-  U* __restrict__ invvar,
   const T* __restrict__ vals,
   const int n1,
   const int n2,
   const U epsilon,
   const V* __restrict__ gamma)
 {
-  cuApplyLayerNorm_<T, U, V>(output_vals, NULL, invvar, vals, n1, n2, epsilon, gamma, NULL, true);
+  cuApplyLayerNorm_<T, U, V>(output_vals, NULL, vals, n1, n2, epsilon, gamma, NULL, true);
 }
 
-template<typename T, typename U, typename V=T> __device__
+template<typename T, typename V=T> __device__
 void cuApplyRotaryEmb_(
   const T* __restrict__ input,
-  const U* __restrict__ freqs,
+  const T* __restrict__ freqs,
   V* __restrict__ output,
   int bsz, int seqlen, int nhead, int head_dim)
 {
@@ -454,26 +435,25 @@ void cuApplyRotaryEmb_(
   int freq_idx = s * head_dim + h * 2;
   T wa = input[input_idx];
   T wb = input[input_idx + 1];
-  U wc = freqs[freq_idx];
-  U wd = freqs[freq_idx + 1];
+  T wc = freqs[freq_idx];
+  T wd = freqs[freq_idx + 1];
   output[input_idx] = wa * wc - wb * wd;
   output[input_idx + 1] = wa * wd + wb * wc;
 }
 
-template<typename T, typename U, typename V=T> __global__
+template<typename T, typename V=T> __global__
 void cuApplyRotaryEmb(
   const T* __restrict__ input,
-  const U* __restrict__ freqs,
+  const T* __restrict__ freqs,
   V* __restrict__ output,
   int bsz, int seqlen, int nhead, int head_dim)
 {
-  cuApplyRotaryEmb_<T, U, V>(input, freqs, output, bsz, seqlen, nhead, head_dim);
+  cuApplyRotaryEmb_<T, V>(input, freqs, output, bsz, seqlen, nhead, head_dim);
 }
 
 template<typename T, typename U, typename V=T>
 void HostApplyRMSNorm(
     V* output,
-    U* invvar,
     const T* input,
     int n1,
     int n2,
@@ -489,13 +469,13 @@ void HostApplyRMSNorm(
             threads.y*sizeof(U)+(threads.y/2)*sizeof(U) :
             0;
     cuApplyRMSNorm<<<blocks, threads, nshared, stream>>>(
-      output, invvar, input, n1, n2, U(epsilon), gamma);
+      output, input, n1, n2, U(epsilon), gamma);
 }
 
-template<typename T, typename U, typename V=T>
+template<typename T, typename V=T>
 void HostApplyRotaryEmb(
     const T* input,
-    const U* freqs,
+    const T* freqs,
     V* output,
   int bsz, int seqlen, int nhead, int head_dim)
 {
@@ -510,7 +490,6 @@ void HostApplyRotaryEmb(
 
 void cuda_rms_norm(
     at::Tensor* output,
-    at::Tensor* invvar,
     at::Tensor* input,
     int n1,
     int n2,
@@ -528,7 +507,6 @@ void cuda_rms_norm(
         using accscalar_t = at::acc_type<scalar_t_in, true>;
         HostApplyRMSNorm<scalar_t_in, accscalar_t, scalar_t_out>(
           output->DATA_PTR<scalar_t_out>(),
-          invvar->DATA_PTR<accscalar_t>(),
           input->DATA_PTR<scalar_t_in>(),
           n1,n2,
           epsilon,
@@ -548,10 +526,9 @@ void cuda_rotary_emb(
   using namespace at;
   DISPATCH_DOUBLE_FLOAT_HALF_AND_BFLOAT_INOUT_TYPES(
       input->scalar_type(), output->scalar_type(), "rotary_emb_cuda_kernel",
-      using accscalar_t = at::acc_type<scalar_t_in, true>;
-      HostApplyRotaryEmb<scalar_t_in, accscalar_t, scalar_t_out>(
+      HostApplyRotaryEmb<scalar_t_in, scalar_t_out>(
         input->DATA_PTR<scalar_t_in>(),
-        freqs->DATA_PTR<accscalar_t>(),
+        freqs->DATA_PTR<scalar_t_in>(),
         output->DATA_PTR<scalar_t_out>(),
         bsz, seqlen, nhead, head_dim);
     )

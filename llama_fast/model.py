@@ -40,13 +40,21 @@ class CustomLinear(nn.Module):
 
     self.weight = original_linear.weight.transpose(0, 1).contiguous().detach()
 
-  def forward(self, x):
+  def forward(self, x, bias = None):
     assert x.shape[-1] == self.weight.shape[0]
     output_shape = x.shape[:-1] + (self.weight.shape[1],)
     if not x.is_contiguous():
       x = x.contiguous()
-    output = torch.empty(output_shape, dtype=x.dtype, device=x.device)
-    teamh_c_helper.cublas_nn(x, self.weight, output, math.prod(x.shape[:-1]), self.weight.shape[1], self.weight.shape[0])
+    if bias is None:
+      output = torch.empty(output_shape, dtype=x.dtype, device=x.device)
+      beta = 0.0
+    else:
+      assert bias.shape == output_shape
+      if not bias.is_contiguous():
+        bias = bias.contiguous()
+      output = bias
+      beta = 1.0
+    teamh_c_helper.cublas_nn(x, self.weight, output, math.prod(x.shape[:-1]), self.weight.shape[1], self.weight.shape[0], beta)
     return output
 
 class Attention(nn.Module):
@@ -79,7 +87,7 @@ class Attention(nn.Module):
 
     self.emb = RotaryEmbed()
 
-  def forward(self, x: torch.Tensor, start_pos: int, freqs_cis: torch.Tensor, mask: Optional[torch.Tensor], use_cache: bool, gen_cache: bool, cache_k = None, cache_v = None, cont2ctx = None, last_token_only = False):
+  def forward(self, x: torch.Tensor, residual_x, start_pos: int, freqs_cis: torch.Tensor, mask: Optional[torch.Tensor], use_cache: bool, gen_cache: bool, cache_k = None, cache_v = None, cont2ctx = None, last_token_only = False):
     #torch.cuda.nvtx.range_push(f'Attention')
 
     bsz, seqlen, _ = x.shape
@@ -133,7 +141,12 @@ class Attention(nn.Module):
 
     #torch.cuda.nvtx.range_pop()
 
-    return self.wo(output), new_cache_k, new_cache_v
+    if last_token_only:
+      residual_x = residual_x[:, -1:, :]
+
+    output = self.wo(output, bias = residual_x)
+
+    return output, new_cache_k, new_cache_v
   
   def fix_weight(self):
     self.wq = CustomLinear(self.wq)
@@ -162,8 +175,8 @@ class FeedForward(nn.Module):
         dim, hidden_dim, bias=False
     )
 
-  def forward(self, x):
-    return self.w2(F.silu(self.w1(x)) * self.w3(x))
+  def forward(self, x, residual_x):
+    return self.w2(F.silu(self.w1(x)) * self.w3(x), bias = residual_x)
 
   def fix_weight(self):
     self.w1 = CustomLinear(self.w1)
@@ -225,12 +238,11 @@ class TransformerBlock(nn.Module):
   def forward(self, x: torch.Tensor, start_pos: int, freqs_cis: torch.Tensor, mask: Optional[torch.Tensor], use_cache: bool, gen_cache: bool, cache_k = None, cache_v = None, cont2ctx = None, last_token_only = False):
     #torch.cuda.nvtx.range_push(f'TfBlock {self.layer_id}')
 
-    h, new_cache_k, new_cache_v = self.attention.forward(self.attention_norm(x), start_pos, freqs_cis, mask, use_cache, gen_cache, cache_k, cache_v, cont2ctx, last_token_only)
+    # in-place; h == x
+    h, new_cache_k, new_cache_v = self.attention.forward(self.attention_norm(x), x, start_pos, freqs_cis, mask, use_cache, gen_cache, cache_k, cache_v, cont2ctx, last_token_only)
 
-    if last_token_only:
-      x = x[:, -1:, :]
-    h = x + h
-    out = h + self.feed_forward.forward(self.ffn_norm(h))
+    # in-place; out == h
+    out = self.feed_forward.forward(self.ffn_norm(h), h)
 
     #torch.cuda.nvtx.range_pop()
 
@@ -331,3 +343,7 @@ class PostTransformer(nn.Module):
     local_dict[f'norm.weight'] = full_dict[f'norm.weight']
     local_dict[f'output.weight'] = full_dict[f'output.weight']
     self.load_state_dict(local_dict)
+    self.fix_weight()
+
+  def fix_weight(self):
+    self.output = CustomLinear(self.output)

@@ -364,8 +364,8 @@ void test(int flag) {
   }
 }
 
-void cublas_nn(torch::Tensor& A, torch::Tensor& B, torch::Tensor& C, int M, int N, int K) {
-  __half alpha = __float2half(1.0f), beta = __float2half(0.0f);
+void cublas_nn(torch::Tensor& A, torch::Tensor& B, torch::Tensor& C, int M, int N, int K, float _beta) {
+  __half alpha = __float2half(1.0f), beta = __float2half(_beta);
   int lda = K, ldb = N, ldc = N;
   // A = M by K
   // B = N by K

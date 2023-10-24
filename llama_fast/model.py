@@ -158,17 +158,6 @@ class Attention(nn.Module):
     self.wo = CustomLinear(self.wo)
 
 
-class FastMultiheadAttention(nn.Module):
-  def __init__(self):
-    super().__init__()
-
-    global fast_multihead_attn
-    fast_multihead_attn = importlib.import_module("fast_multihead_attn")
-
-  def forward(self):
-    pass
-  
-
 class FeedForward(nn.Module):
   def __init__(
       self,

@@ -207,7 +207,7 @@ def main(
     Dataset Tokenization and Scheduling
     ================"""
     import schedule
-    docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset(dataset, tokenizer, DATA_LIMIT, CTX_THR, CTX_MINIBATCH_THR, CONT_THR)
+    docs, tokenized_docs, batches = schedule.preprocess_and_schedule_dataset(dataset, tokenizer, DATA_LIMIT, CTX_THR, CTX_MINIBATCH_THR, CONT_THR, False)
     max_bs, max_b, _ = schedule.max_sizes_of_batches(batches)
     q.put((docs, tokenized_docs, batches, max_bs, max_b))
     print(f'[Rank {local_rank}] preprocess_and_schedule_dataset done: {time.time() - time_py_entered:.2f} seconds')
@@ -273,7 +273,7 @@ def main(
   """================
   Warming up GPU with the smallest data
   ================"""
-  torch.cuda.nvtx.range_push('gpu warmup')
+  #torch.cuda.nvtx.range_push('gpu warmup')
   # warmup PREFILL phase
   B, S, H = 1, 1, model_args.dim
   if local_rank == 0:
@@ -300,17 +300,17 @@ def main(
   h, _, _ = tb.forward(
     h, start_pos = ctx_len, use_cache = True, gen_cache = False,
     cache_k_list = partial_cache_k_list, cache_v_list = partial_cache_v_list, cont2ctx = cont2ctx_gpu)
-  torch.cuda.nvtx.range_pop()
+  #torch.cuda.nvtx.range_pop()
   print(f'[Rank {local_rank}] GPU warmup done: {time.time() - time_py_entered:.2f} seconds')
   # WARMUP END
 
   """================
   Join with dataset process
   ================"""
-  torch.cuda.nvtx.range_push('Join dataset process')
+  #torch.cuda.nvtx.range_push('Join dataset process')
   docs, tokenized_docs, batches, max_bs, max_b = q.get()
   p.join()
-  torch.cuda.nvtx.range_pop()
+  #torch.cuda.nvtx.range_pop()
   print(f'[Rank {local_rank}] dataset process joining done: {time.time() - time_py_entered:.2f} seconds')
 
   """================
@@ -342,8 +342,8 @@ def main(
   }
 
   for batch_idx, batch in enumerate(batches):
-    batch_str = f'batch_idx={batch_idx} bsz={len(batch.data_idx)} use_cache={batch.use_cache} gen_cache={batch.gen_cache} seq_len={batch.seq_len} cache_len={batch.cache_len}'
-    torch.cuda.nvtx.range_push(batch_str)
+    #batch_str = f'batch_idx={batch_idx} bsz={len(batch.data_idx)} use_cache={batch.use_cache} gen_cache={batch.gen_cache} seq_len={batch.seq_len} cache_len={batch.cache_len}'
+    #torch.cuda.nvtx.range_push(batch_str)
 
     if not batch.use_cache:
       ctx_grp_count += 1
@@ -462,7 +462,7 @@ def main(
 
     offset_B += B
 
-    torch.cuda.nvtx.range_pop()
+    #torch.cuda.nvtx.range_pop()
 
   # Empty remaining grade queue
   run_grade(grade_queue, grade_state, d2h_stream)

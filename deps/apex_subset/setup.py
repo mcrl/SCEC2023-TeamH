@@ -95,6 +95,65 @@ if "--cuda_ext" in sys.argv:
         )
   )
 
+generator_flag = []
+torch_dir = torch.__path__[0]
+if os.path.exists(os.path.join(torch_dir, "include", "ATen", "CUDAGeneratorImpl.h")):
+    generator_flag = ["-DOLD_GENERATOR_PATH"]
+    
+if "--fast_multihead_attn" in sys.argv:
+    sys.argv.remove("--fast_multihead_attn")
+    raise_if_cuda_home_none("--fast_multihead_attn")
+
+    cc_flag = []
+    cc_flag.append("-gencode")
+    cc_flag.append("arch=compute_70,code=sm_70")
+
+    if bare_metal_version >= Version("11.0"):
+        cc_flag.append("-gencode")
+        cc_flag.append("arch=compute_80,code=sm_80")
+    if bare_metal_version >= Version("11.1"):
+        cc_flag.append("-gencode")
+        cc_flag.append("arch=compute_86,code=sm_86")
+    if bare_metal_version >= Version("11.8"):
+        cc_flag.append("-gencode")
+        cc_flag.append("arch=compute_90,code=sm_90")
+
+    subprocess.run(["git", "submodule", "update", "--init", "csrc/cutlass"])
+    ext_modules.append(
+        CUDAExtension(
+            name="fast_multihead_attn",
+            sources=[
+                "apex/contrib/csrc/multihead_attn/multihead_attn_cuda.cpp",
+                "apex/contrib/csrc/multihead_attn/additive_masked_softmax_dropout_cuda.cu",
+                "apex/contrib/csrc/multihead_attn/masked_softmax_dropout_cuda.cu",
+                "apex/contrib/csrc/multihead_attn/encdec_multihead_attn_cuda.cu",
+                "apex/contrib/csrc/multihead_attn/encdec_multihead_attn_norm_add_cuda.cu",
+                "apex/contrib/csrc/multihead_attn/self_multihead_attn_cuda.cu",
+                "apex/contrib/csrc/multihead_attn/self_multihead_attn_bias_additive_mask_cuda.cu",
+                "apex/contrib/csrc/multihead_attn/self_multihead_attn_bias_cuda.cu",
+                "apex/contrib/csrc/multihead_attn/self_multihead_attn_norm_add_cuda.cu",
+            ],
+            extra_compile_args={
+                "cxx": ["-O3"] + version_dependent_macros + generator_flag,
+                "nvcc": [
+                    "-O3",
+                    "-U__CUDA_NO_HALF_OPERATORS__",
+                    "-U__CUDA_NO_HALF_CONVERSIONS__",
+                    "--expt-relaxed-constexpr",
+                    "--expt-extended-lambda",
+                    "--use_fast_math",
+                ]
+                + version_dependent_macros
+                + generator_flag
+                + cc_flag,
+            },
+            include_dirs=[
+                os.path.join(this_dir, "csrc/cutlass/include/"),
+                os.path.join(this_dir, "csrc/cutlass/tools/util/include")
+            ],
+        )
+    )
+
 setup(
     name="apex",
     version="0.1",

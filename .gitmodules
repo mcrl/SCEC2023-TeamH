@@ -1,0 +1,3 @@
+[submodule "deps/apex_subset/csrc/cutlass"]
+	path = deps/apex_subset/csrc/cutlass
+	url = git@github.com:NVIDIA/cutlass.git

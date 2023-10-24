@@ -14,7 +14,7 @@ rm /dev/shm/teamh* /dev/shm/sem.teamh*
 start=$(date +%s.%N)
 
 #nsys sessions list
-#nsys profile --cuda-memory-usage true -o /data/231021_morning_customcomm --force-overwrite true torchrun --nproc_per_node $NPROCS example.py --tokenizer_path $TOKENIZER_PATH --ckpt_dir $CKPT_DIR --cache_dir $CACHE_DIR
+#nsys profile --cuda-memory-usage true -o /data/test --force-overwrite true --trace-fork-before-exec=true \
 python example.py --nproc_per_node $NPROCS --tokenizer_path $TOKENIZER_PATH --ckpt_dir $CKPT_DIR --cache_dir $CACHE_DIR
 
 finish=$(date +%s.%N)
@@ -22,4 +22,3 @@ time=$( echo "$finish - $start" | bc -l )
 
 echo '[Report from shell]'
 echo 'time:' $time
-echo '(Note: Discrepancy between reported times is overhead from torchrun and torch.dist, which should be 10 ~ 15 seconds.)'

@@ -16,6 +16,31 @@ namespace multihead_attn {
 namespace self_bias_additive_mask {
 namespace cublas_gemmex {
 
+std::vector<torch::Tensor> fwd_cuda_teamh();
+
+std::vector<torch::Tensor>
+fwd_teamh(
+  const int n_heads,
+  const int head_dim,
+  torch::Tensor const &x,
+  torch::Tensor const &residual_x,
+  torch::Tensor const &wq,
+  torch::Tensor const &wk,
+  torch::Tensor const &wv,
+  const int start_pos,
+  torch::Tensor const &freqs_cis,
+  torch::Tensor const &mask,
+  bool use_cache,
+  bool gen_cache,
+  torch::Tensor const &cache_k,
+  torch::Tensor const &cache_v,
+  auto const &cont2ctx,
+  bool last_token_only,) {
+  return fwd_cuda_teamh(n_heads, head_dim, x, residual_x, wq, wk, wv, start_pos, freqs_cis, mask, use_cache,
+                        gen_cache, cache_k, cache_v, cont2ctx, last_token_only);
+}
+
+
 std::vector<torch::Tensor> fwd_cuda(bool use_time_mask, bool is_training,
                                     int heads, torch::Tensor const &inputs,
                                     torch::Tensor const &input_weights,
@@ -60,8 +85,8 @@ fwd(bool use_mask, bool use_time_mask, bool is_training, int heads,
 } // end namespace multihead_attn
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
-  m.def("self_attn_bias_additive_mask_forward", &multihead_attn::self_bias_additive_mask::cublas_gemmex::fwd,
-        "Self Multihead Attention with Bias -- Forward.");
+  m.def("mha", &multihead_attn::self_bias_additive_mask::cublas_gemmex::fwd_teamh,
+        "Self Multihead Attention with Bias.");
 }
 
 #undef CHECK_CUDA

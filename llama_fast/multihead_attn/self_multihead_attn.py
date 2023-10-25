@@ -1,19 +1,20 @@
 from typing import Optional
+import importlib
 
 import torch
 from torch import nn
 
 from ..model import ModelArgs, RotaryEmbed
-from .self_multihead_attn_func import self_attn_func
 from .fast_self_multihead_attn_func import fast_self_attn_func
 
+global fast_multihead_attn
+fast_multihead_attn = None
 
 # https://github.com/NVIDIA/apex/blob/master/apex/contrib/multihead_attn/self_multihead_attn.py
 class FastMultiheadAttention(nn.Module):
   def __init__(
       self,
-      args: ModelArgs,
-      impl="fast",):
+      args: ModelArgs,):
     
     super().__init__()
 
@@ -41,56 +42,15 @@ class FastMultiheadAttention(nn.Module):
         bias=False,
     )
 
-    self.emb = RotaryEmbed()
+    global fast_multihead_attn
+    fast_multihead_attn = importlib.import_module("fast_multihead_attn")
 
-    if impl == "fast":
-      self.attn_func = fast_self_attn_func
-    elif impl == "default":
-      self.attn_func = self_attn_func
-    else:
-      assert False, "Unsupported impl: {} !".format(impl)
-
-  def forward(self, x: torch.Tensor, mask: Optional[torch.Tensor]):
-    input_weights = (
-      torch.cat(
-        [
-          self.wq.weight.view(self.n_heads, 1, self.head_dim, self.n_heads * self.head_dim),
-          self.wk.weight.view(self.n_heads, 1, self.head_dim, self.n_heads * self.head_dim),
-          self.wv.weight.view(self.n_heads, 1, self.head_dim, self.n_heads * self.head_dim),
-        ],
-        dim=1,
-      )
-      .reshape(3 * self.n_heads * self.head_dim, self.n_heads * self.head_dim)
-      .contiguous()
-    )
-
-    if self.impl == "fast":
-      outputs = self.attn_func(
-        mask is not None, 
-        False, 
-        self.num_heads,
-        x,
-        input_weights,
-        self.wo.weight,
-        None,
-        None,
-        mask,
-        self.mask_additive,
-        0.0,
-      )
-  # else:
-  #     outputs = self.attn_func(
-  #         attn_mask is not None,
-  #         is_training,
-  #         self.num_heads,
-  #         self.scaling,
-  #         query,
-  #         input_weights,
-  #         self.out_proj_weight,
-  #         input_bias,
-  #         self.out_proj_bias,
-  #         mask,
-  #         self.mask_additive,
-  #         self.dropout,
-  #     )
+  def forward(self, x: torch.Tensor, residual_x, start_pos: int, freqs_cis: torch.Tensor, 
+              mask: Optional[torch.Tensor], use_cache: bool, gen_cache: bool, 
+              cache_k = None, cache_v = None, cont2ctx = None, last_token_only = False):
+    
+    return fast_multihead_attn.mha(self.n_heads, self.head_dim, x, residual_x, start_pos, 
+                                   self.wq, self.wk, self.wv, freqs_cis, 
+                                   mask, use_cache, gen_cache, 
+                                   cache_k, cache_v, cont2ctx, last_token_only)
   

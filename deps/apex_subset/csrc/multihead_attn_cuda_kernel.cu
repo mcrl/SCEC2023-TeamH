@@ -6,6 +6,7 @@
 #include <cuda_fp16.h>
 #include <cuda_profiler_api.h>
 #include <cuda_runtime.h>
+#include <cublas_v2.h>
 
 #include <ATen/ATen.h>
 #include <ATen/cuda/CUDAContext.h>
@@ -19,28 +20,27 @@ namespace multihead_attn {
 namespace self_bias_additive_mask {
 namespace cublas_gemmex {
 
-std::vector<torch::Tensor> fwd_cuda(bool use_time_mask, bool is_training,
-                                    int heads, torch::Tensor const &inputs,
-                                    torch::Tensor const &input_weights,
-                                    torch::Tensor const &output_weights,
-                                    torch::Tensor const &input_biases,
-                                    torch::Tensor const &output_biases,
-                                    const half *pad_mask, float dropout_prob) {
-  const int embed_dim = inputs.size(2);
-  const int sequences = inputs.size(1);
-  const int q_seq_len = inputs.size(0);
-  const int k_seq_len = q_seq_len;
-  const int batches = sequences * q_seq_len;
-  const int head_dim = embed_dim / heads;
-  const int output_lin_dim = 3 * embed_dim;
-  const int attn_batches = heads * sequences;
-  const int lead_dim = attn_batches * 3 * head_dim;
-  const int batch_stride = 3 * head_dim;
-  [[maybe_unused]] const int dropout_elems = attn_batches * q_seq_len * k_seq_len;
-  const float alpha = 1.0;
-  const float beta_zero = 0.0;
-  const float beta_one = 1.0;
-  const float scale = 1.0 / sqrt(static_cast<float>(head_dim));
+std::vector<torch::Tensor>
+fwd_cuda_teamh(
+  const int n_heads,
+  const int head_dim,
+  torch::Tensor const &x,
+  torch::Tensor const &residual_x,
+  torch::Tensor const &wq,
+  torch::Tensor const &wk,
+  torch::Tensor const &wv,
+  const int start_pos,
+  torch::Tensor const &freqs_cis,
+  torch::Tensor const &mask,
+  bool use_cache,
+  bool gen_cache,
+  torch::Tensor const &cache_k,
+  torch::Tensor const &cache_v,
+  auto const &cont2ctx,
+  bool last_token_only, ) {
+
+  const int bsz = x.size(0);
+  const int seqlen = x.size(1);
 
   // There is no reason to use more than one stream as every kernel is
   // sequentially dependent
@@ -48,108 +48,106 @@ std::vector<torch::Tensor> fwd_cuda(bool use_time_mask, bool is_training,
   cudaStream_t stream = at::cuda::getCurrentCUDAStream().stream();
   cublasSetStream(handle, stream);
 
-  // 3 Intermediate Results + Output (Note: dropout intermediates are generated
-  // by ATen library code)
-  auto act_options = inputs.options().requires_grad(false);
-  auto mask_options = act_options.dtype(torch::kUInt8);
-
-  torch::Tensor input_lin_results =
-      torch::empty({q_seq_len, sequences, output_lin_dim}, act_options);
-  torch::Tensor bmm1_results =
-      torch::empty({attn_batches, q_seq_len, k_seq_len}, act_options);
-  torch::Tensor dropout_results =
-      torch::empty({attn_batches, q_seq_len, k_seq_len}, act_options);
-  torch::Tensor dropout_mask =
-      torch::empty({attn_batches, q_seq_len, k_seq_len}, mask_options);
-  torch::Tensor matmul2_results =
-      torch::empty({q_seq_len, attn_batches, head_dim}, act_options);
-  torch::Tensor outputs = torch::empty_like(inputs, act_options);
-
-  // Input Linear Results Pointers to Q, K, and V of interviewed activations
-  void *q_lin_results_ptr = static_cast<void *>(input_lin_results.data_ptr());
-  void *k_lin_results_ptr = static_cast<void *>(
-      static_cast<half *>(input_lin_results.data_ptr()) + head_dim);
-  void *v_lin_results_ptr = static_cast<void *>(
-      static_cast<half *>(input_lin_results.data_ptr()) + 2 * head_dim);
-
-  // Softmax Intermediate Result Ptr (used by Matmul1 -> Softmax)
-  void *bmm1_results_ptr = static_cast<void *>(bmm1_results.data_ptr());
-  void *dropout_results_ptr = static_cast<void *>(dropout_results.data_ptr());
-
-  char a_layout_t{'t'};
-  char a_layout_n{'n'};
-  char b_layout_n{'n'};
-
-  TORCH_CUDABLAS_CHECK(cublasSetMathMode(handle, CUBLAS_TENSOR_OP_MATH));
-  // Input Linear Fwd
-  input_lin_results.copy_(input_biases);
-  TORCH_CUDABLAS_CHECK(cublasGemmEx(
-      handle, CUBLAS_OP_T, CUBLAS_OP_N, output_lin_dim, batches, embed_dim,
-      static_cast<const void *>(&alpha),
-      static_cast<const void *>(input_weights.data_ptr()), CUDA_R_16F,
-      embed_dim, static_cast<const void *>(inputs.data_ptr()), CUDA_R_16F,
-      embed_dim, static_cast<const void *>(&beta_one), q_lin_results_ptr,
-      CUDA_R_16F, output_lin_dim, CUDA_R_32F, CUBLAS_GEMM_DEFAULT_TENSOR_OP));
-
-  // MatMul1 of Dot-Product Attention Plus scaling by 1/Sqrt(head size)
-  gemm_switch_fp32accum(
-      a_layout_t, b_layout_n, k_seq_len, q_seq_len, head_dim, scale,
-      static_cast<const half *>(k_lin_results_ptr), lead_dim, batch_stride,
-      static_cast<const half *>(q_lin_results_ptr), lead_dim, batch_stride,
-      beta_zero, static_cast<half *>(bmm1_results_ptr), k_seq_len,
-      k_seq_len * q_seq_len, attn_batches);
-  // Padded Softmax
-  [[maybe_unused]] bool softmax_success = false;
-  if (is_training) {
-    softmax_success =
-        dispatch_additive_masked_softmax_dropout<half, half, float>(
-            reinterpret_cast<half *>(dropout_results_ptr),
-            (is_training)
-                ? reinterpret_cast<uint8_t *>(dropout_mask.data_ptr<uint8_t>())
-                : nullptr,
-            reinterpret_cast<const half *>(bmm1_results_ptr), pad_mask,
-            attn_batches * q_seq_len * q_seq_len, k_seq_len, k_seq_len,
-            attn_batches * q_seq_len, attn_batches * q_seq_len / sequences,
-            1.0f - dropout_prob, stream);
-  } else {
-    softmax_success = dispatch_additive_masked_softmax<half, half, float>(
-        reinterpret_cast<half *>(
-            dropout_results_ptr), // this is actually softmax results, but
-                                  // making it consistent for the next function
-        reinterpret_cast<const half *>(bmm1_results_ptr), pad_mask, k_seq_len,
-        k_seq_len, attn_batches * q_seq_len,
-        attn_batches * q_seq_len / sequences);
-  }
-
-  // Matmul2
-  gemm_switch_fp32accum(
-      a_layout_n, b_layout_n, head_dim, q_seq_len, k_seq_len, alpha,
-      static_cast<const half *>(v_lin_results_ptr), lead_dim, batch_stride,
-      static_cast<const half *>(dropout_results.data_ptr()), k_seq_len,
-      k_seq_len * q_seq_len, beta_zero,
-      static_cast<half *>(matmul2_results.data_ptr()), head_dim * attn_batches,
-      head_dim, attn_batches);
-
-  outputs.copy_(output_biases);
-
-  // Output Linear
-  TORCH_CUDABLAS_CHECK(cublasGemmEx(
-      handle, CUBLAS_OP_T, CUBLAS_OP_N, embed_dim, batches, embed_dim,
-      static_cast<const void *>(&alpha),
-      static_cast<const void *>(output_weights.data_ptr()), CUDA_R_16F,
-      embed_dim, static_cast<const void *>(matmul2_results.data_ptr()),
-      CUDA_R_16F, embed_dim, static_cast<const void *>(&beta_one),
-      static_cast<void *>(outputs.data_ptr()), CUDA_R_16F, embed_dim,
-      CUDA_R_32F,
-      // CUBLAS_GEMM_ALGO1_TENSOR_OP));
-      CUBLAS_GEMM_DEFAULT_TENSOR_OP));
-
+  // Set cublas math mode
   TORCH_CUDABLAS_CHECK(cublasSetMathMode(handle, CUBLAS_DEFAULT_MATH));
 
-  return {input_lin_results, bmm1_results,    dropout_results,
-          dropout_mask,      matmul2_results, outputs};
+  // Inference mode
+  auto act_options = inputs.options().requires_grad(false);
+
+  torch::Tensor xq;
+  torch::Tensor xk = torch::empty({ bsz, seq_len, n_heads * head_dim }, act_options);
+  torch::Tensor xv = torch::empty({ bsz, seq_len, n_heads * head_dim }, act_options);
+
+  // xk = wk(x)
+  cublas_nn(x, wk.transpose(0, 1).contiguous(), xk, x.shape(0) * x.shape(1), wk.shape(1), wk.shape(0), 1.0f, 0.0f);
+  // xv = wv(x)
+  cublas_nn(x, wv.transpose(0, 1).contiguous(), xv, x.shape(0) * x.shape(1), wv.shape(1), wv.shape(0), 1.0f, 0.0f);
+  // xk = xk.view(bsz, seqlen, self.n_heads, self.head_dim)
+  xk = xk.view({ bsz, seqlen, n_heads, head_dim });
+  // xv = xv.view(bsz, seqlen, self.n_heads, self.head_dim)
+  xv = xv.view({ bsz, seqlen, n_heads, head_dim });
+
+  if (last_token_only) {
+    // xq = self.wq(x[:, -1 : , : ])
+    // xq = xq.view(bsz, 1, self.n_heads, self.head_dim)
+    xq = torch::empty({ bsz, 1, n_heads * head_dim }, act_options);
+    cublas_nn(x.index({ "...", Slice(-1, None, None).contiguous(), "..." }), wq.transpose(0, 1).contiguous(), xq, wq.shape(1), wq.shape(0), 1.0f, 0.0f);
+    xq = xq.view({ bsz, 1, n_heads, head_dim });
+  } else {
+    // xq = self.wq(x)
+    // xq = xq.view(bsz, seqlen, self.n_heads, self.head_dim)
+    xq = torch::empty({ bsz, seqlen, n_heads * head_dim }, act_options);
+    cublas_nn(x, wq.transpose(0, 1).contiguous(), xq, x.shape(0) * x.shape(1), wq.shape(1), wq.shape(0), 1.0f, 0.0f);
+    xq = xq.view({ bsz, seqlen, n_heads, head_dim });
+  }
+
+  if (last_token_only) {
+    // xq = self.emb(xq, freqs_cis[-1:])
+    xq = rotary_emb(xq, freqs_cis.index({ Slice(-1, None, None).contiguous() }));
+  } else {
+    // xq = self.emb(xq, freqs_cis)
+    xq = rotary_emb(xq, freqs_cis);
+  }
+  // xk = self.emb(xk, freqs_cis)
+  xk = rotary_emb(xk, freqs_cis);
+
+  if (use_cache) {
+    // xk = torch.cat([cache_k, xk], dim = 1)
+    xk = torch::cat({ cache_k[cont2ctx], xk }, 1); // keys
+    // xv = torch.cat([cache_v, xv], dim = 1)
+    xv = torch::cat({ cache_v[cont2ctx], xv }, 1); // values
+  }
+
+  torch::Tensor bmm1 = torch::empty({ bsz, seq_len, xk.shape(1), head_dim }, act_options);
+  torch::Tensor softmax1 = torch::empty({ bsz, seq_len, xk.shape(1), head_dim }, act_options);
+  torch::Tensor bmm2 =
+  torch::Tensor output;
+
+  // Scaled dot product attention
+  const half scale = 1.0 / sqrt(static_cast<half>(head_dim));
+  cublas_nn(xq, xk.transpose(1, 2).contiguous(), bmm1, xq.shape(0) * xq.shape(1), xk.shape(1), xk.shape(0), scale, 0.0f); // ??
+
+  // Masked Softmax
+  [[maybe_unused]] bool softmax_success = false;
+  softmax_success = dispatch_additive_masked_softmax<half, half, half>(
+    reinterpret_cast<half *>(softmax1),
+    reinterpret_cast<const half *>(bmm1), 
+    mask, xk.shape(1),
+    pad_batch_stride, 
+    bsz * seqlen,
+    pad_batch_stride);
+    
+  // MM2
+  
+  // Output Linear
+  if (residual_x == None) {
+    output = torch::empty({ bsz, seq_len, n_heads * head_dim }, act_options);
+  } else {
+    if (last_token_only) {
+      output = residual_x.index({ "...", Slice(-1, None, None).contiguous(), "..."});
+    } else {
+      output = residual_x;
+    }
+  }
+  cublas_nn(bmm2, wo.transpose(0, 1).contiguous(), output, bmm2.shape(0) * bmm2.shape(1), wo.shape(1), wo.shape(0), 1.0f, 0.0f);
+
+  return { output, xk, xv };
 }
 
+void cublas_nn(torch::Tensor& A, torch::Tensor& B, torch::Tensor& C, int M, int N, int K, float _alpha, float _beta) {
+  __half alpha = __float2half(_alpha), beta = __float2half(_beta);
+  int lda = K, ldb = N, ldc = N;
+  // A = M by K
+  // B = N by K
+  // C = M by N
+
+  // should do C^T = B^T (transposed) * A^T (normal)
+
+  CHECK_CUBLAS(cublasHgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, N, M, K, &alpha,
+                           (const __half*)B.data_ptr(), ldb,
+                           (const __half*)A.data_ptr(), lda, &beta,
+                           (__half*)C.data_ptr(), ldc)); 
+}
 } // end namespace cublas_gemmex
 } // namespace self_bias_additive_mask
 } // end namespace multihead_attn

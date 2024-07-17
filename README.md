@@ -1,10 +1,10 @@
 # SCEC2023-TeamH
 
 ## Team Information
-| Name  | Affiliation | Email | Phone |
-|-------|---------|------------------|------------------|
-| Heehoon Kim* | Seoul National University | csehydrogen@gmail.com | 010-2569-3426 |
-| Junyeol Ryu | Seoul National University | jyeol.ryu@gmail.com | 010-3329-7561 |
+| Name  | Affiliation | Email |
+|-------|---------|------------------|
+| Heehoon Kim* | Seoul National University | csehydrogen@gmail.com |
+| Junyeol Ryu | Seoul National University | jyeol.ryu@gmail.com |
 
 (* is the team lead)
 
